@@ -1,0 +1,7 @@
+[project]
+name = "aerell"
+version = "0.0.1"
+description = "The first prototype of the Aerell programming language."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
