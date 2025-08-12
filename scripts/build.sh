@@ -1,2 +1,2 @@
-cmake -S aerell -G Ninja -B build
+cmake -S . -G Ninja -B build
 cmake --build build

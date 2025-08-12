@@ -9,26 +9,28 @@
 # https://github.com/aerell-lang/aerell/blob/main/LICENSE
 # 
 # File: CMakeLists.txt
-# Description: Build configuration for the aerell subproject.
+# Description: Build configuration for the root project.
 # Author: Fern Aerell fernaerell2020@gmail.com
 # Created: 2025-08-12
 # -----------------------------------------------------------------------------
 
-set(SUBPROJECT_NAME "aerell")
+cmake_minimum_required(VERSION 4.0.3)
 
-file(
-    GLOB_RECURSE 
-    "${SUBPROJECT_NAME}_SOURCE_FILES"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
+project(
+    "aerell"
+    VERSION 0.0.1
+    LANGUAGES C
 )
 
-add_executable(
-    ${SUBPROJECT_NAME}
-    ${${PROJECT_NAME}_SOURCE_FILES}
-)
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
-target_link_libraries(
-    ${SUBPROJECT_NAME}
-    PRIVATE
-    "argp"
-)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+add_subdirectory("argp")
+add_subdirectory("aerell")
+
