@@ -14,7 +14,7 @@
  * Created: 2025-08-12
  */
 
-#include <argp.h>
+#include <argp/argp.h>
 
 int main(int argc, const char* argv[]) {
     argp_short_options_init(2);

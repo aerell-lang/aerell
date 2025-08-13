@@ -30,6 +30,8 @@ add_library(
 
 target_include_directories(
     ${SUBPROJECT_NAME}
-    PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/private"
+    INTERFACE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/interface"
 )
