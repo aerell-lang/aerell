@@ -14,26 +14,10 @@
  * Created: 2025-08-12
  */
 
+#include "argp_short_option.h"
 #include "argp.h"
 
 #include <stdio.h>
-#include <stdlib.h>
-
-void argp_short_options_init(int amount) {
-    short_options_amount = amount;
-    short_options_status = malloc(short_options_amount * sizeof(bool));
-    short_options_char = malloc(short_options_amount * sizeof(char));
-}
-
-void argp_short_option_set(int index, char character) {
-    short_options_status[index] = false;
-    short_options_char[index] = character;
-}
-
-void argp_short_options_destroy() {
-    free(short_options_status);
-    free(short_options_char);
-}
 
 void argp(int argc, const char* argv[], bool verbose) {
     if(verbose) {
@@ -43,9 +27,9 @@ void argp(int argc, const char* argv[], bool verbose) {
     for(int i = 0; i < argc; ++i) {
         if(verbose) printf("argv[%d] = %s\n", i, argv[i]);
         if(argv[i][0] == '-') {
-            for(int cfi = 0; cfi < short_options_amount; ++cfi) {
-                if(argv[i][1] == short_options_char[cfi]) {
-                    short_options_status[cfi] = true;
+            for(int cfi = 0; cfi < argp_short_options_amount; ++cfi) {
+                if(argv[i][1] == argp_short_options_chars[cfi]) {
+                    argp_short_options_status[cfi] = true;
                 }
             }
         }
@@ -55,8 +39,8 @@ void argp(int argc, const char* argv[], bool verbose) {
 void argp_debug() {
     printf("Argument parsing debug...\n");
     printf("Char flag:\n");
-    printf("amount = %d\n", short_options_amount);
-    for(int cfi = 0; cfi < short_options_amount; ++cfi) {
-        printf("%c = %i\n", short_options_char[cfi], short_options_status[cfi]);
+    printf("amount = %d\n", argp_short_options_amount);
+    for(int cfi = 0; cfi < argp_short_options_amount; ++cfi) {
+        printf("%c = %i\n", argp_short_options_chars[cfi], argp_short_options_status[cfi]);
     }
 }

@@ -17,16 +17,6 @@
 #ifndef ARGP_H
 #define ARGP_H
 
-#include <stdio.h>
-
-int short_options_amount = 0;
-bool* short_options_status = NULL;
-char* short_options_char = NULL;
-
-void argp_short_options_init(int amount);
-void argp_short_option_set(int index, char character);
-void argp_short_options_destroy();
-
 void argp(int argc, const char* argv[], bool verbose);
 void argp_debug();
 
