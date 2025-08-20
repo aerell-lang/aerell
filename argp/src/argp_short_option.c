@@ -15,25 +15,20 @@
  */
 
 #include "argp_short_option.h"
+#include "argp_option.h"
 
 #include <stdlib.h>
 
-int argp_short_options_amount = 0;
-bool* argp_short_options_status = NULL;
-char* argp_short_options_chars = NULL;
+char* argp_short_option_chars = NULL;
 
-void argp_short_options_init(int amount) {
-    argp_short_options_amount = amount;
-    argp_short_options_status = malloc(argp_short_options_amount * sizeof(bool));
-    argp_short_options_chars = malloc(argp_short_options_amount * sizeof(char));
+void argp_short_options_init() {
+    argp_short_option_chars = malloc(argp_option_amount * sizeof(char));
 }
 
 void argp_short_option_set(int index, char character) {
-    argp_short_options_status[index] = false;
-    argp_short_options_chars[index] = character;
+    argp_short_option_chars[index] = character;
 }
 
 void argp_short_options_destroy() {
-    free(argp_short_options_status);
-    free(argp_short_options_chars);
+    free(argp_short_option_chars);
 }

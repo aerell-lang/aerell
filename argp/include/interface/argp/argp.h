@@ -17,11 +17,19 @@
 #ifndef ARGP_H
 #define ARGP_H
 
-void argp_short_options_init(int amount);
+void argp_options_init(int amount);
+void argp_option_set(int index, bool value);
+bool argp_option_get(int index);
+void argp_options_destroy();
+
+void argp_short_options_init();
 void argp_short_option_set(int index, char character);
 void argp_short_options_destroy();
 
-void argp(int argc, const char* argv[], bool verbose);
-void argp_debug();
+void argp_long_options_init();
+void argp_long_option_set(int index, const char* chars);
+void argp_long_options_destroy();
+
+void argp(int argc, const char* argv[]);
 
 #endif

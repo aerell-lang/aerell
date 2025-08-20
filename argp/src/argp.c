@@ -15,32 +15,39 @@
  */
 
 #include "argp_short_option.h"
+#include "argp_long_option.h"
+#include "argp_option.h"
 #include "argp.h"
 
 #include <stdio.h>
+#include <string.h>
 
-void argp(int argc, const char* argv[], bool verbose) {
-    if(verbose) {
-        printf("Argument parsing verbose...\n");
-        printf("argc = %d\n", argc);
-    }
-    for(int i = 0; i < argc; ++i) {
-        if(verbose) printf("argv[%d] = %s\n", i, argv[i]);
-        if(argv[i][0] == '-') {
-            for(int cfi = 0; cfi < argp_short_options_amount; ++cfi) {
-                if(argv[i][1] == argp_short_options_chars[cfi]) {
-                    argp_short_options_status[cfi] = true;
+void argp(int argc, const char* argv[]) {
+    for(int i = 1; i < argc; ++i) {
+        const char* sarg = argv[i];
+        int sargc = strlen(sarg);
+        if(sargc == 2 && sarg[0] == '-') {
+            for(int j = 0; j < argp_option_amount; ++j) {
+                if(sarg[1] == argp_short_option_chars[j]) {
+                    argp_option_values[j] = true;
+                    goto next;
                 }
             }
         }
-    }
-}
-
-void argp_debug() {
-    printf("Argument parsing debug...\n");
-    printf("Char flag:\n");
-    printf("amount = %d\n", argp_short_options_amount);
-    for(int cfi = 0; cfi < argp_short_options_amount; ++cfi) {
-        printf("%c = %i\n", argp_short_options_chars[cfi], argp_short_options_status[cfi]);
+        if(sargc > 2 && sarg[0] == '-' && sarg[1] == '-') {
+            int sargc1 = sargc - 2;
+            for(int j = 0; j < argp_option_amount; ++j) {
+                if(sargc1 == argp_long_option_char_sizes[j] && strncmp(sarg + 2, argp_long_option_chars[j], argp_long_option_char_sizes[j]) == 0) {
+                    argp_option_values[j] = true;
+                    goto next;
+                }
+            }
+        }
+        goto error;
+        next:
+            continue;
+        error:
+            printf("Unknown argument: '%s'\n", sarg);
+            break;
     }
 }

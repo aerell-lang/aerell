@@ -17,11 +17,9 @@
 #ifndef ARGP_SHORT_OPTION_H
 #define ARGP_SHORT_OPTION_H
 
-extern int argp_short_options_amount;
-extern bool* argp_short_options_status;
-extern char* argp_short_options_chars;
+extern char* argp_short_option_chars;
 
-void argp_short_options_init(int amount);
+void argp_short_options_init();
 void argp_short_option_set(int index, char character);
 void argp_short_options_destroy();
 

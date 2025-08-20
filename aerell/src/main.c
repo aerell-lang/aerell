@@ -16,12 +16,31 @@
 
 #include <argp/argp.h>
 
+#include <stdio.h>
+
 int main(int argc, const char* argv[]) {
-    argp_short_options_init(2);
+    argp_options_init(2);
+    argp_option_set(0, false);
+    argp_option_set(1, false);
+    argp_short_options_init();
     argp_short_option_set(0, 'h');
     argp_short_option_set(1, 'v');
-    argp(argc, argv, true);
-    argp_debug();
+    argp_long_options_init();
+    argp_long_option_set(0, "help");
+    argp_long_option_set(1, "version");
+    argp(argc, argv);
+    if(argp_option_get(0)) {
+        goto help;
+    }
+    if(argp_option_get(1)) {
+        printf("1.0.0");
+        goto exit;
+    }
+    help:
+    printf("This is help message.");
+    exit:
+    argp_long_options_destroy();
     argp_short_options_destroy();
+    argp_options_destroy();
     return 0;
 }

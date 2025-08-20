@@ -17,7 +17,6 @@
 #ifndef ARGP_H
 #define ARGP_H
 
-void argp(int argc, const char* argv[], bool verbose);
-void argp_debug();
+void argp(int argc, const char* argv[]);
 
 #endif
