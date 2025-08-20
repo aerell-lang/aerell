@@ -1,0 +1,31 @@
+Cargo, the Rust package manager
+
+Usage: cargo [OPTIONS] [SUBCOMMAND]
+
+Options:
+    -V, --version               Print version info and exit
+        --list                  List installed commands
+        --explain <CODE>        Run `rustc --explain <CODE>`
+    -v, --verbose               Use verbose output (-vv very verbose/build.rs output)
+    -q, --quiet                 Do not print cargo log messages
+        --color <WHEN>          Coloring: auto, always, never
+    -Z <FLAG>                   Unstable (nightly-only) flags
+    -h, --help                  Print help
+
+Some common cargo commands are (see all commands with --list):
+    build       Compile the current package
+    check       Analyze the current package and report errors, but don't build object files
+    clean       Remove the target directory
+    doc         Build this package's and its dependencies' documentation
+    new         Create a new cargo project
+    init        Create a new cargo project in an existing directory
+    run         Run a binary or example of the local package
+    test        Run the tests
+    bench       Run the benchmarks
+    update      Update dependencies listed in Cargo.lock
+    search      Search packages in crates.io
+    publish     Package and upload this library to crates.io
+    install     Install a Rust binary
+    uninstall   Uninstall a Rust binary
+
+See 'cargo help <command>' for more information on a specific command.

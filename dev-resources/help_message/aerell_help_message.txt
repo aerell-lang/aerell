@@ -1,0 +1,8 @@
+Usage: aerell <command|file> [arguments]
+
+Global options:
+ -v, --verbose  Show verbose output.
+
+Available commands:
+  help      Print this usage information.
+  version   Print the Aerell version.

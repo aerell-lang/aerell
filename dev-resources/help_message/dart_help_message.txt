@@ -1,0 +1,22 @@
+Usage: dart <command|dart-file> [arguments]
+
+Global options:
+-h, --help                 Print this usage information.
+-v, --verbose              Show verbose output.
+    --version              Print the SDK version.
+    --enable-analytics     Enable analytics.
+    --disable-analytics    Disable analytics.
+
+Available commands:
+  analyze    Analyze the project's Dart code.
+  compile    Compile Dart to various formats (e.g., exe, js, kernel).
+  create     Create a new project.
+  format     Format Dart source code.
+  help       Display help information for dart.
+  migrate    Perform a null safety migration on a project.
+  pub        Work with packages.
+  run        Run a Dart program.
+  test       Run tests for a project.
+
+Run 'dart help <command>' for more information about a command.
+Run 'dart help -v' for verbose help.
