@@ -9,7 +9,7 @@
  * https://github.com/aerell-lang/aerell/blob/main/LICENSE
  * 
  * File: main.c
- * Description: Entry point for the aerell subproject.
+ * Description: Entry point for the aerell project.
  * Author: Fern Aerell fernaerell2020@gmail.com
  * Created: 2025-08-12
  */

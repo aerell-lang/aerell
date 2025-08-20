@@ -9,7 +9,7 @@
  * https://github.com/aerell-lang/aerell/blob/main/LICENSE
  * 
  * File: argp.c
- * Description: Main source for the argp subproject.
+ * Description: Source for the argp feature.
  * Author: Fern Aerell fernaerell2020@gmail.com
  * Created: 2025-08-12
  */

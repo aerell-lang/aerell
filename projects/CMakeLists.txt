@@ -8,18 +8,11 @@
 # You may obtain a copy of the License at:
 # https://github.com/aerell-lang/aerell/blob/main/LICENSE
 # 
-# File: Projects.cmake
+# File: CMakeLists.txt
 # Description: Contains the list of all subprojects and their inclusion order.
 # Author: Fern Aerell fernaerell2020@gmail.com
-# Created: 2025-08-13
+# Created: 2025-08-21
 # -----------------------------------------------------------------------------
 
-set(
-    SUBPROJECT_DIR_NAMES
-    "aerell"
-    "argp"
-)
-
-foreach(SUBPROJECT_DIR_NAME ${SUBPROJECT_DIR_NAMES})
-    add_subdirectory(${SUBPROJECT_DIR_NAME})
-endforeach()
+add_subdirectory("aerell")
+add_subdirectory("argp")
