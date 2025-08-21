@@ -1,2 +1,2 @@
-cmake -S . -G Ninja -B build
+cmake -S . -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
