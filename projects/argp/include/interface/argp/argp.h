@@ -17,19 +17,16 @@
 #ifndef ARGP_H
 #define ARGP_H
 
-void argp_options_init(int amount);
-void argp_option_set(int index, bool value);
-bool argp_option_get(int index);
-void argp_options_destroy();
+#include <stddef.h>
 
-void argp_short_options_init();
-void argp_short_option_set(int index, char character);
-void argp_short_options_destroy();
+typedef struct ARGP ARGP;
 
-void argp_long_options_init();
-void argp_long_option_set(int index, const char* chars);
-void argp_long_options_destroy();
-
-void argp(int argc, const char* argv[]);
+ARGP* argp_create(const char* name, const char* version, size_t option_amount);
+void argp_set_option(ARGP* argp, size_t index, char* short_version, const char* long_version, const char* info);
+void argp_run(ARGP* argp, int argc, const char* argv[]);
+bool argp_get_option(ARGP* argp, size_t index);
+void argp_print_help(ARGP* argp);
+void argp_print_version(ARGP* argp);
+void argp_free(ARGP* argp);
 
 #endif

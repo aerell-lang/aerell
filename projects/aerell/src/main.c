@@ -16,31 +16,25 @@
 
 #include <argp/argp.h>
 
-#include <stdio.h>
-
 int main(int argc, const char* argv[]) {
-    argp_options_init(2);
-    argp_option_set(0, false);
-    argp_option_set(1, false);
-    argp_short_options_init();
-    argp_short_option_set(0, 'h');
-    argp_short_option_set(1, 'v');
-    argp_long_options_init();
-    argp_long_option_set(0, "help");
-    argp_long_option_set(1, "version");
-    argp(argc, argv);
-    if(argp_option_get(0)) {
+    ARGP* argp = argp_create(
+        "aerell", 
+        "1.0.0", 
+        3
+    );
+    argp_set_option(argp, 0, "h", "help", "Print this usage information.");
+    argp_set_option(argp, 1, "V", "version", "Print the aerell version.");
+    argp_set_option(argp, 2, "v", "verbose", "Show verbose output.");
+    argp_run(argp, argc, argv);
+    if(argp_get_option(argp, 0)) {
         goto help;
-    }
-    if(argp_option_get(1)) {
-        printf("1.0.0");
+    }else if(argp_get_option(argp, 1)) {
+        argp_print_version(argp);
         goto exit;
     }
     help:
-    printf("This is help message.");
+    argp_print_help(argp);
     exit:
-    argp_long_options_destroy();
-    argp_short_options_destroy();
-    argp_options_destroy();
+    argp_free(argp);
     return 0;
 }
