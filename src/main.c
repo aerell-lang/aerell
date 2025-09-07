@@ -15,14 +15,46 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "token/tokens.h"
 #include "lexer/lexer.h"
+#include "config.h"
 
 int main(int argc, char* argv[])
 {
     // Exit if not argument
-    if(argc <= 1) return 0;
+    if(argc <= 1)
+    {
+        printf("No arguments.\n");
+        return -1;
+    }
+
+    // Exit if too many argument
+    if(argc > 2)
+    {
+        printf("Too many argument.\n");
+        return -1;
+    }
+
+    // Print version
+    if((argc == 2) && (strcmp(argv[1], "version") == 0))
+    {
+        printf(__PROJECT_VERSION__ "\n");
+        return 0;
+    }
+
+    // Print help
+    if((argc == 2) && (strcmp(argv[1], "help") == 0))
+    {
+        printf(
+            "Usage: " __PROJECT_NAME__ " [argument]\n\n"
+            "Available arguments:\n"
+            "  version   Print version.\n"
+            "  help      Print help.\n"
+            "  <file>    Run file.\n");
+        return 0;
+    }
 
     // Read file
     FILE* file = fopen(argv[1], "r");
