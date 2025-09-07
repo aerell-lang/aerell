@@ -1,0 +1,15 @@
+Source Code
+   ↓
+Lexer → Token
+   ↓
+Parser → AST
+   ↓
+Semantic Analyzer
+   ↓
+IR (Intermediate Representation)
+   ↓
+Optimizer
+   ↓
+Code Generator
+   ↓
+Target Code (Machine/Bytecode)
