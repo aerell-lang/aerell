@@ -22,13 +22,52 @@ project(
     LANGUAGES C
 )
 
+# C Standard
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+# Export compile_commands.json for clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Output dir
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-add_subdirectory("projects")
+# Default build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the build type (Debug or Release)" FORCE)
+endif()
+
+# Flags for Debug
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O0 -Wall -Wextra")
+
+# Flags for Release
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -march=native -flto -funroll-loops -fomit-frame-pointer")
+
+# Linker flags Release
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s")
+
+# aerell
+file(
+    GLOB_RECURSE
+    "${PROJECT_NAME}_SOURCE_FILES"
+    "src/*.c"
+)
+
+add_executable(
+    ${PROJECT_NAME}
+    ${${PROJECT_NAME}_SOURCE_FILES}
+)
+
+target_include_directories(
+    ${PROJECT_NAME}
+    PRIVATE
+    "include"
+    "build/include"
+)
+
+configure_file(
+    "include/config.h.in"
+    "include/config.h"
+)
