@@ -1,0 +1,2 @@
+# Ini adalah komentar
+print 'Hello Aerell!'
