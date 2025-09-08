@@ -17,9 +17,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "token/tokens.h"
+#include "lexer/token/tokens.h"
 #include "lexer/lexer.h"
 #include "config.h"
+
+#include "parser/ast/ast.h"
+#include "parser/ast/asts.h"
+#include "parser/parser.h"
 
 int main(int argc, char* argv[])
 {
@@ -68,18 +72,27 @@ int main(int argc, char* argv[])
 
     // Tokenizer
     Tokens tokens = lexer(file);
-    tokens_shrink(&tokens);
 
-    printf("Print tokens:\n");
+    printf("\nPrint tokens:\n");
     printf("Tokens Length = %zu\n", tokens.length);
     printf("Tokens Capacity = %zu\n", tokens.capacity);
 
     print_tokens(&tokens);
 
-    tokens_free(&tokens);
-
     // Close file
     fclose(file);
 
+    printf("\n");
+
+    // Parsing to AST
+    ASTs* asts = parser(&tokens);
+    tokens_free(&tokens);
+
+    printf("\nPrint asts:\n");
+    printf("Asts Length = %zu\n", asts->length);
+    printf("Asts Capacity = %zu\n", asts->capacity);
+    print_asts(asts, 0);
+    
+    asts_free(asts);
     return 0;
 }

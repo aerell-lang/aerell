@@ -8,19 +8,16 @@
  * You may obtain a copy of the License at:
  * https://github.com/aerell-lang/aerell/blob/main/LICENSE
  *
- * File: lexer.h
- * Description: Lexer function definition.
+ * File: ast_type.h
+ * Description: AST type number definition.
  * Author: Fern Aerell fernaerell2020@gmail.com
- * Created: 2025-09-7
+ * Created: 2025-09-8
  */
 
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef AST_TYPE_H
+#define AST_TYPE_H
 
-#include <stdio.h>
-
-#include "lexer/token/tokens.h"
-
-Tokens lexer(FILE* file);
+#define AST_TYPE_ID 0
+#define AST_TYPE_STR 1
 
 #endif

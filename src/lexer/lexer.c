@@ -15,9 +15,10 @@
  */
 
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-#include "token/token_type.h"
+#include "lexer/token/token_type.h"
 #include "lexer/lexer.h"
 
 Tokens lexer(FILE* file)
@@ -32,12 +33,17 @@ Tokens lexer(FILE* file)
         // Break if char is EOF
         if(c == EOF)
         {
-            printf("EOF...\n");
+            printf("Create EOF token...\n");
             // Create token
-            Token token;
-            token_init(&token);
-            token_set_type(&token, TOKEN_TYPE_EOF);
-            tokens_add(&tokens, token);
+            Token* token = token_create(TOKEN_TYPE_EOF, NULL);
+            if(!token)
+            {
+                printf("Failed to create EOF token.\n");
+            }
+            else
+            {
+                tokens_add(&tokens, token);
+            }
             break;
         }
 
@@ -71,7 +77,7 @@ Tokens lexer(FILE* file)
             size_t buffer_index = 0;
             if(!buffer)
             {
-                printf("Failed to create buffer for ID.");
+                printf("Failed to create buffer for ID.\n");
                 continue;
             }
 
@@ -92,7 +98,7 @@ Tokens lexer(FILE* file)
                     char* buffer_temp = realloc(buffer, new_buffer_size);
                     if(!buffer_temp)
                     {
-                        printf("Failed to realloc buffer for ID.");
+                        printf("Failed to realloc buffer for ID.\n");
                         continue;
                     }
                     buffer = buffer_temp;
@@ -105,12 +111,15 @@ Tokens lexer(FILE* file)
             buffer[buffer_index] = '\0';
 
             // Create token
-            Token token;
-            token_init(&token);
-            token_set_type(&token, TOKEN_TYPE_ID);
-            token_set_content(&token, buffer);
-
-            tokens_add(&tokens, token);
+            Token* token = token_create(TOKEN_TYPE_ID, buffer);
+            if(!token)
+            {
+                printf("Failed to create ID token.\n");
+            }
+            else
+            {
+                tokens_add(&tokens, token);
+            }
 
             // Free
             free(buffer);
@@ -128,7 +137,7 @@ Tokens lexer(FILE* file)
             size_t buffer_index = 0;
             if(!buffer)
             {
-                printf("Failed to create buffer for string.");
+                printf("Failed to create buffer for string.\n");
                 continue;
             }
 
@@ -155,7 +164,7 @@ Tokens lexer(FILE* file)
                     char* buffer_temp = realloc(buffer, new_buffer_size);
                     if(!buffer_temp)
                     {
-                        printf("Failed to realloc buffer for string.");
+                        printf("Failed to realloc buffer for string.\n");
                         continue;
                     }
                     buffer = buffer_temp;
@@ -168,12 +177,15 @@ Tokens lexer(FILE* file)
             buffer[buffer_index] = '\0';
 
             // Create token
-            Token token;
-            token_init(&token);
-            token_set_type(&token, TOKEN_TYPE_STR);
-            token_set_content(&token, buffer);
-
-            tokens_add(&tokens, token);
+            Token* token = token_create(TOKEN_TYPE_STR, buffer);
+            if(!token)
+            {
+                printf("Failed to create str token.\n");
+            }
+            else
+            {
+                tokens_add(&tokens, token);
+            }
 
             // Free
             free(buffer);
@@ -183,15 +195,23 @@ Tokens lexer(FILE* file)
 
         // Unknown char
         printf("Create unknown token...\n");
-        Token token;
-        token_init(&token);
-        token_set_type(&token, TOKEN_TYPE_UNKNOWN);
-        token_set_content_with_char(&token, c);
-
-        tokens_add(&tokens, token);
+        Token* token = token_create_with_char(TOKEN_TYPE_UNKNOWN, c);
+        if(!token)
+        {
+            printf("Failed to create unknown token.\n");
+        }
+        else
+        {
+            tokens_add(&tokens, token);
+        }
 
         // Read next char
         c = fgetc(file);
+    }
+
+    if(!tokens_shrink(&tokens))
+    {
+        printf("Failed to shrink tokens.\n");
     }
 
     printf("Lexer stopped.\n");

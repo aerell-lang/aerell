@@ -8,19 +8,18 @@
  * You may obtain a copy of the License at:
  * https://github.com/aerell-lang/aerell/blob/main/LICENSE
  *
- * File: lexer.h
- * Description: Lexer function definition.
+ * File: parser.h
+ * Description: Parser function definition.
  * Author: Fern Aerell fernaerell2020@gmail.com
- * Created: 2025-09-7
+ * Created: 2025-09-8
  */
 
-#ifndef LEXER_H
-#define LEXER_H
-
-#include <stdio.h>
+#ifndef PARSER_H
+#define PARSER_H
 
 #include "lexer/token/tokens.h"
+#include "parser/ast/asts.h"
 
-Tokens lexer(FILE* file);
+ASTs* parser(Tokens* tokens);
 
 #endif

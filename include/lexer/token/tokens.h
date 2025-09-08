@@ -19,23 +19,23 @@
 
 #include <stddef.h>
 
-#include "token/token.h"
+#include "lexer/token/token.h"
 
 typedef struct Tokens
 {
     size_t length;
     size_t capacity;
-    Token* data;
+    Token** data;
 } Tokens;
 
-void tokens_init(struct Tokens* tokens);
+void tokens_init(Tokens* tokens);
 
-int tokens_add(struct Tokens* tokens, struct Token token);
+int tokens_add(Tokens* tokens, Token* token);
 
-void print_tokens(struct Tokens* tokens);
+void print_tokens(Tokens* tokens);
 
-void tokens_free(struct Tokens* tokens);
+void tokens_free(Tokens* tokens);
 
-int tokens_shrink(struct Tokens* tokens);
+int tokens_shrink(Tokens* tokens);
 
 #endif

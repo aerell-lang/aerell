@@ -23,16 +23,12 @@ typedef struct Token
     char* content;
 } Token;
 
-void token_init(struct Token* token);
+Token* token_create(int type, const char* content);
 
-void token_set_type(struct Token* token, int type);
+Token* token_create_with_char(int type, const char content);
 
-int token_set_content(struct Token* token, const char* content);
+void print_token(Token* token);
 
-int token_set_content_with_char(struct Token* token, const char content);
-
-void print_token(struct Token* token);
-
-void token_free(struct Token* token);
+void token_free(Token* token);
 
 #endif
