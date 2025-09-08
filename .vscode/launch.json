@@ -6,7 +6,9 @@
             "type": "lldb-dap",
             "request": "launch",
             "program": "${workspaceFolder}/build/aerell.exe",
-            "args": [],
+            "args": [
+                "${workspaceFolder}/examples/hello_aerell.n"
+            ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
         }
