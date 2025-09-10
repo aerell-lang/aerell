@@ -17,14 +17,18 @@
 cmake_minimum_required(VERSION 4.0.3)
 
 project(
-    "aerell"
+    "The Aerell Programming Language"
     VERSION 1.0.0
-    LANGUAGES C
+    LANGUAGES C CXX
 )
 
 # C Standard
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# C++ Standard
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Export compile_commands.json for clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -55,26 +59,4 @@ if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
 endif()
 
-# aerell
-file(
-    GLOB_RECURSE
-    "${PROJECT_NAME}_SOURCE_FILES"
-    "src/*.c"
-)
-
-add_executable(
-    ${PROJECT_NAME}
-    ${${PROJECT_NAME}_SOURCE_FILES}
-)
-
-target_include_directories(
-    ${PROJECT_NAME}
-    PRIVATE
-    "include"
-    "build/include"
-)
-
-configure_file(
-    "include/config.h.in"
-    "include/config.h"
-)
+add_subdirectory("projects")

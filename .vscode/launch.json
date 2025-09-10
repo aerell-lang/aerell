@@ -7,7 +7,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/aerell.exe",
             "args": [
-                "${workspaceFolder}/examples/hello_aerell.n"
+                "${workspaceFolder}/examples/main.n"
             ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
