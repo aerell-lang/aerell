@@ -50,6 +50,10 @@ ASTFuncCall* ast_func_call_create()
     return ast;
 }
 
+void ast_print(AST* ast) {
+    if(ast == NULL) return;
+}
+
 void ast_data_type_free(ASTDataType* ast)
 {
     if(ast == NULL) return;

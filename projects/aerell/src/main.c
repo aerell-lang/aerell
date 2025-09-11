@@ -17,6 +17,7 @@
 #include <string.h>
 
 #include <lexer/lexer.h>
+#include <parser/parser.h>
 
 int main(int argc, char* argv[])
 {
@@ -63,13 +64,16 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    int* a = NULL;
-
     // Tokenizer
     Tokens* tokens = lexer(file);
 
     tokens_print(tokens);
 
+    ASTs* asts = parser(tokens);
+
+    asts_print(asts);
+    
     tokens_free(tokens);
+    asts_free(asts);
     return 0;
 }

@@ -70,6 +70,8 @@ ASTFuncDecl* ast_func_decl_create();
 ASTFuncArg* ast_func_arg_create();
 ASTFuncCall* ast_func_call_create();
 
+void ast_print(AST* ast);
+
 void ast_data_type_free(ASTDataType* ast);
 void ast_func_param_free(ASTFuncParam* ast);
 void ast_func_decl_free(ASTFuncDecl* ast);

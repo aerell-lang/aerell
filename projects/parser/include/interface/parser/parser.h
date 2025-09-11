@@ -8,34 +8,23 @@
  * You may obtain a copy of the License at:
  * https://github.com/aerell-lang/aerell/blob/main/LICENSE
  *
- * File: asts.h
- * Description: List of AST struct and function declaration.
+ * File: parser.h
+ * Description: Parser and ast function interface.
  * Author: Fern Aerell fernaerell2020@gmail.com
  * Created: 2025-09-8
  */
 
-#ifndef ASTS_H
-#define ASTS_H
+#ifndef PARSER_H
+#define PARSER_H
 
-#include <stddef.h>
+#include <lexer/lexer.h>
 
-#include "parser/ast/ast.h"
+typedef struct ASTs ASTs;
 
-typedef struct ASTs
-{
-    size_t length;
-    size_t capacity;
-    AST** data;
-} ASTs;
-
-ASTs* asts_create();
+ASTs* parser(Tokens* tokens);
 
 void asts_print(ASTs* asts);
 
-int asts_add(ASTs* asts, AST* ast);
-
 void asts_free(ASTs* asts);
-
-int asts_shrink(ASTs* asts);
 
 #endif
