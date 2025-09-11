@@ -17,11 +17,8 @@
 #ifndef AST_TYPE_H
 #define AST_TYPE_H
 
-#define AST_UNKNOWN 0
-#define AST_DATA_TYPE 1
+#define AST_DATA_TYPE 0
+#define AST_FUNC_PARAM 1
 #define AST_FUNC_DECL 2
-#define AST_FUNC_PARAM 3
-#define AST_FUNC_CALL 4
-#define AST_FUNC_ARG 5
 
 #endif

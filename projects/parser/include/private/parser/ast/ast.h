@@ -39,44 +39,38 @@ typedef struct ASTFuncParam
 {
     AST base;
     ASTDataType* data_type;
-    Token* id;
+    Token* name;
 } ASTFuncParam;
 
 typedef struct ASTFuncDecl
 {
     AST base;
-    ASTDataType* ret_type;
-    Token* id;
+    Token* name;
+    ASTs* params;
     bool is_variadic;
-    ASTFuncParam** params;
+    ASTDataType* return_data_type;
 } ASTFuncDecl;
 
-typedef struct ASTFuncArg
-{
-    AST base;
-    Token* value;
-} ASTFuncArg;
+ASTDataType* ast_data_type_create(Token* value, bool is_pointer);
 
-typedef struct ASTFuncCall
-{
-    AST base;
-    Token* id;
-    ASTFuncArg** args;
-} ASTFuncCall;
+ASTFuncParam* ast_func_param_create(ASTDataType* data_type, Token* name);
 
-ASTDataType* ast_data_type_create();
-ASTFuncParam* ast_func_param_create();
-ASTFuncDecl* ast_func_decl_create();
-ASTFuncArg* ast_func_arg_create();
-ASTFuncCall* ast_func_call_create();
+ASTFuncDecl* ast_func_decl_create(Token* name, ASTs* params, bool is_variadic, ASTDataType* return_data_type);
 
-void ast_print(AST* ast);
+void ast_data_type_print(ASTDataType* ast, size_t indent);
+
+void ast_func_param_print(ASTFuncParam* ast, size_t indent);
+
+void ast_func_decl_print(ASTFuncDecl* ast, size_t indent);
+
+void ast_print(AST* ast, size_t indent);
 
 void ast_data_type_free(ASTDataType* ast);
+
 void ast_func_param_free(ASTFuncParam* ast);
+
 void ast_func_decl_free(ASTFuncDecl* ast);
-void ast_func_arg_free(ASTFuncArg* ast);
-void ast_func_call_free(ASTFuncCall* ast);
+
 void ast_free(AST* ast);
 
 #endif

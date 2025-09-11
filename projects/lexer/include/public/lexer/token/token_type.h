@@ -28,22 +28,24 @@
 #define TOKEN_OPEN_PARENTHESES 5
 #define TOKEN_CLOSE_PARENTHESES 6
 
+// Keyword
+#define TOKEN_F 7
+
 // Unique
-#define TOKEN_VARIADIC 7
+#define TOKEN_VARIADIC 8
 
 // Data Type
-#define TOKEN_DATA_TYPE_I1 8
-#define TOKEN_DATA_TYPE_I8 9
-#define TOKEN_DATA_TYPE_I16 10
-#define TOKEN_DATA_TYPE_I32 11
-#define TOKEN_DATA_TYPE_I64 12
+#define TOKEN_DATA_TYPE_I1 9
+#define TOKEN_DATA_TYPE_I8 10
+#define TOKEN_DATA_TYPE_I16 11
+#define TOKEN_DATA_TYPE_I32 12
+#define TOKEN_DATA_TYPE_I64 13
 
 // Value
-#define TOKEN_VALUE_NUM 13
-#define TOKEN_VALUE_STR 14
+#define TOKEN_VALUE_NUM 14
+#define TOKEN_VALUE_STR 15
 
 // Id
-#define TOKEN_ID 15
-
+#define TOKEN_ID 16
 
 #endif

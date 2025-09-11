@@ -17,6 +17,8 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include <stddef.h>
+
 typedef struct Token
 {
     int type;
@@ -26,6 +28,12 @@ typedef struct Token
 Token* token_create(int type, const char* content);
 
 Token* token_create_with_char(int type, const char content);
+
+const char* token_get_content(const Token* token);
+
+int token_is(Token* token, int type);
+
+int token_iss(Token* token, size_t types_len, int types[]);
 
 void token_print(Token* token);
 

@@ -23,6 +23,14 @@ typedef struct Token Token;
 
 typedef struct Tokens Tokens;
 
+const char* token_get_content(const Token* token);
+
+int token_is(Token* token, int type);
+
+int token_iss(Token* token, size_t types_len, int types[]);
+
+Token* tokens_get_token(Tokens* tokens);
+
 void tokens_print(Tokens* tokens);
 
 void tokens_free(Tokens* tokens);

@@ -67,7 +67,7 @@ Tokens* lexer(FILE* file)
             continue;
         }
 
-        // * ( ) , ;
+        // * ( ) , ; f
         if(c == '*' || c == '(' || c == ')' || c == ',' || c == ';')
         {
             lexer_add_token_with_char(
@@ -80,6 +80,18 @@ Tokens* lexer(FILE* file)
                 c);
             c = fgetc(file);
             continue;
+        }
+
+        if(c == 'f')
+        {
+            int c1 = fgetc(file);
+            if(isspace(c1))
+            {
+                lexer_add_token_with_char(tokens, TOKEN_F, 'f');
+                c = c1;
+                continue;
+            }
+            fseek(file, -1, SEEK_CUR);
         }
 
         // VARIADIC ...

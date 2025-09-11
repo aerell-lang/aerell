@@ -30,7 +30,7 @@ typedef struct ASTs
 
 ASTs* asts_create();
 
-void asts_print(ASTs* asts);
+void asts_print(ASTs* asts, size_t indent);
 
 int asts_add(ASTs* asts, AST* ast);
 

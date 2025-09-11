@@ -23,7 +23,7 @@ typedef struct ASTs ASTs;
 
 ASTs* parser(Tokens* tokens);
 
-void asts_print(ASTs* asts);
+void asts_print(ASTs* asts, size_t indent);
 
 void asts_free(ASTs* asts);
 

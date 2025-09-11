@@ -25,12 +25,15 @@ typedef struct Tokens
 {
     size_t length;
     size_t capacity;
+    size_t offset;
     Token** data;
 } Tokens;
 
 Tokens* tokens_create();
 
 int tokens_add(Tokens* tokens, Token* token);
+
+Token* tokens_get_token(Tokens* tokens);
 
 void tokens_print(Tokens* tokens);
 

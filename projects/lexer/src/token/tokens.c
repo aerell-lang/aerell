@@ -22,8 +22,10 @@
 Tokens* tokens_create()
 {
     Tokens* tokens = malloc(sizeof(Tokens));
+    if(tokens == NULL) return NULL;
     tokens->length = 0;
     tokens->capacity = 0;
+    tokens->offset = 0;
     tokens->data = NULL;
     return tokens;
 }
@@ -43,6 +45,12 @@ int tokens_add(Tokens* tokens, Token* token)
     return 1;
 }
 
+Token* tokens_get_token(Tokens* tokens)
+{
+    if(tokens == NULL) return NULL;
+    return tokens->data[(tokens->offset == tokens->length - 1) ? tokens->offset : tokens->offset++];
+}
+
 void tokens_print(Tokens* tokens)
 {
     if(tokens == NULL) return;
@@ -52,8 +60,6 @@ void tokens_print(Tokens* tokens)
 void tokens_free(Tokens* tokens)
 {
     if(tokens == NULL) return;
-    tokens->length = 0;
-    tokens->capacity = 0;
     for(size_t i = 0; i < tokens->length; i++)
     {
         if(tokens->data[i] != NULL)
@@ -67,6 +73,9 @@ void tokens_free(Tokens* tokens)
         free(tokens->data);
         tokens->data = NULL;
     }
+    tokens->length = 0;
+    tokens->capacity = 0;
+    tokens->offset = 0;
     free(tokens);
 }
 

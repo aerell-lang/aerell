@@ -1,4 +1,4 @@
-i32 printf(i8* fmt, ...); # printf in libc
+f printf(i8* fmt, ...) i32; # printf in libc
 
 printf('Hi! My name is %s.\n', 'Fern Aerell'); # Hi! My name is Fern Aerell
 printf('I\'m %i years old.\n', 20);            # I'm 20 years old.

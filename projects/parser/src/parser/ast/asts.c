@@ -22,16 +22,17 @@
 ASTs* asts_create()
 {
     ASTs* asts = malloc(sizeof(ASTs));
+    if(asts == NULL) return NULL;
     asts->capacity = 0;
     asts->length = 0;
     asts->data = NULL;
     return asts;
 }
 
-void asts_print(ASTs* asts)
+void asts_print(ASTs* asts, size_t indent)
 {
     if(asts == NULL) return;
-    for(size_t i = 0; i < asts->length; i++) ast_print(asts->data[i]);
+    for(size_t i = 0; i < asts->length; i++) ast_print(asts->data[i], indent);
 }
 
 int asts_add(ASTs* asts, AST* ast)

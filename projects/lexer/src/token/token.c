@@ -24,7 +24,7 @@
 Token* token_create(int type, const char* content)
 {
     Token* token = malloc(sizeof(Token));
-    if(!token) return NULL;
+    if(token == NULL) return NULL;
     token->type = type;
     token->content = ((content != NULL) ? strdup(content) : NULL);
     if(content != NULL && !token->content)
@@ -51,6 +51,24 @@ Token* token_create_with_char(int type, const char content)
     token->content[0] = content;
     token->content[1] = '\0';
     return token;
+}
+
+const char* token_get_content(const Token* token) {
+    return token->content;
+}
+
+int token_is(Token* token, int type)
+{
+    if(token == NULL) return 0;
+    return token->type == type;
+}
+
+int token_iss(Token* token, size_t types_len, int types[])
+{
+    if(token == NULL) return 0;
+    for(size_t i = 0; i < types_len; i++)
+        if(token->type == types[i]) return 1;
+    return 0;
 }
 
 void token_print(Token* token)
