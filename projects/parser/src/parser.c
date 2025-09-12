@@ -184,6 +184,14 @@ ASTFunc* parseFunc(Token** token_ref, Tokens* tokens)
         return NULL;
     }
 
+    // Expect current token is semicolon
+    if(!token_is(*token_ref, TOKEN_SEMICOLON))
+    {
+        printf("Expect ';' for declaration of function.\n");
+        asts_free(params);
+        return NULL;
+    }
+
     return ast_func_create(name, params, is_variadic, return_data_type);
 }
 

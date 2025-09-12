@@ -70,9 +70,11 @@ int main(int argc, char* argv[])
     printf("[Lexer] Tokenization Result:\n");
     tokens_print(tokens);
 
+    printf("\n");
+
     ASTs* asts = parser(tokens);
 
-    printf("\n[Parser] Parsing Result:\n");
+    printf("[Parser] Parsing Result:\n");
     asts_print(asts, 0);
     
     asts_free(asts);
