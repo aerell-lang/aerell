@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2025, The Aerell Language Project Authors
+ * All rights reserved.
+ *
+ * This file is part of the Aerell Language project.
+ *
+ * Licensed under the BSD 3-Clause License.
+ * You may obtain a copy of the License at:
+ * https://github.com/aerell-lang/aerell/blob/main/LICENSE
+ *
+ * File: ast.c
+ * Description: AST function definition.
+ * Author: Fern Aerell fernaerell2020@gmail.com
+ * Created: 2025-09-8
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -18,14 +34,14 @@ ASTDataType* ast_data_type_create(Token* value, bool is_pointer)
     return ast;
 }
 
-ASTFuncParam* ast_func_param_create(ASTDataType* data_type, Token* name)
+ASTFuncParam* ast_func_param_create(Token* name, ASTDataType* data_type)
 {
-    if(data_type == NULL || name == NULL) return NULL;
+    if(name == NULL || data_type == NULL) return NULL;
     ASTFuncParam* ast = malloc(sizeof(ASTFuncParam));
     if(ast == NULL) return NULL;
     ast->base.type = AST_FUNC_PARAM;
-    ast->data_type = data_type;
     ast->name = name;
+    ast->data_type = data_type;
     return ast;
 }
 
@@ -54,9 +70,9 @@ void ast_func_param_print(ASTFuncParam* ast, size_t indent)
 {
     if(ast == NULL || ast->data_type == NULL || ast->name == NULL) return;
     printf("%*sASTFuncParam\n", (int)indent, "");
+    printf("%*s    name: %s\n", (int)indent, "", token_get_content(ast->name));
     printf("%*s    data_type: \n", (int)indent, "");
     ast_data_type_print(ast->data_type, indent + AST_INDENT);
-    printf("%*s    name: %s\n", (int)indent, "", token_get_content(ast->name));
 }
 
 void ast_func_print(ASTFunc* ast, size_t indent)
@@ -64,9 +80,9 @@ void ast_func_print(ASTFunc* ast, size_t indent)
     if(ast == NULL || ast->name == NULL || ast->params == NULL) return;
     printf("%*sASTFunc\n", (int)indent, "");
     printf("%*s    name: %s\n", (int)indent, "", token_get_content(ast->name));
-    printf("%*s    is_variadic: %i\n", (int)indent, "", ast->is_variadic);
     printf("%*s    params: \n", (int)indent, "");
     asts_print(ast->params, indent + AST_INDENT);
+    printf("%*s    is_variadic: %i\n", (int)indent, "", ast->is_variadic);
     printf("%*s    ret_type: \n", (int)indent, "");
     ast_data_type_print(ast->return_data_type, indent + AST_INDENT);
 }

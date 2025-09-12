@@ -38,8 +38,8 @@ typedef struct ASTDataType
 typedef struct ASTFuncParam
 {
     AST base;
-    ASTDataType* data_type;
     Token* name;
+    ASTDataType* data_type;
 } ASTFuncParam;
 
 typedef struct ASTFunc
@@ -53,7 +53,7 @@ typedef struct ASTFunc
 
 ASTDataType* ast_data_type_create(Token* value, bool is_pointer);
 
-ASTFuncParam* ast_func_param_create(ASTDataType* data_type, Token* name);
+ASTFuncParam* ast_func_param_create(Token* name, ASTDataType* data_type);
 
 ASTFunc* ast_func_create(Token* name, ASTs* params, bool is_variadic, ASTDataType* return_data_type);
 

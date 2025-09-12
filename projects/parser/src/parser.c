@@ -55,9 +55,6 @@ ASTFuncParam* parseFuncParam(Token** token_ref, Tokens* tokens)
     // Validate parameter is valid
     if(token_ref == NULL || *token_ref == NULL || tokens == NULL) return NULL;
 
-    ASTDataType* data_type = parseDataType(token_ref, tokens);
-    if(data_type == NULL) return NULL;
-
     // Expect current token is id
     if(!token_is(*token_ref, TOKEN_ID))
     {
@@ -71,7 +68,11 @@ ASTFuncParam* parseFuncParam(Token** token_ref, Tokens* tokens)
     // Next token
     *token_ref = tokens_get_token(tokens);
 
-    return ast_func_param_create(data_type, name);
+    // Save data type 
+    ASTDataType* data_type = parseDataType(token_ref, tokens);
+    if(data_type == NULL) return NULL;
+
+    return ast_func_param_create(name, data_type);
 }
 
 ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref)
