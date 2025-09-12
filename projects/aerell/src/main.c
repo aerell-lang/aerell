@@ -67,17 +67,25 @@ int main(int argc, char* argv[])
     // Tokenizer
     Tokens* tokens = lexer(file);
 
+    // Close file
+    fclose(file);
+
+    // Print token
     printf("[Lexer] Tokenization Result:\n");
     tokens_print(tokens);
 
     printf("\n");
 
+    // Parsing
     ASTs* asts = parser(tokens);
 
+    // Print AST
     printf("[Parser] Parsing Result:\n");
     asts_print(asts, 0);
     
+    // Clean up
     asts_free(asts);
     tokens_free(tokens);
+    
     return 0;
 }
