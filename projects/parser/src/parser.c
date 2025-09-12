@@ -141,7 +141,7 @@ ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref)
     return params;
 }
 
-ASTFuncDecl* parseFunc(Token** token_ref, Tokens* tokens)
+ASTFunc* parseFunc(Token** token_ref, Tokens* tokens)
 {
     // Validate parameter is valid
     if(token_ref == NULL || *token_ref == NULL || tokens == NULL) return NULL;
@@ -184,7 +184,7 @@ ASTFuncDecl* parseFunc(Token** token_ref, Tokens* tokens)
         return NULL;
     }
 
-    return ast_func_decl_create(name, params, is_variadic, return_data_type);
+    return ast_func_create(name, params, is_variadic, return_data_type);
 }
 
 ASTs* parser(Tokens* tokens)

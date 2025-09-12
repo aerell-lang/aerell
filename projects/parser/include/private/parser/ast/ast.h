@@ -42,26 +42,26 @@ typedef struct ASTFuncParam
     Token* name;
 } ASTFuncParam;
 
-typedef struct ASTFuncDecl
+typedef struct ASTFunc
 {
     AST base;
     Token* name;
     ASTs* params;
     bool is_variadic;
     ASTDataType* return_data_type;
-} ASTFuncDecl;
+} ASTFunc;
 
 ASTDataType* ast_data_type_create(Token* value, bool is_pointer);
 
 ASTFuncParam* ast_func_param_create(ASTDataType* data_type, Token* name);
 
-ASTFuncDecl* ast_func_decl_create(Token* name, ASTs* params, bool is_variadic, ASTDataType* return_data_type);
+ASTFunc* ast_func_create(Token* name, ASTs* params, bool is_variadic, ASTDataType* return_data_type);
 
 void ast_data_type_print(ASTDataType* ast, size_t indent);
 
 void ast_func_param_print(ASTFuncParam* ast, size_t indent);
 
-void ast_func_decl_print(ASTFuncDecl* ast, size_t indent);
+void ast_func_print(ASTFunc* ast, size_t indent);
 
 void ast_print(AST* ast, size_t indent);
 
@@ -69,7 +69,7 @@ void ast_data_type_free(ASTDataType* ast);
 
 void ast_func_param_free(ASTFuncParam* ast);
 
-void ast_func_decl_free(ASTFuncDecl* ast);
+void ast_func_free(ASTFunc* ast);
 
 void ast_free(AST* ast);
 

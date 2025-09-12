@@ -19,6 +19,6 @@
 
 #define AST_DATA_TYPE 0
 #define AST_FUNC_PARAM 1
-#define AST_FUNC_DECL 2
+#define AST_FUNC 2
 
 #endif

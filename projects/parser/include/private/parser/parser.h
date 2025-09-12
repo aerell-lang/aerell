@@ -26,7 +26,7 @@ ASTFuncParam* parseFuncParam(Token** token_ref, Tokens* tokens);
 
 ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref);
 
-ASTFuncDecl* parseFunc(Token** token_ref, Tokens* tokens);
+ASTFunc* parseFunc(Token** token_ref, Tokens* tokens);
 
 ASTs* parser(Tokens* tokens);
 

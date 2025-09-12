@@ -29,12 +29,12 @@ ASTFuncParam* ast_func_param_create(ASTDataType* data_type, Token* name)
     return ast;
 }
 
-ASTFuncDecl* ast_func_decl_create(Token* name, ASTs* params, bool is_variadic, ASTDataType* return_data_type)
+ASTFunc* ast_func_create(Token* name, ASTs* params, bool is_variadic, ASTDataType* return_data_type)
 {
     if(name == NULL || params == NULL) return NULL;
-    ASTFuncDecl* ast = malloc(sizeof(ASTFuncDecl));
+    ASTFunc* ast = malloc(sizeof(ASTFunc));
     if(ast == NULL) return NULL;
-    ast->base.type = AST_FUNC_DECL;
+    ast->base.type = AST_FUNC;
     ast->name = name;
     ast->params = params;
     ast->is_variadic = is_variadic;
@@ -59,10 +59,10 @@ void ast_func_param_print(ASTFuncParam* ast, size_t indent)
     printf("%*s    name: %s\n", (int)indent, "", token_get_content(ast->name));
 }
 
-void ast_func_decl_print(ASTFuncDecl* ast, size_t indent)
+void ast_func_print(ASTFunc* ast, size_t indent)
 {
     if(ast == NULL || ast->name == NULL || ast->params == NULL) return;
-    printf("%*sASTFuncDecl\n", (int)indent, "");
+    printf("%*sASTFunc\n", (int)indent, "");
     printf("%*s    name: %s\n", (int)indent, "", token_get_content(ast->name));
     printf("%*s    is_variadic: %i\n", (int)indent, "", ast->is_variadic);
     printf("%*s    params: \n", (int)indent, "");
@@ -78,8 +78,8 @@ void ast_print(AST* ast, size_t indent)
         ast_data_type_print((ASTDataType*)ast, indent);
     else if(ast->type == AST_FUNC_PARAM)
         ast_func_param_print((ASTFuncParam*)ast, indent);
-    else if(ast->type == AST_FUNC_DECL)
-        ast_func_decl_print((ASTFuncDecl*)ast, indent);
+    else if(ast->type == AST_FUNC)
+        ast_func_print((ASTFunc*)ast, indent);
 }
 
 void ast_data_type_free(ASTDataType* ast)
@@ -95,7 +95,7 @@ void ast_func_param_free(ASTFuncParam* ast)
     free(ast);
 }
 
-void ast_func_decl_free(ASTFuncDecl* ast)
+void ast_func_free(ASTFunc* ast)
 {
     if(ast == NULL) return;
     asts_free(ast->params);
@@ -110,6 +110,6 @@ void ast_free(AST* ast)
         ast_data_type_free((ASTDataType*)ast);
     else if(ast->type == AST_FUNC_PARAM)
         ast_func_param_free((ASTFuncParam*)ast);
-    else if(ast->type == AST_FUNC_DECL)
-        ast_func_decl_free((ASTFuncDecl*)ast);
+    else if(ast->type == AST_FUNC)
+        ast_func_free((ASTFunc*)ast);
 }
