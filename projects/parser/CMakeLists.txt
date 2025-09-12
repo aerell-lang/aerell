@@ -6,7 +6,7 @@ file(
 
 add_library(
     "parser"
-    SHARED
+    STATIC
     ${PARSER_SOURCE_FILES}
 )
 

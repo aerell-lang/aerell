@@ -6,7 +6,7 @@ file(
 
 add_library(
     "lexer"
-    SHARED
+    STATIC
     ${LEXER_SOURCE_FILES}
 )
 
