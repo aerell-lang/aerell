@@ -22,7 +22,7 @@
 ASTs* asts_create()
 {
     ASTs* asts = malloc(sizeof(ASTs));
-    if(asts == NULL) return NULL;
+    if(!asts) return NULL;
     asts->capacity = 0;
     asts->length = 0;
     asts->data = NULL;
@@ -31,13 +31,13 @@ ASTs* asts_create()
 
 void asts_print(ASTs* asts, size_t indent)
 {
-    if(asts == NULL) return;
+    if(!asts) return;
     for(size_t i = 0; i < asts->length; i++) ast_print(asts->data[i], indent);
 }
 
 int asts_add(ASTs* asts, AST* ast)
 {
-    if(asts == NULL || ast == NULL) return 0;
+    if(!asts || !ast) return 0;
     if(asts->length >= asts->capacity)
     {
         size_t new_capacity = (asts->capacity == 0) ? 2 : asts->capacity * 2;
@@ -52,18 +52,18 @@ int asts_add(ASTs* asts, AST* ast)
 
 void asts_free(ASTs* asts)
 {
-    if(asts == NULL) return;
+    if(!asts) return;
     asts->length = 0;
     asts->capacity = 0;
     for(size_t i = 0; i < asts->length; i++)
     {
-        if(asts->data[i] != NULL)
+        if(asts->data[i])
         {
             ast_free(asts->data[i]);
             asts->data[i] = NULL;
         }
     }
-    if(asts->data != NULL)
+    if(asts->data)
     {
         free(asts->data);
         asts->data = NULL;
@@ -73,7 +73,7 @@ void asts_free(ASTs* asts)
 
 int asts_shrink(ASTs* asts)
 {
-    if(asts == NULL) return 0;
+    if(!asts) return 0;
 
     if(asts->length == 0)
     {

@@ -22,7 +22,7 @@
 ASTDataType* parseDataType(Token** token_ref, Tokens* tokens)
 {
     // Validate parameter is valid
-    if(token_ref == NULL || *token_ref == NULL || tokens == NULL) return NULL;
+    if(!token_ref|| !*token_ref || !tokens) return NULL;
 
     // Expect current token is data type
     int types[] = {
@@ -53,7 +53,7 @@ ASTDataType* parseDataType(Token** token_ref, Tokens* tokens)
 ASTFuncParam* parseFuncParam(Token** token_ref, Tokens* tokens)
 {
     // Validate parameter is valid
-    if(token_ref == NULL || *token_ref == NULL || tokens == NULL) return NULL;
+    if(!token_ref|| !*token_ref || !tokens) return NULL;
 
     // Expect current token is id
     if(!token_is(*token_ref, TOKEN_ID))
@@ -70,7 +70,7 @@ ASTFuncParam* parseFuncParam(Token** token_ref, Tokens* tokens)
 
     // Save data type 
     ASTDataType* data_type = parseDataType(token_ref, tokens);
-    if(data_type == NULL) return NULL;
+    if(!data_type) return NULL;
 
     return ast_func_param_create(name, data_type);
 }
@@ -78,7 +78,7 @@ ASTFuncParam* parseFuncParam(Token** token_ref, Tokens* tokens)
 ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref)
 {
     // Validate parameter is valid
-    if(token_ref == NULL || *token_ref == NULL || tokens == NULL) return NULL;
+    if(!token_ref|| !*token_ref || !tokens) return NULL;
 
     // Expect current token is open parentheses
     if(!token_is(*token_ref, TOKEN_OPEN_PARENTHESES))
@@ -145,7 +145,7 @@ ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref)
 ASTFunc* parseFunc(Token** token_ref, Tokens* tokens)
 {
     // Validate parameter is valid
-    if(token_ref == NULL || *token_ref == NULL || tokens == NULL) return NULL;
+    if(!token_ref|| !*token_ref || !tokens) return NULL;
 
     // Expect current token is f keyword
     if(!token_is(*token_ref, TOKEN_F))
@@ -175,11 +175,11 @@ ASTFunc* parseFunc(Token** token_ref, Tokens* tokens)
 
     // Parse params
     ASTs* params = parseFuncParams(token_ref, tokens, &is_variadic);
-    if(params == NULL) return NULL;
+    if(!params) return NULL;
 
     // Return data type
     ASTDataType* return_data_type = parseDataType(token_ref, tokens);
-    if(return_data_type == NULL)
+    if(!return_data_type)
     {
         asts_free(params);
         return NULL;

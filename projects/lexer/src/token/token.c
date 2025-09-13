@@ -24,10 +24,10 @@
 Token* token_create(int type, const char* content)
 {
     Token* token = malloc(sizeof(Token));
-    if(token == NULL) return NULL;
+    if(!token) return NULL;
     token->type = type;
-    token->content = ((content != NULL) ? strdup(content) : NULL);
-    if(content != NULL && !token->content)
+    token->content = ((content) ? strdup(content) : NULL);
+    if(content && !token->content)
     {
         token_free(token);
         token = NULL;
@@ -54,18 +54,19 @@ Token* token_create_with_char(int type, const char content)
 }
 
 const char* token_get_content(const Token* token) {
+    if(!token) return NULL;
     return token->content;
 }
 
 int token_is(Token* token, int type)
 {
-    if(token == NULL) return 0;
+    if(!token) return 0;
     return token->type == type;
 }
 
 int token_iss(Token* token, size_t types_len, int types[])
 {
-    if(token == NULL) return 0;
+    if(!token) return 0;
     for(size_t i = 0; i < types_len; i++)
         if(token->type == types[i]) return 1;
     return 0;
@@ -73,17 +74,17 @@ int token_iss(Token* token, size_t types_len, int types[])
 
 void token_print(Token* token)
 {
-    if(token == NULL) return;
+    if(!token) return;
     printf(
         "[%i] %s\n", token->type,
-        (token->content != NULL && strcmp(token->content, "\n") == 0) ? "\\n" : token->content);
+        (token->content && strcmp(token->content, "\n") == 0) ? "\\n" : token->content);
 }
 
 void token_free(Token* token)
 {
-    if(token == NULL) return;
+    if(!token) return;
     token->type = TOKEN_UNKNOWN;
-    if(token->content != NULL)
+    if(token->content)
     {
         free(token->content);
         token->content = NULL;

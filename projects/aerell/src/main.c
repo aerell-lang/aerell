@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
     FILE* file = fopen(argv[1], "r");
 
     // Check file open or not
-    if(file == NULL)
+    if(!file)
     {
         printf("Failed to opening file '%s'.\n", argv[1]);
         return -1;
