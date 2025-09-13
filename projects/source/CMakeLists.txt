@@ -1,26 +1,19 @@
 file(
     GLOB_RECURSE
-    "AERELL_SOURCE_FILES"
+    "SOURCE_SOURCE_FILES"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
 )
 
-add_executable(
-    "aerell"
-    ${AERELL_SOURCE_FILES}
+add_library(
+    "source"
+    STATIC
+    ${SOURCE_SOURCE_FILES}
 )
 
 target_include_directories(
-    "aerell"
+    "source"
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include/private"
     INTERFACE
     "${CMAKE_CURRENT_SOURCE_DIR}/include/interface"
-)
-
-target_link_libraries(
-    "aerell"
-    PRIVATE
-    "source"
-    "lexer"
-    "parser"
 )

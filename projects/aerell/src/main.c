@@ -14,10 +14,12 @@
  * Created: 2025-09-7
  */
 
+#include <stdio.h>
 #include <string.h>
 
-#include <lexer/lexer.h>
-#include <parser/parser.h>
+#include <source/source.h>
+// #include <lexer/lexer.h>
+// #include <parser/parser.h>
 
 int main(int argc, char* argv[])
 {
@@ -54,38 +56,49 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    // Read file
-    FILE* file = fopen(argv[1], "r");
-
-    // Check file open or not
-    if(!file)
+    SourceFile* source_file = source_file_create(argv[1]);
+    if(!source_file)
     {
         printf("Failed to opening file '%s'.\n", argv[1]);
         return -1;
     }
 
-    // Tokenizer
-    Tokens* tokens = lexer(file);
+    source_file_print(source_file);
 
-    // Close file
-    fclose(file);
+    source_file_free(source_file);
 
-    // Print token
-    printf("[Lexer] Tokenization Result:\n");
-    tokens_print(tokens);
+    // // Read file
+    // FILE* file = fopen(argv[1], "r");
 
-    printf("\n");
+    // // Check file open or not
+    // if(!file)
+    // {
+    //     printf("Failed to opening file '%s'.\n", argv[1]);
+    //     return -1;
+    // }
 
-    // Parsing
-    ASTs* asts = parser(tokens);
+    // // Tokenizer
+    // Tokens* tokens = lexer(file);
 
-    // Print AST
-    printf("[Parser] Parsing Result:\n");
-    asts_print(asts, 0);
-    
-    // Clean up
-    asts_free(asts);
-    tokens_free(tokens);
-    
+    // // Close file
+    // fclose(file);
+
+    // // Print token
+    // printf("[Lexer] Tokenization Result:\n");
+    // tokens_print(tokens);
+
+    // printf("\n");
+
+    // // Parsing
+    // ASTs* asts = parser(tokens);
+
+    // // Print AST
+    // printf("[Parser] Parsing Result:\n");
+    // asts_print(asts, 0);
+
+    // // Clean up
+    // asts_free(asts);
+    // tokens_free(tokens);
+
     return 0;
 }
