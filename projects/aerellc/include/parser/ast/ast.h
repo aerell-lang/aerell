@@ -19,7 +19,7 @@
 
 #include <stddef.h>
 
-#include <lexer/lexer.h>
+#include "lexer/token/token.h"
 
 typedef struct ASTs ASTs;
 

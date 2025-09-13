@@ -14,15 +14,16 @@
  * Created: 2025-09-8
  */
 
-#include "parser/parser.h"
+#include <stdio.h>
+
 #include "lexer/token/token_type.h"
+#include "parser/parser.h"
 #include "parser/ast/ast.h"
-#include <assert.h>
 
 ASTDataType* parseDataType(Token** token_ref, Tokens* tokens)
 {
     // Validate parameter is valid
-    if(!token_ref|| !*token_ref || !tokens) return NULL;
+    if(!token_ref || !*token_ref || !tokens) return NULL;
 
     // Expect current token is data type
     int types[] = {
@@ -53,7 +54,7 @@ ASTDataType* parseDataType(Token** token_ref, Tokens* tokens)
 ASTFuncParam* parseFuncParam(Token** token_ref, Tokens* tokens)
 {
     // Validate parameter is valid
-    if(!token_ref|| !*token_ref || !tokens) return NULL;
+    if(!token_ref || !*token_ref || !tokens) return NULL;
 
     // Expect current token is id
     if(!token_is(*token_ref, TOKEN_ID))
@@ -68,7 +69,7 @@ ASTFuncParam* parseFuncParam(Token** token_ref, Tokens* tokens)
     // Next token
     *token_ref = tokens_get_token(tokens);
 
-    // Save data type 
+    // Save data type
     ASTDataType* data_type = parseDataType(token_ref, tokens);
     if(!data_type) return NULL;
 
@@ -78,7 +79,7 @@ ASTFuncParam* parseFuncParam(Token** token_ref, Tokens* tokens)
 ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref)
 {
     // Validate parameter is valid
-    if(!token_ref|| !*token_ref || !tokens) return NULL;
+    if(!token_ref || !*token_ref || !tokens) return NULL;
 
     // Expect current token is open parentheses
     if(!token_is(*token_ref, TOKEN_OPEN_PARENTHESES))
@@ -145,7 +146,7 @@ ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref)
 ASTFunc* parseFunc(Token** token_ref, Tokens* tokens)
 {
     // Validate parameter is valid
-    if(!token_ref|| !*token_ref || !tokens) return NULL;
+    if(!token_ref || !*token_ref || !tokens) return NULL;
 
     // Expect current token is f keyword
     if(!token_is(*token_ref, TOKEN_F))
