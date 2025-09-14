@@ -12,5 +12,5 @@ add_executable(
 target_include_directories(
     "aerellc"
     PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/private"
 )

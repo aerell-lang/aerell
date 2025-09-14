@@ -18,8 +18,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lexer/token/token_type.h"
-#include "lexer/token/token.h"
+#include "aerellc/lexer/token/token_type.h"
+#include "aerellc/lexer/token/token.h"
 
 Token* token_create(int type, const char* content)
 {
@@ -53,7 +53,8 @@ Token* token_create_with_char(int type, const char content)
     return token;
 }
 
-const char* token_get_content(const Token* token) {
+const char* token_get_content(const Token* token)
+{
     if(!token) return NULL;
     return token->content;
 }
@@ -75,9 +76,7 @@ int token_iss(Token* token, size_t types_len, int types[])
 void token_print(Token* token)
 {
     if(!token) return;
-    printf(
-        "[%i] %s\n", token->type,
-        (token->content && strcmp(token->content, "\n") == 0) ? "\\n" : token->content);
+    printf("[%i] %s\n", token->type, (token->content && strcmp(token->content, "\n") == 0) ? "\\n" : token->content);
 }
 
 void token_free(Token* token)

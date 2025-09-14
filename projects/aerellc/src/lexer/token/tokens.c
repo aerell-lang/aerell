@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lexer/token/tokens.h"
+#include "aerellc/lexer/token/tokens.h"
 
 Tokens* tokens_create()
 {

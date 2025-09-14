@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "parser/ast/asts.h"
+#include "aerellc/parser/ast/asts.h"
 
 ASTs* asts_create()
 {

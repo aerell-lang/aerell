@@ -18,8 +18,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lexer/token/token_type.h"
-#include "lexer/lexer.h"
+#include "aerellc/lexer/token/token_type.h"
+#include "aerellc/lexer/lexer.h"
 
 int lexer_add_token(Tokens* tokens, int type, const char* content)
 {
@@ -35,39 +35,31 @@ int lexer_add_token_with_char(Tokens* tokens, int type, const char content)
     return tokens_add(tokens, token);
 }
 
-Tokens* lexer(FILE* file)
+Tokens* lexer(SourceFile* source_file)
 {
+    if(!source_file || !source_file->buffer || source_file->buffer_size == 0) return NULL;
+
     Tokens* tokens = tokens_create();
 
-    int c = fgetc(file);
-    while(true)
+    const unsigned char* buffer = (const unsigned char*)source_file->buffer;
+    const unsigned char* buffer_begin = buffer;
+    const unsigned char* buffer_end = buffer + source_file->buffer_size;
+
+    while(buffer < buffer_end)
     {
-        // Break if char is EOF
-        if(c == EOF)
-        {
-            lexer_add_token(tokens, TOKEN_EOF, NULL);
-            break;
-        }
+        unsigned char c = *buffer++;
 
-        // Whitespace (SKIP)
-        if(isspace(c))
-        {
-            c = fgetc(file);
-            continue;
-        }
+        // Whitespace (skip)
+        if(isspace(c)) continue;
 
-        // Comments (SKIP)
+        // Comments (skip)
         if(c == '#')
         {
-            while(true)
-            {
-                c = fgetc(file);
-                if(c == '\n' || c == EOF) break;
-            }
+            while(buffer < buffer_end && *buffer != '\n') buffer++;
             continue;
         }
 
-        // * ( ) , ; f
+        // Single-char tokens: * ( ) , ;
         if(c == '*' || c == '(' || c == ')' || c == ',' || c == ';')
         {
             lexer_add_token_with_char(
@@ -76,246 +68,146 @@ Tokens* lexer(FILE* file)
                 : c == '(' ? TOKEN_OPEN_PARENTHESES
                 : c == ')' ? TOKEN_CLOSE_PARENTHESES
                 : c == ',' ? TOKEN_COMA
-                           : TOKEN_SEMICOLON, // ;
+                           : TOKEN_SEMICOLON,
                 c);
-            c = fgetc(file);
             continue;
         }
 
+        // 'f' token
         if(c == 'f')
         {
-            int c1 = fgetc(file);
-            if(isspace(c1))
+            if(buffer < buffer_end && isspace(*buffer))
             {
                 lexer_add_token_with_char(tokens, TOKEN_F, 'f');
-                c = c1;
                 continue;
             }
-            fseek(file, -1, SEEK_CUR);
         }
 
-        // VARIADIC ...
-        if(c == '.')
+        // Variadic "..."
+        if(c == '.' && (buffer + 1) < buffer_end)
         {
-            int c1 = fgetc(file);
-            int c2 = fgetc(file);
-            if(c1 == '.' && c2 == '.')
+            if(buffer[0] == '.' && buffer[1] == '.')
             {
                 lexer_add_token(tokens, TOKEN_VARIADIC, "...");
-                c = fgetc(file);
+                buffer += 2;
                 continue;
             }
-            // Backward (back to first '.')
-            fseek(file, -2, SEEK_CUR);
         }
 
-        // i1, i8, i16, i32, i64
-        if(c == 'i')
+        // Integer types i1, i8, i16, i32, i64
+        if(c == 'i' && (buffer + 1) < buffer_end)
         {
-            int c1 = fgetc(file);
-            int c2 = fgetc(file);
+            unsigned char c1 = buffer[0];
+            unsigned char c2 = buffer[1];
 
             if(c1 == '6' && c2 == '4')
             {
                 lexer_add_token(tokens, TOKEN_DATA_TYPE_I64, "i64");
-                c = fgetc(file);
+                buffer += 2;
                 continue;
             }
-
             if(c1 == '3' && c2 == '2')
             {
                 lexer_add_token(tokens, TOKEN_DATA_TYPE_I32, "i32");
-                c = fgetc(file);
+                buffer += 2;
                 continue;
             }
-
             if(c1 == '1' && c2 == '6')
             {
                 lexer_add_token(tokens, TOKEN_DATA_TYPE_I16, "i16");
-                c = fgetc(file);
+                buffer += 2;
                 continue;
             }
-
-            if(c1 == '1' || c1 == '8')
+            if(c1 == '1')
             {
-                lexer_add_token(
-                    tokens, (c1 == '1') ? TOKEN_DATA_TYPE_I1 : TOKEN_DATA_TYPE_I8, (c1 == '1') ? "i1" : "i8");
-                c = c2;
+                lexer_add_token(tokens, TOKEN_DATA_TYPE_I1, "i1");
+                buffer += 1;
                 continue;
             }
-
-            // Backward (back to 'i')
-            fseek(file, -2, SEEK_CUR);
+            if(c1 == '8')
+            {
+                lexer_add_token(tokens, TOKEN_DATA_TYPE_I8, "i8");
+                buffer += 1;
+                continue;
+            }
         }
 
-        // Number -?[0-9]*(.[0-9]*)?
+        // Number: -?[0-9]*(.[0-9]*)?
         if(isdigit(c) || c == '-')
         {
-            if(c == '-')
-            {
-                int c1 = fgetc(file);
-                if(!isdigit(c1)) goto skip_not_number;
-                // Backward (back to '-')
-                fseek(file, -1, SEEK_CUR);
-            }
+            const unsigned char* num_start = buffer - 1;
+            if(c == '-' && (buffer >= buffer_end || !isdigit(*buffer))) continue; // not a number
 
-            // Setup buffer for number
-            size_t buffer_size = 2;
-            char* buffer = malloc(buffer_size * sizeof(char));
-            size_t buffer_index = 0;
-            if(!buffer) continue;
+            while(buffer < buffer_end && (isdigit(*buffer) || *buffer == '.')) buffer++;
+            size_t num_len = buffer - num_start;
 
-            bool decimal = false;
-            buffer[buffer_index++] = c;
-            while(true)
-            {
-                // Get char
-                c = fgetc(file);
+            char* num_str = malloc(num_len + 1);
+            if(!num_str) continue;
+            for(size_t i = 0; i < num_len; i++) num_str[i] = num_start[i];
+            num_str[num_len] = '\0';
 
-                if(c == '.' && !decimal) decimal = true;
-                // Break if not digit or EOF
-                else if((c == '.' && decimal) || !isdigit(c) || c == EOF)
-                    break;
-
-                // Auto resize buffer if not enough
-                if((buffer_index + 1) >= buffer_size)
-                {
-                    size_t new_buffer_size = (buffer_size == 0) ? 2 : buffer_size * 2;
-                    char* buffer_temp = realloc(buffer, new_buffer_size);
-                    if(!buffer_temp) continue;
-                    buffer = buffer_temp;
-                    buffer_size = new_buffer_size;
-                }
-                buffer[buffer_index++] = c;
-            }
-
-            // Set null terminator at the end of buffer
-            buffer[buffer_index] = '\0';
-
-            // Create token
-            lexer_add_token(tokens, TOKEN_VALUE_NUM, buffer);
-
-            // Free
-            free(buffer);
-
+            lexer_add_token(tokens, TOKEN_VALUE_NUM, num_str);
+            free(num_str);
             continue;
-        skip_not_number:
-            // Backward (back to '-')
-            fseek(file, -1, SEEK_CUR);
         }
 
-        // String ' [^ \n\r\f\t].* '
+        // String '...'
         if(c == '\'')
         {
-            // Setup buffer for string
+            const unsigned char* str_start = buffer;
             size_t buffer_size = 2;
-            char* buffer = malloc(buffer_size * sizeof(char));
-            size_t buffer_index = 0;
-            if(!buffer) continue;
+            char* str_buf = malloc(buffer_size);
+            if(!str_buf) continue;
+            size_t index = 0;
 
-            while(true)
+            while(buffer < buffer_end)
             {
-                // Get char
-                c = fgetc(file);
-
-                // Break if quote
-                if(c == '\'')
-                {
-                    // Skip char
-                    c = fgetc(file);
-                    break;
+                c = *buffer++;
+                if(c == '\'') break;                           // end of string
+                if(c == '\n' || c == '\r' || c == '\f') break; // invalid end
+                if(c == '\\' && buffer < buffer_end)
+                { // escape
+                    unsigned char esc = *buffer++;
+                    c = (esc == 'n') ? '\n' : (esc == 'r') ? '\r' : (esc == 'f') ? '\f' : (esc == 't') ? '\t' : esc;
                 }
-
-                // Break if newline or EOF
-                if(c == '\n' || c == '\r' || c == '\f' || c == EOF) break;
-
-                // Next char
-                if(c == '\\')
+                if(index + 1 >= buffer_size)
                 {
-                    c = fgetc(file);
-                    if(c == 'n') c = '\n';
-                    else if(c == 'r')
-                        c = '\r';
-                    else if(c == 'f')
-                        c = '\f';
-                    else if(c == 't')
-                        c = '\t';
+                    buffer_size *= 2;
+                    char* tmp = realloc(str_buf, buffer_size);
+                    if(!tmp) break;
+                    str_buf = tmp;
                 }
-
-                // Auto resize buffer if not enough
-                if((buffer_index + 1) >= buffer_size)
-                {
-                    size_t new_buffer_size = (buffer_size == 0) ? 2 : buffer_size * 2;
-                    char* buffer_temp = realloc(buffer, new_buffer_size);
-                    if(!buffer_temp) continue;
-                    buffer = buffer_temp;
-                    buffer_size = new_buffer_size;
-                }
-                buffer[buffer_index++] = c;
+                str_buf[index++] = c;
             }
-
-            // Set null terminator at the end of buffer
-            buffer[buffer_index] = '\0';
-
-            // Create token
-            lexer_add_token(tokens, TOKEN_VALUE_STR, buffer);
-
-            // Free
-            free(buffer);
-
+            str_buf[index] = '\0';
+            lexer_add_token(tokens, TOKEN_VALUE_STR, str_buf);
+            free(str_buf);
             continue;
         }
 
-        // ID [a-zA-Z_][a-zA-Z0-9_]*
+        // Identifier [a-zA-Z_][a-zA-Z0-9_]*
         if(isalpha(c) || c == '_')
         {
-            // Setup buffer for ID
-            size_t buffer_size = 1;
-            char* buffer = malloc(buffer_size * sizeof(char));
-            size_t buffer_index = 0;
-            if(!buffer) continue;
+            const unsigned char* id_start = buffer - 1;
+            while(buffer < buffer_end && (isalnum(*buffer) || *buffer == '_')) buffer++;
+            size_t id_len = buffer - id_start;
 
-            // Get char to buffer for ID
-            buffer[buffer_index++] = c;
-            while(true)
-            {
-                // Get char
-                c = fgetc(file);
+            char* id_str = malloc(id_len + 1);
+            if(!id_str) continue;
+            for(size_t i = 0; i < id_len; i++) id_str[i] = id_start[i];
+            id_str[id_len] = '\0';
 
-                // Break if not [a-zA-Z0-9_]
-                if(!isalpha(c) && !isdigit(c) && c != '_') break;
-
-                // Auto resize buffer if not enough
-                if((buffer_index + 1) >= buffer_size)
-                {
-                    size_t new_buffer_size = (buffer_size == 0) ? 2 : buffer_size * 2;
-                    char* buffer_temp = realloc(buffer, new_buffer_size);
-                    if(!buffer_temp) continue;
-                    buffer = buffer_temp;
-                    buffer_size = new_buffer_size;
-                }
-
-                buffer[buffer_index++] = c;
-            }
-
-            // Set null terminator at the end of buffer
-            buffer[buffer_index] = '\0';
-
-            // Create token
-            lexer_add_token(tokens, TOKEN_ID, buffer);
-
-            // Free
-            free(buffer);
-
+            lexer_add_token(tokens, TOKEN_ID, id_str);
+            free(id_str);
             continue;
         }
 
         // Unknown char
         lexer_add_token_with_char(tokens, TOKEN_UNKNOWN, c);
-
-        // Read next char
-        c = fgetc(file);
     }
+
+    // EOF
+    lexer_add_token_with_char(tokens, TOKEN_EOF, '\0');
 
     tokens_shrink(tokens);
     return tokens;

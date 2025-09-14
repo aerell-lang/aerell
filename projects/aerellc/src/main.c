@@ -14,12 +14,12 @@
  * Created: 2025-09-7
  */
 
-#include <stdio.h>
 #include <string.h>
 
-#include "source/source_file.h"
-// #include <lexer/lexer.h>
-// #include <parser/parser.h>
+#include <stdio.h>
+#include "aerellc/source/source_file.h"
+#include <aerellc/lexer/lexer.h>
+#include <aerellc/parser/parser.h>
 
 int main(int argc, char* argv[])
 {
@@ -65,40 +65,27 @@ int main(int argc, char* argv[])
 
     source_file_print(source_file);
 
+    // Tokenizer
+    Tokens* tokens = lexer(source_file);
+
     source_file_free(source_file);
 
-    // // Read file
-    // FILE* file = fopen(argv[1], "r");
+    // Print token
+    printf("[Lexer] Tokenization Result:\n");
+    tokens_print(tokens);
 
-    // // Check file open or not
-    // if(!file)
-    // {
-    //     printf("Failed to opening file '%s'.\n", argv[1]);
-    //     return -1;
-    // }
+    printf("\n");
 
-    // // Tokenizer
-    // Tokens* tokens = lexer(file);
+    // Parsing
+    ASTs* asts = parser(tokens);
 
-    // // Close file
-    // fclose(file);
+    // Print AST
+    printf("[Parser] Parsing Result:\n");
+    asts_print(asts, 0);
 
-    // // Print token
-    // printf("[Lexer] Tokenization Result:\n");
-    // tokens_print(tokens);
-
-    // printf("\n");
-
-    // // Parsing
-    // ASTs* asts = parser(tokens);
-
-    // // Print AST
-    // printf("[Parser] Parsing Result:\n");
-    // asts_print(asts, 0);
-
-    // // Clean up
-    // asts_free(asts);
-    // tokens_free(tokens);
+    // Clean up
+    asts_free(asts);
+    tokens_free(tokens);
 
     return 0;
 }

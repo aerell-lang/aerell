@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "source/source_file.h"
+#include "aerellc/source/source_file.h"
 
 SourceFile* source_file_create(const char* file_path)
 {

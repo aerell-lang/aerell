@@ -17,9 +17,9 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "lexer/token/token.h"
-#include "lexer/token/tokens.h"
-#include "parser/ast/asts.h"
+#include "aerellc/lexer/token/token.h"
+#include "aerellc/lexer/token/tokens.h"
+#include "aerellc/parser/ast/asts.h"
 
 ASTDataType* parseDataType(Token** token_ref, Tokens* tokens);
 

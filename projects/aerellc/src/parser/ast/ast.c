@@ -17,9 +17,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "parser/ast/ast.h"
-#include "parser/ast/ast_type.h"
-#include "parser/ast/asts.h"
+#include "aerellc/parser/ast/ast.h"
+#include "aerellc/parser/ast/ast_type.h"
+#include "aerellc/parser/ast/asts.h"
 
 #define AST_INDENT 4
 

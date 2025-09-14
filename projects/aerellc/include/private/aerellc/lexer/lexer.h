@@ -17,14 +17,13 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include <stdio.h>
-
-#include "lexer/token/tokens.h"
+#include "aerellc/lexer/token/tokens.h"
+#include "aerellc/source/source_file.h"
 
 int lexer_add_token(Tokens* tokens, int type, const char* content);
 
 int lexer_add_token_with_char(Tokens* tokens, int type, const char content);
 
-Tokens* lexer(FILE* file);
+Tokens* lexer(SourceFile* source_file);
 
 #endif
