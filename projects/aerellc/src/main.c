@@ -48,11 +48,12 @@ int main(int argc, char* argv[])
     if((argc == 2) && (strcmp(argv[1], "help") == 0))
     {
         printf(
-            "Usage: aerell [argument]\n\n"
-            "Available arguments:\n"
-            "  version   Print version.\n"
-            "  help      Print help.\n"
-            "  <file>    Run file.\n");
+            "Usage: aerell <command|file> [arguments]\n\n"
+            "Global options:\n"
+            "  -v, --verbose  Show verbose output.\n\n"
+            "Available commands:\n"
+            "  help      Print this usage information.\n"
+            "  version   Print the Aerell version.\n");
         return 0;
     }
 

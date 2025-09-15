@@ -1,0 +1,72 @@
+(* The Aerell Programming Language (Grammar) *)
+
+(* ===== FRAGMENT ===== *)
+
+(* Basic letters *)
+lower_letter = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z";
+upper_letter = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z";
+letter = lower_letter | upper_letter ;
+
+(* digits *)
+nonzero_digit = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+digit = "0" | nonzero_digit;
+
+(* ===== TOKEN ===== *)
+
+(* Skip *)
+WHITESPACE = " " | "\t" | "\r" | "\n" ;
+COMMENT = "#", { ? any character except newline ? }, ( "\n" | EOF ) ;
+
+UNKNOWN = ;
+EOF = ;
+
+COMA = ",";
+ASTERISK = "*" ;
+SEMICOLON = ";" ;
+PARENT_OPEN = "(" ;
+PARENT_CLOSE = ")" ;
+
+KW_F = "f" ;
+
+VARIADIC = "..." ;
+
+DT_I1 = "i1" ;
+DT_I8 = "i8" ;
+DT_I16 = "i16" ;
+DT_I32 = "i32" ;
+DT_I64 = "i64" ;
+
+(* Numbers: integer or fractional (simple) *)
+NUMBER = "0" | [ "-" ], nonzero_digit, { digit }, [ ".", digit, { digit } ] ;
+(* String literal using single quotes, supports escapes *)
+STRING = "'", { "\\" , ( "'" | "\\" | "n" | "t" | "r" | "f" ) | ? any character except "'" , "\" , newline ? }, "'" ;
+
+(* Identifier: starts with letter or "_" then letters/digits/_ *)
+IDENTIFIER = (lower_letter | upper_letter | "_" ), { lower_letter | upper_letter | digit | "_" };
+
+(* ===== RULES ===== *)
+
+(* Data types: basic integer types, optional pointer stars *)
+base_type = DT_I1 | DT_I8 | DT_I16 | DT_I32 | DT_I64 ;
+pointer = ASTERISK, { ASTERISK } ;
+data_type = base_type, [ pointer ] ;
+
+(* Expression: a literal, identifier and call_func *)
+expr = STRING | NUMBER | IDENTIFIER | func_call ;
+
+(* Function parameter: identifier followed by a data_type *)
+func_param = IDENTIFIER, data_type ;
+
+(* Function parameter list *)
+func_params = PARENT_OPEN , [ VARIADIC | func_param , { COMA , func_param } , [ COMA , VARIADIC ] ] , PARENT_CLOSE ;
+
+(* Function declaration: "f" name params return_type ";" *)
+func = KW_F, IDENTIFIER, func_params, data_type, SEMICOLON ;
+
+(* Function call: name ( arglist ) ; where args are exprs *)
+func_arg = PARENT_OPEN, [ expr, { COMA, expr } ], PARENT_CLOSE ;
+func_call = IDENTIFIER, func_arg, SEMICOLON ;
+
+(* Top-level: sequence of statements (func declarations, calls, comments) *)
+statement = ( func | func_call ) ;
+aerell = { statement } ;
