@@ -42,7 +42,7 @@ tokens_t* lexer(SourceFile* source_file)
     tokens_t* tokens = tokens_create();
 
     const unsigned char* buffer = (const unsigned char*)source_file->buffer;
-    const unsigned char* buffer_begin = buffer;
+    // const unsigned char* buffer_begin = buffer;
     const unsigned char* buffer_end = buffer + source_file->buffer_size;
 
     while(buffer < buffer_end)
@@ -154,7 +154,7 @@ tokens_t* lexer(SourceFile* source_file)
         // String '...'
         if(c == '\'')
         {
-            const unsigned char* str_start = buffer;
+            // const unsigned char* str_start = buffer;
             size_t buffer_size = 2;
             char* str_buf = malloc(buffer_size);
             if(!str_buf) continue;
