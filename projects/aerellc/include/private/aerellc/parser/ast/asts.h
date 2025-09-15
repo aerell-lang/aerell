@@ -21,21 +21,21 @@
 
 #include "aerellc/parser/ast/ast.h"
 
-typedef struct ASTs
+typedef struct asts
 {
     size_t length;
     size_t capacity;
-    AST** data;
-} ASTs;
+    ast_t** data;
+} asts_t;
 
-ASTs* asts_create();
+asts_t* asts_create();
 
-void asts_print(ASTs* asts, size_t indent);
+void asts_print(asts_t* asts, size_t indent);
 
-int asts_add(ASTs* asts, AST* ast);
+int asts_add(asts_t* asts, ast_t* ast);
 
-void asts_free(ASTs* asts);
+void asts_free(asts_t* asts);
 
-int asts_shrink(ASTs* asts);
+int asts_shrink(asts_t* asts);
 
 #endif

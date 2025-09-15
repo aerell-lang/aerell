@@ -19,9 +19,9 @@
 
 #include "aerellc/lexer/token/tokens.h"
 
-Tokens* tokens_create()
+tokens_t* tokens_create()
 {
-    Tokens* tokens = malloc(sizeof(Tokens));
+    tokens_t* tokens = malloc(sizeof(tokens_t));
     if(!tokens) return NULL;
     tokens->length = 0;
     tokens->capacity = 0;
@@ -30,13 +30,13 @@ Tokens* tokens_create()
     return tokens;
 }
 
-int tokens_add(Tokens* tokens, Token* token)
+int tokens_add(tokens_t* tokens, token_t* token)
 {
     if(!tokens || !token) return 0;
     if(tokens->length >= tokens->capacity)
     {
         size_t new_capacity = (tokens->capacity == 0) ? 2 : tokens->capacity * 2;
-        Token** data_temp = realloc(tokens->data, new_capacity * sizeof(Token*));
+        token_t** data_temp = realloc(tokens->data, new_capacity * sizeof(token_t*));
         if(!data_temp) return 0;
         tokens->data = data_temp;
         tokens->capacity = new_capacity;
@@ -45,19 +45,19 @@ int tokens_add(Tokens* tokens, Token* token)
     return 1;
 }
 
-Token* tokens_get_token(Tokens* tokens)
+token_t* tokens_get_token(tokens_t* tokens)
 {
     if(!tokens) return NULL;
     return tokens->data[(tokens->offset == tokens->length - 1) ? tokens->offset : tokens->offset++];
 }
 
-void tokens_print(Tokens* tokens)
+void tokens_print(tokens_t* tokens)
 {
     if(!tokens) return;
     for(size_t i = 0; i < tokens->length; i++) token_print(tokens->data[i]);
 }
 
-void tokens_free(Tokens* tokens)
+void tokens_free(tokens_t* tokens)
 {
     if(!tokens) return;
     if(tokens->data)
@@ -71,7 +71,7 @@ void tokens_free(Tokens* tokens)
     free(tokens);
 }
 
-int tokens_shrink(Tokens* tokens)
+int tokens_shrink(tokens_t* tokens)
 {
     if(!tokens) return 0;
     if(tokens->length == 0)
@@ -79,7 +79,7 @@ int tokens_shrink(Tokens* tokens)
         tokens_free(tokens);
         return 1;
     }
-    Token** data_temp = realloc(tokens->data, tokens->length * sizeof(Token*));
+    token_t** data_temp = realloc(tokens->data, tokens->length * sizeof(token_t*));
     if(!data_temp) return 0;
     tokens->data = data_temp;
     tokens->capacity = tokens->length;

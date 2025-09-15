@@ -19,9 +19,9 @@
 
 #include "aerellc/parser/ast/asts.h"
 
-ASTs* asts_create()
+asts_t* asts_create()
 {
-    ASTs* asts = malloc(sizeof(ASTs));
+    asts_t* asts = malloc(sizeof(asts_t));
     if(!asts) return NULL;
     asts->capacity = 0;
     asts->length = 0;
@@ -29,19 +29,19 @@ ASTs* asts_create()
     return asts;
 }
 
-void asts_print(ASTs* asts, size_t indent)
+void asts_print(asts_t* asts, size_t indent)
 {
     if(!asts) return;
     for(size_t i = 0; i < asts->length; i++) ast_print(asts->data[i], indent);
 }
 
-int asts_add(ASTs* asts, AST* ast)
+int asts_add(asts_t* asts, ast_t* ast)
 {
     if(!asts || !ast) return 0;
     if(asts->length >= asts->capacity)
     {
         size_t new_capacity = (asts->capacity == 0) ? 2 : asts->capacity * 2;
-        AST** data_temp = realloc(asts->data, new_capacity * sizeof(AST*));
+        ast_t** data_temp = realloc(asts->data, new_capacity * sizeof(ast_t*));
         if(!data_temp) return 0;
         asts->data = data_temp;
         asts->capacity = new_capacity;
@@ -50,7 +50,7 @@ int asts_add(ASTs* asts, AST* ast)
     return 1;
 }
 
-void asts_free(ASTs* asts)
+void asts_free(asts_t* asts)
 {
     if(!asts) return;
     asts->length = 0;
@@ -71,7 +71,7 @@ void asts_free(ASTs* asts)
     free(asts);
 }
 
-int asts_shrink(ASTs* asts)
+int asts_shrink(asts_t* asts)
 {
     if(!asts) return 0;
 
@@ -81,7 +81,7 @@ int asts_shrink(ASTs* asts)
         return 1;
     }
 
-    AST** data_temp = realloc(asts->data, asts->length * sizeof(AST*));
+    ast_t** data_temp = realloc(asts->data, asts->length * sizeof(ast_t*));
     if(!data_temp) return 0;
 
     asts->data = data_temp;

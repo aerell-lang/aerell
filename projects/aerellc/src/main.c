@@ -66,18 +66,18 @@ int main(int argc, char* argv[])
     source_file_print(source_file);
 
     // Tokenizer
-    Tokens* tokens = lexer(source_file);
+    tokens_t* tokens = lexer(source_file);
 
     source_file_free(source_file);
 
     // Print token
-    printf("[Lexer] Tokenization Result:\n");
+    printf("\n[Lexer] Tokenization Result:\n");
     tokens_print(tokens);
 
     printf("\n");
 
     // Parsing
-    ASTs* asts = parser(tokens);
+    asts_t* asts = parser(tokens);
 
     // Print AST
     printf("[Parser] Parsing Result:\n");

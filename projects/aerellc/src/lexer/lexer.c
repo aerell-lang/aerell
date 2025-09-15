@@ -21,25 +21,25 @@
 #include "aerellc/lexer/token/token_type.h"
 #include "aerellc/lexer/lexer.h"
 
-int lexer_add_token(Tokens* tokens, int type, const char* content)
+int lexer_add_token(tokens_t* tokens, int type, const char* content)
 {
-    Token* token = token_create(type, content);
+    token_t* token = token_create(type, content);
     if(!token) return 0;
     return tokens_add(tokens, token);
 }
 
-int lexer_add_token_with_char(Tokens* tokens, int type, const char content)
+int lexer_add_token_with_char(tokens_t* tokens, int type, const char content)
 {
-    Token* token = token_create_with_char(type, content);
+    token_t* token = token_create_with_char(type, content);
     if(!token) return 0;
     return tokens_add(tokens, token);
 }
 
-Tokens* lexer(SourceFile* source_file)
+tokens_t* lexer(SourceFile* source_file)
 {
     if(!source_file || !source_file->buffer || source_file->buffer_size == 0) return NULL;
 
-    Tokens* tokens = tokens_create();
+    tokens_t* tokens = tokens_create();
 
     const unsigned char* buffer = (const unsigned char*)source_file->buffer;
     const unsigned char* buffer_begin = buffer;

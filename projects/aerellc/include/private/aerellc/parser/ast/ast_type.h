@@ -17,8 +17,11 @@
 #ifndef AST_TYPE_H
 #define AST_TYPE_H
 
-#define AST_DATA_TYPE 0
-#define AST_FUNC_PARAM 1
-#define AST_FUNC 2
+typedef enum ast_type
+{
+    AST_DATA_TYPE,
+    AST_FUNC_PARAM,
+    AST_FUNC,
+} ast_type_t;
 
 #endif

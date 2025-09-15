@@ -19,24 +19,26 @@
 
 #include <stddef.h>
 
-typedef struct Token
+#include "aerellc/lexer/token/token_type.h"
+
+typedef struct token
 {
-    int type;
+    token_type_t type;
     char* content;
-} Token;
+} token_t;
 
-Token* token_create(int type, const char* content);
+token_t* token_create(token_type_t type, const char* content);
 
-Token* token_create_with_char(int type, const char content);
+token_t* token_create_with_char(token_type_t type, const char content);
 
-const char* token_get_content(const Token* token);
+const char* token_get_content(const token_t* token);
 
-int token_is(Token* token, int type);
+int token_type_is(token_t* token, token_type_t type);
 
-int token_iss(Token* token, size_t types_len, int types[]);
+int token_types_is(token_t* token, size_t types_len, token_type_t types[]);
 
-void token_print(Token* token);
+void token_print(token_t* token);
 
-void token_free(Token* token);
+void token_free(token_t* token);
 
 #endif

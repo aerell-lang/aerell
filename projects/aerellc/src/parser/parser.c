@@ -20,29 +20,29 @@
 #include "aerellc/parser/parser.h"
 #include "aerellc/parser/ast/ast.h"
 
-ASTDataType* parseDataType(Token** token_ref, Tokens* tokens)
+ast_data_type_t* parseDataType(token_t** token_ref, tokens_t* tokens)
 {
     // Validate parameter is valid
     if(!token_ref || !*token_ref || !tokens) return NULL;
 
     // Expect current token is data type
-    int types[] = {
+    token_type_t types[] = {
         TOKEN_DATA_TYPE_I1, TOKEN_DATA_TYPE_I8, TOKEN_DATA_TYPE_I16, TOKEN_DATA_TYPE_I32, TOKEN_DATA_TYPE_I64};
-    if(!token_iss(*token_ref, sizeof(types) / sizeof(types[0]), types))
+    if(!token_types_is(*token_ref, sizeof(types) / sizeof(types[0]), types))
     {
         printf("Expect data type i1, i8, i16, i32, i64.\n");
         return NULL;
     }
 
     // Save value
-    Token* value = *token_ref;
+    token_t* value = *token_ref;
 
     // Next token
     *token_ref = tokens_get_token(tokens);
 
     // Check is pointer or not
     bool is_pointer = false;
-    if(token_is(*token_ref, TOKEN_ASTERISK))
+    if(token_type_is(*token_ref, TOKEN_ASTERISK))
     {
         is_pointer = true;
         *token_ref = tokens_get_token(tokens);
@@ -51,38 +51,38 @@ ASTDataType* parseDataType(Token** token_ref, Tokens* tokens)
     return ast_data_type_create(value, is_pointer);
 }
 
-ASTFuncParam* parseFuncParam(Token** token_ref, Tokens* tokens)
+ast_func_param_t* parseFuncParam(token_t** token_ref, tokens_t* tokens)
 {
     // Validate parameter is valid
     if(!token_ref || !*token_ref || !tokens) return NULL;
 
     // Expect current token is id
-    if(!token_is(*token_ref, TOKEN_ID))
+    if(!token_type_is(*token_ref, TOKEN_ID))
     {
         printf("Expect identifier for function parameter.\n");
         return NULL;
     }
 
     // Save name token
-    Token* name = *token_ref;
+    token_t* name = *token_ref;
 
     // Next token
     *token_ref = tokens_get_token(tokens);
 
     // Save data type
-    ASTDataType* data_type = parseDataType(token_ref, tokens);
+    ast_data_type_t* data_type = parseDataType(token_ref, tokens);
     if(!data_type) return NULL;
 
     return ast_func_param_create(name, data_type);
 }
 
-ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref)
+asts_t* parseFuncParams(token_t** token_ref, tokens_t* tokens, bool* is_variadic_ref)
 {
     // Validate parameter is valid
     if(!token_ref || !*token_ref || !tokens) return NULL;
 
     // Expect current token is open parentheses
-    if(!token_is(*token_ref, TOKEN_OPEN_PARENTHESES))
+    if(!token_type_is(*token_ref, TOKEN_OPEN_PARENTHESES))
     {
         printf("Expect '(' for function parameters.\n");
         return NULL;
@@ -91,31 +91,31 @@ ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref)
     // Next token
     *token_ref = tokens_get_token(tokens);
 
-    ASTs* params = asts_create();
+    asts_t* params = asts_create();
 
-    while(!token_is(*token_ref, TOKEN_CLOSE_PARENTHESES))
+    while(!token_type_is(*token_ref, TOKEN_CLOSE_PARENTHESES))
     {
         // if variadic consume '...'
-        if(token_is(*token_ref, TOKEN_VARIADIC))
+        if(token_type_is(*token_ref, TOKEN_VARIADIC))
         {
             *is_variadic_ref = true;
             *token_ref = tokens_get_token(tokens);
             break;
         }
 
-        if(!asts_add(params, (AST*)parseFuncParam(token_ref, tokens)))
+        if(!asts_add(params, (ast_t*)parseFuncParam(token_ref, tokens)))
         {
             asts_free(params);
             return NULL;
         }
 
         // Next token if current token is coma and continue
-        if(token_is(*token_ref, TOKEN_COMA))
+        if(token_type_is(*token_ref, TOKEN_COMA))
         {
             *token_ref = tokens_get_token(tokens);
 
             // If current token after coma is ')' printf error
-            if(token_is(*token_ref, TOKEN_CLOSE_PARENTHESES))
+            if(token_type_is(*token_ref, TOKEN_CLOSE_PARENTHESES))
             {
                 printf("Trailing comma in function parameters.\n");
                 asts_free(params);
@@ -129,7 +129,7 @@ ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref)
     }
 
     // Expect current token is close parentheses
-    if(!token_is(*token_ref, TOKEN_CLOSE_PARENTHESES))
+    if(!token_type_is(*token_ref, TOKEN_CLOSE_PARENTHESES))
     {
         printf("Expect ')' for function parameters.\n");
         asts_free(params);
@@ -143,13 +143,13 @@ ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref)
     return params;
 }
 
-ASTFunc* parseFunc(Token** token_ref, Tokens* tokens)
+ast_func_t* parseFunc(token_t** token_ref, tokens_t* tokens)
 {
     // Validate parameter is valid
     if(!token_ref || !*token_ref || !tokens) return NULL;
 
     // Expect current token is f keyword
-    if(!token_is(*token_ref, TOKEN_F))
+    if(!token_type_is(*token_ref, TOKEN_F))
     {
         printf("Expect 'f' keyword for function.\n");
         return NULL;
@@ -159,14 +159,14 @@ ASTFunc* parseFunc(Token** token_ref, Tokens* tokens)
     *token_ref = tokens_get_token(tokens);
 
     // Expect current token is id
-    if(!token_is(*token_ref, TOKEN_ID))
+    if(!token_type_is(*token_ref, TOKEN_ID))
     {
         printf("Expect identifier for function.\n");
         return NULL;
     }
 
     // Save name token
-    Token* name = *token_ref;
+    token_t* name = *token_ref;
 
     // Next token
     *token_ref = tokens_get_token(tokens);
@@ -175,11 +175,11 @@ ASTFunc* parseFunc(Token** token_ref, Tokens* tokens)
     bool is_variadic = false;
 
     // Parse params
-    ASTs* params = parseFuncParams(token_ref, tokens, &is_variadic);
+    asts_t* params = parseFuncParams(token_ref, tokens, &is_variadic);
     if(!params) return NULL;
 
     // Return data type
-    ASTDataType* return_data_type = parseDataType(token_ref, tokens);
+    ast_data_type_t* return_data_type = parseDataType(token_ref, tokens);
     if(!return_data_type)
     {
         asts_free(params);
@@ -187,7 +187,7 @@ ASTFunc* parseFunc(Token** token_ref, Tokens* tokens)
     }
 
     // Expect current token is semicolon
-    if(!token_is(*token_ref, TOKEN_SEMICOLON))
+    if(!token_type_is(*token_ref, TOKEN_SEMICOLON))
     {
         printf("Expect ';' for declaration of function.\n");
         asts_free(params);
@@ -197,16 +197,16 @@ ASTFunc* parseFunc(Token** token_ref, Tokens* tokens)
     return ast_func_create(name, params, is_variadic, return_data_type);
 }
 
-ASTs* parser(Tokens* tokens)
+asts_t* parser(tokens_t* tokens)
 {
-    ASTs* asts = asts_create();
-    Token* token = tokens_get_token(tokens);
-    while(token != NULL && !token_is(token, TOKEN_EOF))
+    asts_t* asts = asts_create();
+    token_t* token = tokens_get_token(tokens);
+    while(token != NULL && !token_type_is(token, TOKEN_EOF))
     {
         // Function
-        if(token_is(token, TOKEN_F))
+        if(token_type_is(token, TOKEN_F))
         {
-            asts_add(asts, (AST*)parseFunc(&token, tokens));
+            asts_add(asts, (ast_t*)parseFunc(&token, tokens));
             continue;
         }
 

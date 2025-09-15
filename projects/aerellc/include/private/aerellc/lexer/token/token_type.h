@@ -17,35 +17,38 @@
 #ifndef TOKEN_TYPE_H
 #define TOKEN_TYPE_H
 
-// System
-#define TOKEN_UNKNOWN 0
-#define TOKEN_EOF 1
+typedef enum token_type
+{
+    // System
+    TOKEN_UNKNOWN,
+    TOKEN_EOF,
 
-// Symbol
-#define TOKEN_COMA 2
-#define TOKEN_ASTERISK 3
-#define TOKEN_SEMICOLON 4
-#define TOKEN_OPEN_PARENTHESES 5
-#define TOKEN_CLOSE_PARENTHESES 6
+    // Symbol
+    TOKEN_COMA,
+    TOKEN_ASTERISK,
+    TOKEN_SEMICOLON,
+    TOKEN_OPEN_PARENTHESES,
+    TOKEN_CLOSE_PARENTHESES,
 
-// Keyword
-#define TOKEN_F 7
+    // Keyword
+    TOKEN_F,
 
-// Unique
-#define TOKEN_VARIADIC 8
+    // Unique
+    TOKEN_VARIADIC,
 
-// Data Type
-#define TOKEN_DATA_TYPE_I1 9
-#define TOKEN_DATA_TYPE_I8 10
-#define TOKEN_DATA_TYPE_I16 11
-#define TOKEN_DATA_TYPE_I32 12
-#define TOKEN_DATA_TYPE_I64 13
+    // Data Type
+    TOKEN_DATA_TYPE_I1,
+    TOKEN_DATA_TYPE_I8,
+    TOKEN_DATA_TYPE_I16,
+    TOKEN_DATA_TYPE_I32,
+    TOKEN_DATA_TYPE_I64,
 
-// Value
-#define TOKEN_VALUE_NUM 14
-#define TOKEN_VALUE_STR 15
+    // Value
+    TOKEN_VALUE_NUM,
+    TOKEN_VALUE_STR,
 
-// Id
-#define TOKEN_ID 16
+    // Id
+    TOKEN_ID,
+} token_type_t;
 
 #endif

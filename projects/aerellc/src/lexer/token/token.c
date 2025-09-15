@@ -21,9 +21,9 @@
 #include "aerellc/lexer/token/token_type.h"
 #include "aerellc/lexer/token/token.h"
 
-Token* token_create(int type, const char* content)
+token_t* token_create(token_type_t type, const char* content)
 {
-    Token* token = malloc(sizeof(Token));
+    token_t* token = malloc(sizeof(token_t));
     if(!token) return NULL;
     token->type = type;
     token->content = ((content) ? strdup(content) : NULL);
@@ -36,9 +36,9 @@ Token* token_create(int type, const char* content)
     return token;
 }
 
-Token* token_create_with_char(int type, const char content)
+token_t* token_create_with_char(token_type_t type, const char content)
 {
-    Token* token = malloc(sizeof(Token));
+    token_t* token = malloc(sizeof(token_t));
     if(!token) return NULL;
     token->type = type;
     token->content = malloc(2);
@@ -53,19 +53,19 @@ Token* token_create_with_char(int type, const char content)
     return token;
 }
 
-const char* token_get_content(const Token* token)
+const char* token_get_content(const token_t* token)
 {
     if(!token) return NULL;
     return token->content;
 }
 
-int token_is(Token* token, int type)
+int token_type_is(token_t* token, token_type_t type)
 {
     if(!token) return 0;
     return token->type == type;
 }
 
-int token_iss(Token* token, size_t types_len, int types[])
+int token_types_is(token_t* token, size_t types_len, token_type_t types[])
 {
     if(!token) return 0;
     for(size_t i = 0; i < types_len; i++)
@@ -73,13 +73,13 @@ int token_iss(Token* token, size_t types_len, int types[])
     return 0;
 }
 
-void token_print(Token* token)
+void token_print(token_t* token)
 {
     if(!token) return;
     printf("[%i] %s\n", token->type, (token->content && strcmp(token->content, "\n") == 0) ? "\\n" : token->content);
 }
 
-void token_free(Token* token)
+void token_free(token_t* token)
 {
     if(!token) return;
     token->type = TOKEN_UNKNOWN;

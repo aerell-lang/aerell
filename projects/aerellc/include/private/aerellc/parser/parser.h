@@ -21,14 +21,14 @@
 #include "aerellc/lexer/token/tokens.h"
 #include "aerellc/parser/ast/asts.h"
 
-ASTDataType* parseDataType(Token** token_ref, Tokens* tokens);
+ast_data_type_t* parseDataType(token_t** token_ref, tokens_t* tokens);
 
-ASTFuncParam* parseFuncParam(Token** token_ref, Tokens* tokens);
+ast_func_param_t* parseFuncParam(token_t** token_ref, tokens_t* tokens);
 
-ASTs* parseFuncParams(Token** token_ref, Tokens* tokens, bool* is_variadic_ref);
+asts_t* parseFuncParams(token_t** token_ref, tokens_t* tokens, bool* is_variadic_ref);
 
-ASTFunc* parseFunc(Token** token_ref, Tokens* tokens);
+ast_func_t* parseFunc(token_t** token_ref, tokens_t* tokens);
 
-ASTs* parser(Tokens* tokens);
+asts_t* parser(tokens_t* tokens);
 
 #endif

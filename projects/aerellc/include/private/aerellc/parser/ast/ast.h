@@ -19,58 +19,59 @@
 
 #include <stddef.h>
 
+#include "ast_type.h"
 #include "aerellc/lexer/token/token.h"
 
-typedef struct ASTs ASTs;
+typedef struct asts asts_t;
 
-typedef struct AST
+typedef struct ast
 {
-    int type;
-} AST;
+    ast_type_t type;
+} ast_t;
 
-typedef struct ASTDataType
+typedef struct ast_data_type
 {
-    AST base;
-    Token* value;
+    ast_t base;
+    token_t* value;
     bool is_pointer;
-} ASTDataType;
+} ast_data_type_t;
 
-typedef struct ASTFuncParam
+typedef struct ast_func_param
 {
-    AST base;
-    Token* name;
-    ASTDataType* data_type;
-} ASTFuncParam;
+    ast_t base;
+    token_t* name;
+    ast_data_type_t* data_type;
+} ast_func_param_t;
 
-typedef struct ASTFunc
+typedef struct ast_func
 {
-    AST base;
-    Token* name;
-    ASTs* params;
+    ast_t base;
+    token_t* name;
+    asts_t* params;
     bool is_variadic;
-    ASTDataType* return_data_type;
-} ASTFunc;
+    ast_data_type_t* return_data_type;
+} ast_func_t;
 
-ASTDataType* ast_data_type_create(Token* value, bool is_pointer);
+ast_data_type_t* ast_data_type_create(token_t* value, bool is_pointer);
 
-ASTFuncParam* ast_func_param_create(Token* name, ASTDataType* data_type);
+ast_func_param_t* ast_func_param_create(token_t* name, ast_data_type_t* data_type);
 
-ASTFunc* ast_func_create(Token* name, ASTs* params, bool is_variadic, ASTDataType* return_data_type);
+ast_func_t* ast_func_create(token_t* name, asts_t* params, bool is_variadic, ast_data_type_t* return_data_type);
 
-void ast_data_type_print(ASTDataType* ast, size_t indent);
+void ast_data_type_print(ast_data_type_t* ast, size_t indent);
 
-void ast_func_param_print(ASTFuncParam* ast, size_t indent);
+void ast_func_param_print(ast_func_param_t* ast, size_t indent);
 
-void ast_func_print(ASTFunc* ast, size_t indent);
+void ast_func_print(ast_func_t* ast, size_t indent);
 
-void ast_print(AST* ast, size_t indent);
+void ast_print(ast_t* ast, size_t indent);
 
-void ast_data_type_free(ASTDataType* ast);
+void ast_data_type_free(ast_data_type_t* ast);
 
-void ast_func_param_free(ASTFuncParam* ast);
+void ast_func_param_free(ast_func_param_t* ast);
 
-void ast_func_free(ASTFunc* ast);
+void ast_func_free(ast_func_t* ast);
 
-void ast_free(AST* ast);
+void ast_free(ast_t* ast);
 
 #endif

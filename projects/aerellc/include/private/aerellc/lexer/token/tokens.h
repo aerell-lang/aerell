@@ -21,24 +21,24 @@
 
 #include "aerellc/lexer/token/token.h"
 
-typedef struct Tokens
+typedef struct tokens
 {
     size_t length;
     size_t capacity;
     size_t offset;
-    Token** data;
-} Tokens;
+    token_t** data;
+} tokens_t;
 
-Tokens* tokens_create();
+tokens_t* tokens_create();
 
-int tokens_add(Tokens* tokens, Token* token);
+int tokens_add(tokens_t* tokens, token_t* token);
 
-Token* tokens_get_token(Tokens* tokens);
+token_t* tokens_get_token(tokens_t* tokens);
 
-void tokens_print(Tokens* tokens);
+void tokens_print(tokens_t* tokens);
 
-int tokens_shrink(Tokens* tokens);
+int tokens_shrink(tokens_t* tokens);
 
-void tokens_free(Tokens* tokens);
+void tokens_free(tokens_t* tokens);
 
 #endif
