@@ -41,12 +41,26 @@ int asts_add(asts_t* asts, ast_t* ast)
     if(asts->length >= asts->capacity)
     {
         size_t new_capacity = (asts->capacity == 0) ? 2 : asts->capacity * 2;
-        ast_t** data_temp = realloc(asts->data, new_capacity * sizeof(ast_t*));
-        if(!data_temp) return 0;
-        asts->data = data_temp;
+        ast_t** new_data = realloc(asts->data, new_capacity * sizeof(ast_t*));
+        if(!new_data) return 0;
+        asts->data = new_data;
         asts->capacity = new_capacity;
     }
     asts->data[asts->length++] = ast;
+    return 1;
+}
+
+int asts_shrink(asts_t* asts)
+{
+    if(!asts) return 0;
+    if(asts->length == 0) return 1;
+
+    ast_t** new_data = realloc(asts->data, asts->length * sizeof(ast_t*));
+    if(!new_data) return 0;
+
+    asts->data = new_data;
+    asts->capacity = asts->length;
+
     return 1;
 }
 
@@ -69,23 +83,4 @@ void asts_free(asts_t* asts)
         asts->data = NULL;
     }
     free(asts);
-}
-
-int asts_shrink(asts_t* asts)
-{
-    if(!asts) return 0;
-
-    if(asts->length == 0)
-    {
-        asts_free(asts);
-        return 1;
-    }
-
-    ast_t** data_temp = realloc(asts->data, asts->length * sizeof(ast_t*));
-    if(!data_temp) return 0;
-
-    asts->data = data_temp;
-    asts->capacity = asts->length;
-
-    return 1;
 }

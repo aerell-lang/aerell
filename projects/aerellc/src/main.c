@@ -18,8 +18,11 @@
 
 #include <stdio.h>
 #include "aerellc/source/source_file.h"
+#include "aerellc/source/source_manager.h"
 #include <aerellc/lexer/lexer.h>
 #include <aerellc/parser/parser.h>
+
+int file_is_exist(const char* file_path) { return (fopen(file_path, "r")) ? 1 : 0; }
 
 int main(int argc, char* argv[])
 {
@@ -30,23 +33,26 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    // Exit if too many argument
-    if(argc > 2)
-    {
-        printf("Too many argument.\n");
-        return 1;
-    }
-
     // Print version
-    if((argc == 2) && (strcmp(argv[1], "version") == 0))
+    if(strcmp(argv[1], "version") == 0)
     {
+        if(argc > 2)
+        {
+            printf("Too many argument just to print version.\n");
+            return 1;
+        }
         printf("1.0.0\n");
         return 0;
     }
 
     // Print help
-    if((argc == 2) && (strcmp(argv[1], "help") == 0))
+    if(strcmp(argv[1], "help") == 0)
     {
+        if(argc > 2)
+        {
+            printf("Too many argument just to print help.\n");
+            return 1;
+        }
         printf(
             "Usage: aerell <command|file> [arguments]\n\n"
             "Global options:\n"
@@ -57,36 +63,63 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    source_file_t* source_file = source_file_create(argv[1]);
-    if(!source_file)
+    source_manager_t* source_manager = source_manager_create();
+    if(!source_manager)
     {
-        printf("Failed to opening file '%s'.\n", argv[1]);
+        printf("Failed to create source manager.\n");
         return -1;
     }
 
-    source_file_print(source_file);
+    for(size_t i = 1; i < (size_t)argc; i++)
+    {
+        const char* file_path = argv[i];
+        if(!file_is_exist(file_path))
+        {
+            printf("Failed to opening file '%s'.\n", file_path);
+            continue;
+        }
+        source_file_t* source_file = source_file_create(file_path);
+        if(!source_file)
+        {
+            printf("Failed to create source file '%s'.\n", file_path);
+            continue;
+        }
+        if(!source_manager_add(source_manager, source_file)) printf("Failed to add source file to source manager.\n");
+    }
 
-    // Tokenizer
-    tokens_t* tokens = lexer(source_file);
+    if(!source_manager_shrink(source_manager))
+    {
+        printf("Failed to shrink source manager.\n");
+        source_manager_free(source_manager);
+        return -1;
+    }
 
-    source_file_free(source_file);
+    for(size_t i = 0; i < source_manager->length; i++)
+    {
+        source_file_print(source_manager->files[i]);
 
-    // Print token
-    printf("\n[Lexer] Tokenization Result:\n");
-    tokens_print(tokens);
+        // Tokenizer
+        tokens_t* tokens = lexer(source_manager->files[i]);
 
-    printf("\n");
+        // Print token
+        printf("\n[Lexer] Tokenization Result:\n");
+        tokens_print(tokens);
 
-    // Parsing
-    asts_t* asts = parser(tokens);
+        printf("\n");
 
-    // Print AST
-    printf("[Parser] Parsing Result:\n");
-    asts_print(asts, 0);
+        // Parsing
+        asts_t* asts = parser(tokens);
 
-    // Clean up
-    asts_free(asts);
-    tokens_free(tokens);
+        // Print AST
+        printf("[Parser] Parsing Result:\n");
+        asts_print(asts, 0);
+
+        // Clean up
+        asts_free(asts);
+        tokens_free(tokens);
+    }
+
+    source_manager_free(source_manager);
 
     return 0;
 }

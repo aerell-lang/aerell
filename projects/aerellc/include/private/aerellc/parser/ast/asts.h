@@ -34,8 +34,8 @@ void asts_print(asts_t* asts, size_t indent);
 
 int asts_add(asts_t* asts, ast_t* ast);
 
-void asts_free(asts_t* asts);
-
 int asts_shrink(asts_t* asts);
+
+void asts_free(asts_t* asts);
 
 #endif

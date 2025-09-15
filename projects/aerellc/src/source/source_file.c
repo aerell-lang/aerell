@@ -66,14 +66,14 @@ source_file_t* source_file_create(const char* file_path)
         if(line_count >= line_capacity)
         {
             line_capacity *= 2;
-            size_t* line_offsets_tmp = realloc(line_offsets, line_capacity * sizeof(size_t));
-            if(!line_offsets_tmp)
+            size_t* new_line_offsets = realloc(line_offsets, line_capacity * sizeof(size_t));
+            if(!new_line_offsets)
             {
                 free(line_offsets);
                 free(buffer);
                 return NULL;
             }
-            line_offsets = line_offsets_tmp;
+            line_offsets = new_line_offsets;
         }
         line_offsets[line_count++] = offset + 1;
     }
@@ -83,26 +83,26 @@ source_file_t* source_file_create(const char* file_path)
         if(line_count >= line_capacity)
         {
             line_capacity++;
-            size_t* line_offsets_tmp = realloc(line_offsets, line_capacity * sizeof(size_t));
-            if(!line_offsets_tmp)
+            size_t* new_line_offsets = realloc(line_offsets, line_capacity * sizeof(size_t));
+            if(!new_line_offsets)
             {
                 free(line_offsets);
                 free(buffer);
                 return NULL;
             }
-            line_offsets = line_offsets_tmp;
+            line_offsets = new_line_offsets;
         }
         line_offsets[line_count++] = buffer_size;
     }
 
-    size_t* line_offsets_tmp = realloc(line_offsets, line_count * sizeof(size_t));
-    if(!line_offsets_tmp)
+    size_t* new_line_offsets = realloc(line_offsets, line_count * sizeof(size_t));
+    if(!new_line_offsets)
     {
         free(line_offsets);
         free(buffer);
         return NULL;
     }
-    line_offsets = line_offsets_tmp;
+    line_offsets = new_line_offsets;
 
     source_file_t* source_file = malloc(sizeof(source_file_t));
     if(!source_file)

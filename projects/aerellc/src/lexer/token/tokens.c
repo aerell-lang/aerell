@@ -36,9 +36,9 @@ int tokens_add(tokens_t* tokens, token_t* token)
     if(tokens->length >= tokens->capacity)
     {
         size_t new_capacity = (tokens->capacity == 0) ? 2 : tokens->capacity * 2;
-        token_t** data_temp = realloc(tokens->data, new_capacity * sizeof(token_t*));
-        if(!data_temp) return 0;
-        tokens->data = data_temp;
+        token_t** new_data = realloc(tokens->data, new_capacity * sizeof(token_t*));
+        if(!new_data) return 0;
+        tokens->data = new_data;
         tokens->capacity = new_capacity;
     }
     tokens->data[tokens->length++] = token;
@@ -57,6 +57,17 @@ void tokens_print(tokens_t* tokens)
     for(size_t i = 0; i < tokens->length; i++) token_print(tokens->data[i]);
 }
 
+int tokens_shrink(tokens_t* tokens)
+{
+    if(!tokens) return 0;
+    if(tokens->length == 0) return 1;
+    token_t** new_data = realloc(tokens->data, tokens->length * sizeof(token_t*));
+    if(!new_data) return 0;
+    tokens->data = new_data;
+    tokens->capacity = tokens->length;
+    return 1;
+}
+
 void tokens_free(tokens_t* tokens)
 {
     if(!tokens) return;
@@ -69,19 +80,4 @@ void tokens_free(tokens_t* tokens)
     tokens->capacity = 0;
     tokens->offset = 0;
     free(tokens);
-}
-
-int tokens_shrink(tokens_t* tokens)
-{
-    if(!tokens) return 0;
-    if(tokens->length == 0)
-    {
-        tokens_free(tokens);
-        return 1;
-    }
-    token_t** data_temp = realloc(tokens->data, tokens->length * sizeof(token_t*));
-    if(!data_temp) return 0;
-    tokens->data = data_temp;
-    tokens->capacity = tokens->length;
-    return 1;
 }
