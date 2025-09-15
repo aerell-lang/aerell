@@ -20,7 +20,7 @@
 
 #include "aerellc/source/source_file.h"
 
-SourceFile* source_file_create(const char* file_path)
+source_file_t* source_file_create(const char* file_path)
 {
     if(!file_path) return NULL;
 
@@ -104,7 +104,7 @@ SourceFile* source_file_create(const char* file_path)
     }
     line_offsets = line_offsets_tmp;
 
-    SourceFile* source_file = malloc(sizeof(SourceFile));
+    source_file_t* source_file = malloc(sizeof(source_file_t));
     if(!source_file)
     {
         free(buffer);
@@ -129,7 +129,7 @@ SourceFile* source_file_create(const char* file_path)
     return source_file;
 }
 
-void source_file_print(SourceFile* source_file)
+void source_file_print(source_file_t* source_file)
 {
     if(!source_file) return;
     printf("File Path: %s\n", source_file->file_path);
@@ -142,7 +142,7 @@ void source_file_print(SourceFile* source_file)
     printf("Line Count: %zu\n", source_file->line_count);
 }
 
-void source_file_free(SourceFile* source_file)
+void source_file_free(source_file_t* source_file)
 {
     if(!source_file) return;
     if(source_file->file_path) free((char*)source_file->file_path);

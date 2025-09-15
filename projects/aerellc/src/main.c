@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    SourceFile* source_file = source_file_create(argv[1]);
+    source_file_t* source_file = source_file_create(argv[1]);
     if(!source_file)
     {
         printf("Failed to opening file '%s'.\n", argv[1]);

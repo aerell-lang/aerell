@@ -35,7 +35,7 @@ int lexer_add_token_with_char(tokens_t* tokens, int type, const char content)
     return tokens_add(tokens, token);
 }
 
-tokens_t* lexer(SourceFile* source_file)
+tokens_t* lexer(source_file_t* source_file)
 {
     if(!source_file || !source_file->buffer || source_file->buffer_size == 0) return NULL;
 

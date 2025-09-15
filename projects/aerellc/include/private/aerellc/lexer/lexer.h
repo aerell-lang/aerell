@@ -24,6 +24,6 @@ int lexer_add_token(tokens_t* tokens, int type, const char* content);
 
 int lexer_add_token_with_char(tokens_t* tokens, int type, const char content);
 
-tokens_t* lexer(SourceFile* source_file);
+tokens_t* lexer(source_file_t* source_file);
 
 #endif
