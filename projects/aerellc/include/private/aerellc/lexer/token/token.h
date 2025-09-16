@@ -24,14 +24,11 @@
 typedef struct token
 {
     token_type_t type;
-    char* content;
+    const unsigned char* lexeme;
+    size_t lexeme_length;
 } token_t;
 
-token_t* token_create(token_type_t type, const char* content);
-
-token_t* token_create_with_char(token_type_t type, const char content);
-
-const char* token_get_content(const token_t* token);
+token_t* token_create(token_type_t type, const unsigned char* lexeme, size_t lexeme_length);
 
 int token_type_is(token_t* token, token_type_t type);
 

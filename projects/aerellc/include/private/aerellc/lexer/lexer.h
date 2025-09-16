@@ -20,9 +20,7 @@
 #include "aerellc/lexer/token/tokens.h"
 #include "aerellc/source/source_file.h"
 
-int lexer_add_token(tokens_t* tokens, int type, const char* content);
-
-int lexer_add_token_with_char(tokens_t* tokens, int type, const char content);
+int lexer_add_token(tokens_t* tokens, int type, const unsigned char* lexeme, size_t lexeme_length);
 
 tokens_t* lexer(source_file_t* source_file);
 

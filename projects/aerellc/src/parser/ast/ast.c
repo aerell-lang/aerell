@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "aerellc/parser/ast/ast.h"
 #include "aerellc/parser/ast/ast_type.h"
@@ -62,7 +63,7 @@ void ast_data_type_print(ast_data_type_t* ast, size_t indent)
 {
     if(!ast || !ast->value) return;
     printf("%*sASTDataType\n", (int)indent, "");
-    printf("%*s    value: %s\n", (int)indent, "", token_get_content(ast->value));
+    printf("%*s    value: %.*s\n", (int)indent, "", (int)ast->value->lexeme_length, ast->value->lexeme);
     printf("%*s    is_pointer: %i\n", (int)indent, "", ast->is_pointer);
 }
 
@@ -70,7 +71,7 @@ void ast_func_param_print(ast_func_param_t* ast, size_t indent)
 {
     if(!ast || !ast->data_type || !ast->name) return;
     printf("%*sASTFuncParam\n", (int)indent, "");
-    printf("%*s    name: %s\n", (int)indent, "", token_get_content(ast->name));
+    printf("%*s    name: %.*s\n", (int)indent, "", (int)ast->name->lexeme_length, ast->name->lexeme);
     printf("%*s    data_type: \n", (int)indent, "");
     ast_data_type_print(ast->data_type, indent + AST_INDENT);
 }
@@ -79,7 +80,7 @@ void ast_func_print(ast_func_t* ast, size_t indent)
 {
     if(!ast || !ast->name || !ast->params) return;
     printf("%*sASTFunc\n", (int)indent, "");
-    printf("%*s    name: %s\n", (int)indent, "", token_get_content(ast->name));
+    printf("%*s    name: %.*s\n", (int)indent, "", (int)ast->name->lexeme_length, ast->name->lexeme);
     printf("%*s    params: \n", (int)indent, "");
     asts_print(ast->params, indent + AST_INDENT);
     printf("%*s    is_variadic: %i\n", (int)indent, "", ast->is_variadic);

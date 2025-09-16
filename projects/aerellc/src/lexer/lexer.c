@@ -21,16 +21,9 @@
 #include "aerellc/lexer/token/token_type.h"
 #include "aerellc/lexer/lexer.h"
 
-int lexer_add_token(tokens_t* tokens, int type, const char* content)
+int lexer_add_token(tokens_t* tokens, int type, const unsigned char* lexeme, size_t lexeme_length)
 {
-    token_t* token = token_create(type, content);
-    if(!token) return 0;
-    return tokens_add(tokens, token);
-}
-
-int lexer_add_token_with_char(tokens_t* tokens, int type, const char content)
-{
-    token_t* token = token_create_with_char(type, content);
+    token_t* token = token_create(type, lexeme, lexeme_length);
     if(!token) return 0;
     return tokens_add(tokens, token);
 }
@@ -42,172 +35,183 @@ tokens_t* lexer(source_file_t* source_file)
     tokens_t* tokens = tokens_create();
 
     const unsigned char* buffer = (const unsigned char*)source_file->buffer;
-    // const unsigned char* buffer_begin = buffer;
     const unsigned char* buffer_end = buffer + source_file->buffer_size;
 
     while(buffer < buffer_end)
     {
-        unsigned char c = *buffer++;
-
         // Whitespace (skip)
-        if(isspace(c)) continue;
+        if(isspace(*buffer))
+        {
+            buffer++;
+            continue;
+        }
 
         // Comments (skip)
-        if(c == '#')
+        if(*buffer == '#')
         {
             while(buffer < buffer_end && *buffer != '\n') buffer++;
             continue;
         }
 
         // Single-char tokens: * ( ) , ;
-        if(c == '*' || c == '(' || c == ')' || c == ',' || c == ';')
+        if(*buffer == '*' || *buffer == '(' || *buffer == ')' || *buffer == ',' || *buffer == ';')
         {
-            lexer_add_token_with_char(
+            size_t lexeme_length = 1;
+            lexer_add_token(
                 tokens,
-                c == '*'   ? TOKEN_ASTERISK
-                : c == '(' ? TOKEN_OPEN_PARENTHESES
-                : c == ')' ? TOKEN_CLOSE_PARENTHESES
-                : c == ',' ? TOKEN_COMA
-                           : TOKEN_SEMICOLON,
-                c);
+                *buffer == '*'   ? TOKEN_ASTERISK
+                : *buffer == '(' ? TOKEN_OPEN_PARENTHESES
+                : *buffer == ')' ? TOKEN_CLOSE_PARENTHESES
+                : *buffer == ',' ? TOKEN_COMA
+                                 : TOKEN_SEMICOLON,
+                buffer, lexeme_length);
+            buffer += lexeme_length;
             continue;
         }
 
         // 'f' token
-        if(c == 'f')
+        if(*buffer == 'f')
         {
-            if(buffer < buffer_end && isspace(*buffer))
+            if((buffer + 1) < buffer_end && isspace(*(buffer + 1)))
             {
-                lexer_add_token_with_char(tokens, TOKEN_F, 'f');
+                size_t lexeme_length = 1;
+                lexer_add_token(tokens, TOKEN_F, buffer, lexeme_length);
+                buffer += lexeme_length;
                 continue;
             }
         }
 
         // Variadic "..."
-        if(c == '.' && (buffer + 1) < buffer_end)
+        if(*buffer == '.' && (buffer + 1) < buffer_end && (buffer + 2) < buffer_end)
         {
-            if(buffer[0] == '.' && buffer[1] == '.')
+            if(*(buffer + 1) == '.' && *(buffer + 2) == '.')
             {
-                lexer_add_token(tokens, TOKEN_VARIADIC, "...");
-                buffer += 2;
+                size_t lexeme_length = 3;
+                lexer_add_token(tokens, TOKEN_VARIADIC, buffer, lexeme_length);
+                buffer += lexeme_length;
                 continue;
             }
         }
 
         // Integer types i1, i8, i16, i32, i64
-        if(c == 'i' && (buffer + 1) < buffer_end)
+        if(*buffer == 'i' && (buffer + 1) < buffer_end)
         {
-            unsigned char c1 = buffer[0];
-            unsigned char c2 = buffer[1];
+            size_t lexeme_length = 2;
 
-            if(c1 == '6' && c2 == '4')
-            {
-                lexer_add_token(tokens, TOKEN_DATA_TYPE_I64, "i64");
-                buffer += 2;
-                continue;
-            }
-            if(c1 == '3' && c2 == '2')
-            {
-                lexer_add_token(tokens, TOKEN_DATA_TYPE_I32, "i32");
-                buffer += 2;
-                continue;
-            }
-            if(c1 == '1' && c2 == '6')
-            {
-                lexer_add_token(tokens, TOKEN_DATA_TYPE_I16, "i16");
-                buffer += 2;
-                continue;
-            }
+            unsigned char c1 = *(buffer + 1);
+
             if(c1 == '1')
             {
-                lexer_add_token(tokens, TOKEN_DATA_TYPE_I1, "i1");
-                buffer += 1;
+                lexer_add_token(tokens, TOKEN_DATA_TYPE_I1, buffer, lexeme_length);
+                buffer += lexeme_length;
                 continue;
             }
             if(c1 == '8')
             {
-                lexer_add_token(tokens, TOKEN_DATA_TYPE_I8, "i8");
-                buffer += 1;
+                lexer_add_token(tokens, TOKEN_DATA_TYPE_I8, buffer, lexeme_length);
+                buffer += lexeme_length;
                 continue;
+            }
+            else
+            {
+                unsigned char c2 = *(buffer + 2);
+
+                if((buffer + 2) < buffer_end)
+                {
+                    lexeme_length++;
+
+                    if(c1 == '6' && c2 == '4')
+                    {
+                        lexer_add_token(tokens, TOKEN_DATA_TYPE_I64, buffer, lexeme_length);
+                        buffer += lexeme_length;
+                        continue;
+                    }
+                    if(c1 == '3' && c2 == '2')
+                    {
+                        lexer_add_token(tokens, TOKEN_DATA_TYPE_I32, buffer, lexeme_length);
+                        buffer += lexeme_length;
+                        continue;
+                    }
+                    if(c1 == '1' && c2 == '6')
+                    {
+                        lexer_add_token(tokens, TOKEN_DATA_TYPE_I16, buffer, lexeme_length);
+                        buffer += lexeme_length;
+                        continue;
+                    }
+                }
             }
         }
 
         // Number: -?[0-9]*(.[0-9]*)?
-        if(isdigit(c) || c == '-')
+        if(isdigit(*buffer) || *buffer == '-')
         {
-            const unsigned char* num_start = buffer - 1;
-            if(c == '-' && (buffer >= buffer_end || !isdigit(*buffer))) continue; // not a number
+            size_t lexeme_length = 0;
 
-            while(buffer < buffer_end && (isdigit(*buffer) || *buffer == '.')) buffer++;
-            size_t num_len = buffer - num_start;
+            if(*buffer == '-')
+            {
+                if((buffer + 1) >= buffer_end || !isdigit(*(buffer + 1))) goto skip_is_not_number;
+                lexeme_length++;
+            }
 
-            char* num_str = malloc(num_len + 1);
-            if(!num_str) continue;
-            for(size_t i = 0; i < num_len; i++) num_str[i] = num_start[i];
-            num_str[num_len] = '\0';
+            while((buffer + lexeme_length) < buffer_end && isdigit(*(buffer + lexeme_length))) lexeme_length++;
 
-            lexer_add_token(tokens, TOKEN_VALUE_NUM, num_str);
-            free(num_str);
+            if(*(buffer + lexeme_length) == '.')
+            {
+                lexeme_length++;
+
+                while((buffer + lexeme_length) < buffer_end && isdigit(*(buffer + lexeme_length))) lexeme_length++;
+            }
+
+            lexer_add_token(tokens, TOKEN_VALUE_NUM, buffer, lexeme_length);
+            buffer += lexeme_length;
             continue;
+
+        skip_is_not_number:
         }
 
-        // String '...'
-        if(c == '\'')
+        // STRING
+        if(*buffer == '\'')
         {
-            // const unsigned char* str_start = buffer;
-            size_t buffer_size = 2;
-            char* str_buf = malloc(buffer_size);
-            if(!str_buf) continue;
-            size_t index = 0;
+            size_t lexeme_length = 1;
 
-            while(buffer < buffer_end)
+            while((buffer + lexeme_length) < buffer_end && *(buffer + lexeme_length) != '\'' &&
+                  *(buffer + lexeme_length) != '\n')
             {
-                c = *buffer++;
-                if(c == '\'') break;                           // end of string
-                if(c == '\n' || c == '\r' || c == '\f') break; // invalid end
-                if(c == '\\' && buffer < buffer_end)
-                { // escape
-                    unsigned char esc = *buffer++;
-                    c = (esc == 'n') ? '\n' : (esc == 'r') ? '\r' : (esc == 'f') ? '\f' : (esc == 't') ? '\t' : esc;
-                }
-                if(index + 1 >= buffer_size)
-                {
-                    buffer_size *= 2;
-                    char* tmp = realloc(str_buf, buffer_size);
-                    if(!tmp) break;
-                    str_buf = tmp;
-                }
-                str_buf[index++] = c;
+                if(*(buffer + lexeme_length) == '\\' && (buffer + lexeme_length + 1) < buffer_end &&
+                   *(buffer + lexeme_length + 1) == '\'')
+                    lexeme_length++;
+                lexeme_length++;
             }
-            str_buf[index] = '\0';
-            lexer_add_token(tokens, TOKEN_VALUE_STR, str_buf);
-            free(str_buf);
-            continue;
+
+            if(*(buffer + lexeme_length) == '\'')
+            { // "'"
+                lexeme_length++;
+                lexer_add_token(tokens, TOKEN_VALUE_STR, buffer, lexeme_length);
+                buffer += lexeme_length;
+                continue;
+            }
         }
 
         // Identifier [a-zA-Z_][a-zA-Z0-9_]*
-        if(isalpha(c) || c == '_')
+        if(isalpha(*buffer) || *buffer == '_')
         {
-            const unsigned char* id_start = buffer - 1;
-            while(buffer < buffer_end && (isalnum(*buffer) || *buffer == '_')) buffer++;
-            size_t id_len = buffer - id_start;
+            size_t lexeme_length = 1;
+            while((buffer + lexeme_length) < buffer_end &&
+                  (isalnum(*(buffer + lexeme_length)) || *(buffer + lexeme_length) == '_'))
+                lexeme_length++;
 
-            char* id_str = malloc(id_len + 1);
-            if(!id_str) continue;
-            for(size_t i = 0; i < id_len; i++) id_str[i] = id_start[i];
-            id_str[id_len] = '\0';
-
-            lexer_add_token(tokens, TOKEN_ID, id_str);
-            free(id_str);
+            lexer_add_token(tokens, TOKEN_ID, buffer, lexeme_length);
+            buffer += lexeme_length;
             continue;
         }
 
         // Unknown char
-        lexer_add_token_with_char(tokens, TOKEN_UNKNOWN, c);
+        lexer_add_token(tokens, TOKEN_UNKNOWN, buffer, 1);
+        buffer++;
     }
 
     // EOF
-    lexer_add_token_with_char(tokens, TOKEN_EOF, '\0');
+    lexer_add_token(tokens, TOKEN_EOF, buffer, 1);
 
     tokens_shrink(tokens);
     return tokens;
