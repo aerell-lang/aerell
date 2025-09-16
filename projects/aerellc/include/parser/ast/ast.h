@@ -20,7 +20,7 @@
 #include <stddef.h>
 
 #include "ast_type.h"
-#include "aerellc/lexer/token/token.h"
+#include "lexer/token/token.h"
 
 typedef struct asts asts_t;
 

@@ -14,13 +14,13 @@
  * Created: 2025-09-7
  */
 
+#include <stdio.h>
 #include <string.h>
 
-#include <stdio.h>
-#include "aerellc/source/source_file.h"
-#include "aerellc/source/source_manager.h"
-#include <aerellc/lexer/lexer.h>
-#include <aerellc/parser/parser.h>
+#include "source/source_file.h"
+#include "source/source_manager.h"
+#include "lexer/lexer.h"
+#include "parser/parser.h"
 
 int file_is_exist(const char* file_path) { return (fopen(file_path, "r")) ? 1 : 0; }
 

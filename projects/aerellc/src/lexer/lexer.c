@@ -18,8 +18,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "aerellc/lexer/token/token_type.h"
-#include "aerellc/lexer/lexer.h"
+#include "lexer/token/token_type.h"
+#include "lexer/lexer.h"
 
 int lexer_add_token(tokens_t* tokens, int type, const unsigned char* lexeme, size_t lexeme_length)
 {

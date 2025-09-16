@@ -19,7 +19,7 @@
 
 #include <stddef.h>
 
-#include "aerellc/lexer/token/token_type.h"
+#include "lexer/token/token_type.h"
 
 typedef struct token
 {

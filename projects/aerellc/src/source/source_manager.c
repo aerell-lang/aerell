@@ -16,7 +16,7 @@
 
 #include <stdlib.h>
 
-#include "aerellc/source/source_manager.h"
+#include "source/source_manager.h"
 
 source_manager_t* source_manager_create()
 {

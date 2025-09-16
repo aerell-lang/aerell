@@ -18,8 +18,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "aerellc/lexer/token/token_type.h"
-#include "aerellc/lexer/token/token.h"
+#include "lexer/token/token_type.h"
+#include "lexer/token/token.h"
 
 token_t* token_create(token_type_t type, const unsigned char* lexeme, size_t lexeme_length)
 {

@@ -17,7 +17,7 @@
 #ifndef SOURCE_MANAGER_H
 #define SOURCE_MANAGER_H
 
-#include "aerellc/source/source_file.h"
+#include "source/source_file.h"
 
 typedef struct source_manager
 {

@@ -16,9 +16,9 @@
 
 #include <stdio.h>
 
-#include "aerellc/lexer/token/token_type.h"
-#include "aerellc/parser/parser.h"
-#include "aerellc/parser/ast/ast.h"
+#include "lexer/token/token_type.h"
+#include "parser/parser.h"
+#include "parser/ast/ast.h"
 
 ast_data_type_t* parseDataType(token_t** token_ref, tokens_t* tokens)
 {

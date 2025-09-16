@@ -19,7 +19,7 @@
 
 #include <stddef.h>
 
-#include "aerellc/parser/ast/ast.h"
+#include "parser/ast/ast.h"
 
 typedef struct asts
 {

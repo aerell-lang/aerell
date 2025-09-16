@@ -17,8 +17,8 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include "aerellc/lexer/token/tokens.h"
-#include "aerellc/source/source_file.h"
+#include "lexer/token/tokens.h"
+#include "source/source_file.h"
 
 int lexer_add_token(tokens_t* tokens, int type, const unsigned char* lexeme, size_t lexeme_length);
 
