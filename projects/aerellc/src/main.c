@@ -17,10 +17,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #include "source/source_file.h"
 #include "source/source_manager.h"
 #include "lexer/lexer.h"
@@ -30,11 +26,6 @@ int file_is_exist(const char* file_path) { return (fopen(file_path, "r")) ? 1 : 
 
 int main(int argc, char* argv[])
 {
-#ifdef _WIN32
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
-#endif
-
     // Exit if not argument
     if(argc <= 1)
     {

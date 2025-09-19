@@ -21,8 +21,8 @@
 #include <string.h>
 
 #include "lexer/token/token_type.h"
-#include "support/range/range_table.h"
-#include "support/unicode/unicode_range_tables.h"
+#include "support/range/ranges.h"
+#include "support/unicode/unicode_ranges.h"
 #include "lexer/lexer.h"
 
 const bool ascii_whitespace[128] = {
@@ -32,79 +32,55 @@ const bool ascii_xid_start[128] = {['A' ... 'Z'] = true, ['a' ... 'z'] = true, [
 
 const bool ascii_xid_continue[128] = {['0' ... '9'] = true, ['A' ... 'Z'] = true, ['a' ... 'z'] = true, ['_'] = true};
 
-size_t utf8_decode(const unsigned char* buf, size_t buf_len, uint32_t* codepoint)
+size_t utf8_uchar_len(const unsigned char c)
 {
-    if(buf_len == 0) return 0;
-
-    unsigned char c = buf[0];
-
-    if(c < 0x80)
-    { // 1-byte ASCII
-        *codepoint = c;
-        return 1;
-    }
-    else if((c & 0xE0) == 0xC0 && buf_len >= 2)
-    { // 2-byte
-        *codepoint = ((c & 0x1F) << 6) | (buf[1] & 0x3F);
-        return 2;
-    }
-    else if((c & 0xF0) == 0xE0 && buf_len >= 3)
-    { // 3-byte
-        *codepoint = ((c & 0x0F) << 12) | ((buf[1] & 0x3F) << 6) | (buf[2] & 0x3F);
-        return 3;
-    }
-    else if((c & 0xF8) == 0xF0 && buf_len >= 4)
-    { // 4-byte
-        *codepoint = ((c & 0x07) << 18) | ((buf[1] & 0x3F) << 12) | ((buf[2] & 0x3F) << 6) | (buf[3] & 0x3F);
-        return 4;
-    }
-
-    return 0; // Invalid byte
+    if((c & 0x80) == 0) return 1;    // 0xxxxxxx
+    if((c & 0xE0) == 0xC0) return 2; // 110xxxxx
+    if((c & 0xF0) == 0xE0) return 3; // 1110xxxx
+    if((c & 0xF8) == 0xF0) return 4; // 11110xxx
+    return 0;                        // invalid
 }
 
-bool is_unicode_whitespace(const unsigned char* buf, const unsigned char* buf_end, size_t* ba)
+bool is_unicode_whitespace(const unsigned char c, size_t* ba)
 {
-    if(*buf < 128)
+    if(c < 128)
     {
         *ba = 1;
-        return ascii_whitespace[*buf];
+        return ascii_whitespace[c];
     }
 
-    uint32_t cp;
-    *ba = utf8_decode(buf, buf_end - buf, &cp);
+    *ba = utf8_uchar_len(c);
     if(*ba == 0) return false;
 
-    return in_uint32_range_table(whitespace_range_table, whitespace_range_table_count, cp);
+    return is_in_uint32_ranges(c, whitespace_ranges, whitespace_ranges_count);
 }
 
-bool is_xid_start(const unsigned char* buf, const unsigned char* buf_end, size_t* ba)
+bool is_xid_start(const unsigned char c, size_t* ba)
 {
-    if(*buf < 128)
+    if(c < 128)
     {
         *ba = 1;
-        return ascii_xid_start[*buf];
+        return ascii_xid_start[c];
     }
 
-    uint32_t cp;
-    *ba = utf8_decode(buf, buf_end - buf, &cp);
+    *ba = utf8_uchar_len(c);
     if(*ba == 0) return false;
 
-    return in_uint32_range_table(xid_start_range_table, xid_start_range_table_count, cp);
+    return is_in_uint32_ranges(c, xid_start_ranges, xid_start_ranges_count);
 }
 
-bool is_xid_continue(const unsigned char* buf, const unsigned char* buf_end, size_t* ba)
+bool is_xid_continue(const unsigned char c, size_t* ba)
 {
-    if(*buf < 128)
+    if(c < 128)
     {
         *ba = 1;
-        return ascii_xid_continue[*buf];
+        return ascii_xid_continue[c];
     }
 
-    uint32_t cp;
-    *ba = utf8_decode(buf, buf_end - buf, &cp);
+    *ba = utf8_uchar_len(c);
     if(*ba == 0) return false;
 
-    return in_uint32_range_table(xid_continue_range_table, xid_continue_range_table_count, cp);
+    return is_in_uint32_ranges(c, xid_continue_ranges, xid_continue_ranges_count);
 }
 
 bool lexer_add_token(tokens_t* tokens, int type, const unsigned char* lexeme, size_t lexeme_length)
@@ -129,7 +105,7 @@ tokens_t* lexer(source_file_t* source_file)
         size_t lexeme_length = 0;
 
         // WHITESPACE (Skip)
-        if(is_unicode_whitespace(buffer, buffer_end, &byte_amount))
+        if(is_unicode_whitespace(*buffer, &byte_amount))
         {
             buffer += byte_amount;
             continue;
@@ -165,8 +141,7 @@ tokens_t* lexer(source_file_t* source_file)
         }
 
         // KW_F
-        if(*buffer == 'f' &&
-           (((buffer + 1) >= buffer_end) || is_unicode_whitespace(buffer + 1, buffer_end, &byte_amount)))
+        if(*buffer == 'f' && (((buffer + 1) >= buffer_end) || is_unicode_whitespace(*(buffer + 1), &byte_amount)))
         {
             lexeme_length = 1;
             lexer_add_token(tokens, TOKEN_KW_F, buffer, lexeme_length);
@@ -218,7 +193,7 @@ tokens_t* lexer(source_file_t* source_file)
             }
 
             if(type != TOKEN_ILLEGAL && ((buffer + lexeme_length) < buffer_end) &&
-               is_xid_continue(buffer + lexeme_length, buffer_end, &byte_amount))
+               is_xid_continue(*(buffer + lexeme_length), &byte_amount))
                 type = TOKEN_ILLEGAL;
 
             if(type != TOKEN_ILLEGAL)
@@ -263,8 +238,7 @@ tokens_t* lexer(source_file_t* source_file)
 
             while(buffer < buffer_end)
             {
-                uint32_t codepoint = 0;
-                size_t byte_amount = utf8_decode(buffer, buffer_end - buffer, &codepoint);
+                size_t byte_amount = utf8_uchar_len(*buffer);
                 if(byte_amount == 0)
                 {
                     buffer++;
@@ -272,23 +246,21 @@ tokens_t* lexer(source_file_t* source_file)
                     continue;
                 }
 
-                if(codepoint == U'\n') break;
-                if(codepoint == U'\'')
+                if(*buffer == '\n') break;
+                if(*buffer == '\'')
                 {
                     buffer += byte_amount;
                     lexeme_length += byte_amount;
                     goto string_done;
                 }
 
-                if(codepoint == U'\\')
+                if(*buffer == '\\')
                 {
-                    // escape cek next
+                    // escape next char
                     if((buffer + byte_amount) < buffer_end)
                     {
-                        uint32_t escape_codepoint = 0;
-                        size_t escape_byte_amount =
-                            utf8_decode(buffer + byte_amount, buffer_end - (buffer + byte_amount), &escape_codepoint);
-                        if(escape_byte_amount > 0 && escape_codepoint == U'\'')
+                        size_t escape_byte_amount = utf8_uchar_len(*(buffer + byte_amount));
+                        if(escape_byte_amount > 0 && *(buffer + byte_amount) == '\'')
                         {
                             buffer += byte_amount + escape_byte_amount;
                             lexeme_length += byte_amount + escape_byte_amount;
@@ -310,7 +282,7 @@ tokens_t* lexer(source_file_t* source_file)
         }
 
         // IDENTIFIER
-        if(is_xid_start(buffer, buffer_end, &byte_amount))
+        if(is_xid_start(*buffer, &byte_amount))
         {
             lexeme_length = byte_amount;
 
@@ -318,7 +290,7 @@ tokens_t* lexer(source_file_t* source_file)
 
             buffer += lexeme_length;
 
-            while(is_xid_continue(buffer, buffer_end, &byte_amount))
+            while(is_xid_continue(*buffer, &byte_amount))
             {
                 buffer += byte_amount;
                 lexeme_length += byte_amount;

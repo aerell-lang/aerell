@@ -1,16 +1,19 @@
-#include "support/range/range_table.h"
+#include "support/range/ranges.h"
 
-bool in_uint32_range_table(const uint32_range_t* table, size_t count, uint32_t cp)
+bool is_in_uint32_ranges(uint32_t cp, const uint32_range_t* ranges, size_t ranges_count)
 {
-    size_t left = 0, right = count;
+    size_t left = 0;
+    size_t right = ranges_count;
+
     while(left < right)
     {
         size_t mid = left + (right - left) / 2;
-        if(cp < table[mid].start)
+
+        if(cp < ranges[mid].start)
         {
             right = mid;
         }
-        else if(cp > table[mid].end)
+        else if(cp > ranges[mid].end)
         {
             left = mid + 1;
         }
