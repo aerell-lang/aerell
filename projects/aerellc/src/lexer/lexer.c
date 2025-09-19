@@ -1,17 +1,7 @@
 /*
- * Copyright (c) 2025, The Aerell Language Project Authors
- * All rights reserved.
- *
- * This file is part of the Aerell Language project.
- *
- * Licensed under the BSD 3-Clause License.
- * You may obtain a copy of the License at:
- * https://github.com/aerell-lang/aerell/blob/main/LICENSE
- *
- * File: lexer.c
- * Description: Lexer function definition.
- * Author: Fern Aerell fernaerell2020@gmail.com
- * Created: 2025-09-7
+ * Copyright (c) 2025 The Aerell Authors
+ * All rights reserved — BSD 3-Clause License
+ * See LICENSE file for details.
  */
 
 #include <ctype.h>
@@ -176,132 +166,149 @@ bool is_multi_char_token(const unsigned char** buf, const unsigned char* buf_end
     return false;
 }
 
+bool is_number(const unsigned char** buf, const unsigned char* buf_end, tokens_t* tokens)
+{
+    if(isdigit(**buf))
+    {
+        size_t lexeme_length = 1;
+
+        while(((*buf) + lexeme_length) < buf_end && isdigit(*((*buf) + lexeme_length))) lexeme_length++;
+
+        if(((*buf) + lexeme_length) < buf_end && (*((*buf) + lexeme_length) == '.'))
+        {
+            lexeme_length++;
+            if(((*buf) + lexeme_length) < buf_end && !isdigit(*((*buf) + lexeme_length)))
+            {
+                lexer_add_token(tokens, TOKEN_ILLEGAL, (*buf), lexeme_length);
+                (*buf) += lexeme_length;
+                return true;
+            }
+
+            while(((*buf) + lexeme_length) < buf_end && isdigit(*((*buf) + lexeme_length))) lexeme_length++;
+        }
+
+        lexer_add_token(tokens, TOKEN_VALUE_NUM, (*buf), lexeme_length);
+        (*buf) += lexeme_length;
+        return true;
+    }
+    return false;
+}
+
+bool is_string(const unsigned char** buf, const unsigned char* buf_end, tokens_t* tokens)
+{
+    if(**buf == '\'')
+    {
+        const unsigned char* start = *buf;
+        size_t lexeme_length = 1;
+        (*buf) += lexeme_length;
+
+        while((*buf) < buf_end)
+        {
+            size_t byte_amount = utf8_uchar_len(*(*buf));
+            if(byte_amount == 0)
+            {
+                (*buf)++;
+                lexeme_length++;
+                continue;
+            }
+
+            if(*(*buf) == '\n') break;
+            if(*(*buf) == '\'')
+            {
+                (*buf) += byte_amount;
+                lexeme_length += byte_amount;
+                goto string_done;
+            }
+
+            if(*(*buf) == '\\')
+            {
+                // escape next char
+                if(((*buf) + byte_amount) < buf_end)
+                {
+                    size_t escape_byte_amount = utf8_uchar_len(*((*buf) + byte_amount));
+                    if(escape_byte_amount > 0 && *((*buf) + byte_amount) == '\'')
+                    {
+                        (*buf) += byte_amount + escape_byte_amount;
+                        lexeme_length += byte_amount + escape_byte_amount;
+                        continue;
+                    }
+                }
+            }
+
+            (*buf) += byte_amount;
+            lexeme_length += byte_amount;
+        }
+
+        lexer_add_token(tokens, TOKEN_ILLEGAL, start, lexeme_length);
+        return true;
+
+    string_done:
+        lexer_add_token(tokens, TOKEN_VALUE_STR, start, lexeme_length);
+        return true;
+    }
+
+    return false;
+}
+
+bool is_identifier(const unsigned char** buf, tokens_t* tokens)
+{
+    size_t ba;
+    if(is_xid_start(**buf, &ba))
+    {
+        size_t lexeme_length = ba;
+
+        const unsigned char* start = (*buf);
+
+        (*buf) += lexeme_length;
+
+        while(is_xid_continue(*(*buf), &ba))
+        {
+            (*buf) += ba;
+            lexeme_length += ba;
+        }
+
+        lexer_add_token(tokens, TOKEN_ID, start, lexeme_length);
+        return true;
+    }
+    return false;
+}
+
 tokens_t* lexer(source_file_t* source_file)
 {
     if(!source_file || !source_file->buffer || source_file->buffer_size == 0) return NULL;
 
     tokens_t* tokens = tokens_create();
 
-    const unsigned char* buffer = source_file->buffer;
-    const unsigned char* buffer_end = buffer + source_file->buffer_size;
+    const unsigned char* buf = source_file->buffer;
+    const unsigned char* buf_end = buf + source_file->buffer_size;
 
-    while(buffer < buffer_end)
+    while(buf < buf_end)
     {
         // WHITESPACE, COMMENT (Skip)
-        if(skip(&buffer, buffer_end)) continue;
-
-        size_t byte_amount = 0; // byte amount
-        size_t lexeme_length = 0;
-
-        // COMA, ASTERISK, SEMICOLON, PARENT_OPEN, PARENT_CLOSE
-        if(is_single_char_token(&buffer, tokens)) continue;
+        if(skip(&buf, buf_end)) continue;
 
         // KW_F, VARIADIC, DT_I1, DT_I8, DT_I16, DT_I32, DT_I64
-        if(is_multi_char_token(&buffer, buffer_end, tokens)) continue;
+        if(is_multi_char_token(&buf, buf_end, tokens)) continue;
+
+        // COMA, ASTERISK, SEMICOLON, PARENT_OPEN, PARENT_CLOSE
+        if(is_single_char_token(&buf, tokens)) continue;
 
         // NUMBER
-        if(isdigit(*buffer))
-        {
-            lexeme_length = 1;
-
-            while((buffer + lexeme_length) < buffer_end && isdigit(*(buffer + lexeme_length))) lexeme_length++;
-
-            if((buffer + lexeme_length) < buffer_end && (*(buffer + lexeme_length) == '.'))
-            {
-                lexeme_length++;
-                if((buffer + lexeme_length) < buffer_end && !isdigit(*(buffer + lexeme_length)))
-                {
-                    lexer_add_token(tokens, TOKEN_ILLEGAL, buffer, lexeme_length);
-                    buffer += lexeme_length;
-                    continue;
-                }
-
-                while((buffer + lexeme_length) < buffer_end && isdigit(*(buffer + lexeme_length))) lexeme_length++;
-            }
-
-            lexer_add_token(tokens, TOKEN_VALUE_NUM, buffer, lexeme_length);
-            buffer += lexeme_length;
-            continue;
-        }
+        if(is_number(&buf, buf_end, tokens)) continue;
 
         // STRING
-        if(*buffer == '\'')
-        {
-            const unsigned char* start = buffer;
-            lexeme_length = 1;
-            buffer += lexeme_length;
-
-            while(buffer < buffer_end)
-            {
-                size_t byte_amount = utf8_uchar_len(*buffer);
-                if(byte_amount == 0)
-                {
-                    buffer++;
-                    lexeme_length++;
-                    continue;
-                }
-
-                if(*buffer == '\n') break;
-                if(*buffer == '\'')
-                {
-                    buffer += byte_amount;
-                    lexeme_length += byte_amount;
-                    goto string_done;
-                }
-
-                if(*buffer == '\\')
-                {
-                    // escape next char
-                    if((buffer + byte_amount) < buffer_end)
-                    {
-                        size_t escape_byte_amount = utf8_uchar_len(*(buffer + byte_amount));
-                        if(escape_byte_amount > 0 && *(buffer + byte_amount) == '\'')
-                        {
-                            buffer += byte_amount + escape_byte_amount;
-                            lexeme_length += byte_amount + escape_byte_amount;
-                            continue;
-                        }
-                    }
-                }
-
-                buffer += byte_amount;
-                lexeme_length += byte_amount;
-            }
-
-            lexer_add_token(tokens, TOKEN_ILLEGAL, start, lexeme_length);
-            continue;
-
-        string_done:
-            lexer_add_token(tokens, TOKEN_VALUE_STR, start, lexeme_length);
-            continue;
-        }
+        if(is_string(&buf, buf_end, tokens)) continue;
 
         // IDENTIFIER
-        if(is_xid_start(*buffer, &byte_amount))
-        {
-            lexeme_length = byte_amount;
-
-            const unsigned char* start = buffer;
-
-            buffer += lexeme_length;
-
-            while(is_xid_continue(*buffer, &byte_amount))
-            {
-                buffer += byte_amount;
-                lexeme_length += byte_amount;
-            }
-
-            lexer_add_token(tokens, TOKEN_ID, start, lexeme_length);
-            continue;
-        }
+        if(is_identifier(&buf, tokens)) continue;
 
         // Illegal token
-        lexer_add_token(tokens, TOKEN_ILLEGAL, buffer, 1);
-        buffer++;
+        lexer_add_token(tokens, TOKEN_ILLEGAL, buf, 1);
+        buf++;
     }
 
     // EOF
-    lexer_add_token(tokens, TOKEN_EOF, buffer, 1);
+    lexer_add_token(tokens, TOKEN_EOF, buf, 1);
 
     tokens_shrink(tokens);
     return tokens;

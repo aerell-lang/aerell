@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2025 The Aerell Authors
+ * All rights reserved — BSD 3-Clause License
+ * See LICENSE file for details.
+ */
+
 #ifndef RANGES_H
 #define RANGES_H
 
