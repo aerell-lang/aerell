@@ -1,6 +1,10 @@
-# Declare printf function from libc
-f printf(fmt i8*, ...) i32;
+use "print.arl";
 
-# Use printf for print string to console
-printf('Hi! My name is %s.\n', 'Fern Aerell'); # Hi! My name is Fern Aerell
-printf('I\'m %i years old.\n', 20);            # I'm 20 years old.
+var NAME str = "Fern Aerell";
+var AGE i32 = 20;
+var RATE f32 = 4.5;
+
+println("BIO:");
+println("Name: {NAME}");
+println("Age: {AGE}");
+println("Rate: ⭐ {RATE}");

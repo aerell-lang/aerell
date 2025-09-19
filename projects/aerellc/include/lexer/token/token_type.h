@@ -9,36 +9,43 @@
 
 typedef enum token_type
 {
-    // System
-    TOKEN_ILLEGAL,
-    TOKEN_EOF,
+    // Special
+    TOKEN_TYPE_ILLEGAL, // Ilegal or error
 
-    // Symbol
-    TOKEN_COMA,
-    TOKEN_ASTERISK,
-    TOKEN_SEMICOLON,
-    TOKEN_PARENT_OPEN,
-    TOKEN_PARENT_CLOSE,
+    // Keywords
+    TOKEN_TYPE_KW_F, // f
+    TOKEN_TYPE_KW_VOID, // void
+    TOKEN_TYPE_KW_USE, // use
+    TOKEN_TYPE_KW_VAR, // var
 
-    // Keyword
-    TOKEN_KW_F,
+    // Data types
+    TOKEN_TYPE_DT_I32, // i32
+    TOKEN_TYPE_DT_F32, // f32
+    TOKEN_TYPE_DT_STR, // str
 
-    // Unique
-    TOKEN_VARIADIC,
+    // Operators and delimiters
+    TOKEN_TYPE_ADD, // +
+    TOKEN_TYPE_ASSIGN, // =
 
-    // Data Type
-    TOKEN_DATA_TYPE_I1,
-    TOKEN_DATA_TYPE_I8,
-    TOKEN_DATA_TYPE_I16,
-    TOKEN_DATA_TYPE_I32,
-    TOKEN_DATA_TYPE_I64,
+    TOKEN_TYPE_LPAREN, // (
+    TOKEN_TYPE_LBRACE, // {
 
-    // Value
-    TOKEN_VALUE_NUM,
-    TOKEN_VALUE_STR,
+    TOKEN_TYPE_RPAREN, // )
+    TOKEN_TYPE_RBRACE, // }
 
-    // Id
-    TOKEN_ID,
+    TOKEN_TYPE_SEMICOLON, // ;
+
+    // Literal
+    TOKEN_TYPE_INT, // 12345
+    TOKEN_TYPE_FLOAT, // 123.45
+    TOKEN_TYPE_CHAR, // 'a'
+    TOKEN_TYPE_STRING, // "abc"
+
+    // Additional
+    TOKEN_TYPE_ID, // [_a-zA-Z][_a-zA-Z0-9]*
+
 } token_type_t;
+
+extern const char* token_type_string[];
 
 #endif

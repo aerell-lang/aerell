@@ -10,7 +10,6 @@
 #include "source/source_file.h"
 #include "source/source_manager.h"
 #include "lexer/lexer.h"
-#include "parser/parser.h"
 
 int file_is_exist(const char* file_path) { return (fopen(file_path, "r")) ? 1 : 0; }
 
@@ -94,17 +93,7 @@ int main(int argc, char* argv[])
         printf("\n[Lexer] Tokenization Result:\n");
         tokens_print(tokens);
 
-        printf("\n");
-
-        // Parsing
-        asts_t* asts = parser(tokens);
-
-        // Print AST
-        printf("[Parser] Parsing Result:\n");
-        asts_print(asts, 0);
-
         // Clean up
-        asts_free(asts);
         tokens_free(tokens);
     }
 

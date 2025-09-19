@@ -1,2 +1,2 @@
 ./scripts/build.sh
-./build/aerellc ./examples/main.arl
+./build/aerellc ./examples/print.arl ./examples/main.arl

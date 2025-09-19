@@ -1,0 +1,2 @@
+f print(v str) void;
+f println(v str) void { print(v + '\n'); }

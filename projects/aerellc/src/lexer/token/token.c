@@ -38,13 +38,13 @@ int token_types_is(token_t* token, size_t types_len, token_type_t types[])
 void token_print(token_t* token)
 {
     if(!token) return;
-    printf("[%i] %.*s\n", token->type, (int)token->lexeme_length, token->lexeme);
+    printf("[%s] %.*s\n", token_type_string[token->type], (int)token->lexeme_length, token->lexeme);
 }
 
 void token_free(token_t* token)
 {
     if(!token) return;
-    token->type = TOKEN_ILLEGAL;
+    token->type = TOKEN_TYPE_ILLEGAL;
     token->lexeme = NULL;
     token->lexeme_length = 0;
     free(token);
