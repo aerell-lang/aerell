@@ -1,4 +1,6 @@
-f printf(fmt i8*, ...) i32; # printf in libc
+# Declare printf function from libc
+f printf(fmt i8*, ...) i32;
 
+# Use printf for print string to console
 printf('Hi! My name is %s.\n', 'Fern Aerell'); # Hi! My name is Fern Aerell
 printf('I\'m %i years old.\n', 20);            # I'm 20 years old.

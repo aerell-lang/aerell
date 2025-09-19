@@ -25,6 +25,26 @@
 #include "support/unicode/unicode_ranges.h"
 #include "lexer/lexer.h"
 
+typedef struct multi_char_token
+{
+    const char* lexeme;
+    const size_t lexeme_length;
+    const token_type_t type;
+    const bool can_be_a_identifier;
+} multi_char_token_t;
+
+const multi_char_token_t multi_char_tokens[] = {
+    {"f", 1, TOKEN_KW_F, true},
+    {"...", 3, TOKEN_VARIADIC, false},
+    {"i1", 2, TOKEN_DATA_TYPE_I1, true},
+    {"i8", 2, TOKEN_DATA_TYPE_I8, true},
+    {"i16", 3, TOKEN_DATA_TYPE_I16, true},
+    {"i32", 3, TOKEN_DATA_TYPE_I32, true},
+    {"i64", 3, TOKEN_DATA_TYPE_I64, true},
+};
+
+const size_t multi_char_tokens_count = sizeof(multi_char_tokens) / sizeof(multi_char_tokens[0]);
+
 const bool ascii_whitespace[128] = {
     ['\t'] = true, ['\n'] = true, ['\v'] = true, ['\f'] = true, ['\r'] = true, [' '] = true};
 
@@ -90,6 +110,72 @@ bool lexer_add_token(tokens_t* tokens, int type, const unsigned char* lexeme, si
     return tokens_add(tokens, token);
 }
 
+bool skip_whitespace(const unsigned char** buf)
+{
+    size_t ba = 0;
+    if(is_unicode_whitespace(**buf, &ba))
+    {
+        (*buf) += ba;
+        return true;
+    }
+    return false;
+}
+
+bool skip_comment(const unsigned char** buf, const unsigned char* buf_end)
+{
+    if(**buf == '#')
+    {
+        while(*buf < buf_end && **buf != '\n') (*buf)++;
+        return true;
+    }
+    return false;
+}
+
+bool skip(const unsigned char** buf, const unsigned char* buf_end)
+{
+    return skip_whitespace(buf) || skip_comment(buf, buf_end);
+}
+
+bool is_single_char_token(const unsigned char** buf, tokens_t* tokens)
+{
+    token_type_t type;
+
+    switch(**buf)
+    {
+    case '*': type = TOKEN_ASTERISK; break;
+    case '(': type = TOKEN_PARENT_OPEN; break;
+    case ')': type = TOKEN_PARENT_CLOSE; break;
+    case ',': type = TOKEN_COMA; break;
+    case ';': type = TOKEN_SEMICOLON; break;
+    default: return false;
+    }
+
+    size_t lexeme_length = 1;
+    lexer_add_token(tokens, type, *buf, lexeme_length);
+    (*buf) += lexeme_length;
+    return true;
+}
+
+bool is_multi_char_token(const unsigned char** buf, const unsigned char* buf_end, tokens_t* tokens)
+{
+    for(size_t i = 0; i < multi_char_tokens_count; i++)
+    {
+        if(((size_t)(*buf - buf_end) >= multi_char_tokens[i].lexeme_length) &&
+           (strncmp((const char*)*buf, multi_char_tokens[i].lexeme, multi_char_tokens[i].lexeme_length) == 0))
+        {
+            size_t ba;
+            if(multi_char_tokens[i].can_be_a_identifier && ((*buf + multi_char_tokens[i].lexeme_length) < buf_end) &&
+               is_xid_continue(*(*buf + multi_char_tokens[i].lexeme_length), &ba))
+                return false;
+
+            lexer_add_token(tokens, multi_char_tokens[i].type, *buf, multi_char_tokens[i].lexeme_length);
+            (*buf) += multi_char_tokens[i].lexeme_length;
+            return true;
+        }
+    }
+    return false;
+}
+
 tokens_t* lexer(source_file_t* source_file)
 {
     if(!source_file || !source_file->buffer || source_file->buffer_size == 0) return NULL;
@@ -101,108 +187,17 @@ tokens_t* lexer(source_file_t* source_file)
 
     while(buffer < buffer_end)
     {
+        // WHITESPACE, COMMENT (Skip)
+        if(skip(&buffer, buffer_end)) continue;
+
         size_t byte_amount = 0; // byte amount
         size_t lexeme_length = 0;
 
-        // WHITESPACE (Skip)
-        if(is_unicode_whitespace(*buffer, &byte_amount))
-        {
-            buffer += byte_amount;
-            continue;
-        }
-
-        // COMMENT (Skip)
-        if(*buffer == '#')
-        {
-            while(buffer < buffer_end && *buffer != '\n') buffer++;
-            continue;
-        }
-
         // COMA, ASTERISK, SEMICOLON, PARENT_OPEN, PARENT_CLOSE
-        {
-            token_type_t type = TOKEN_ILLEGAL;
+        if(is_single_char_token(&buffer, tokens)) continue;
 
-            switch(*buffer)
-            {
-            case '*': type = TOKEN_ASTERISK; break;
-            case '(': type = TOKEN_PARENT_OPEN; break;
-            case ')': type = TOKEN_PARENT_CLOSE; break;
-            case ',': type = TOKEN_COMA; break;
-            case ';': type = TOKEN_SEMICOLON; break;
-            }
-
-            if(type != TOKEN_ILLEGAL)
-            {
-                lexeme_length = 1;
-                lexer_add_token(tokens, type, buffer, lexeme_length);
-                buffer += lexeme_length;
-                continue;
-            }
-        }
-
-        // KW_F
-        if(*buffer == 'f' && (((buffer + 1) >= buffer_end) || is_unicode_whitespace(*(buffer + 1), &byte_amount)))
-        {
-            lexeme_length = 1;
-            lexer_add_token(tokens, TOKEN_KW_F, buffer, lexeme_length);
-            buffer += lexeme_length;
-            continue;
-        }
-
-        // VARIADIC
-        if(((buffer_end - buffer) >= 3) && (strncmp((const char*)buffer, "...", 3) == 0))
-        {
-            lexeme_length = 3;
-            lexer_add_token(tokens, TOKEN_VARIADIC, buffer, lexeme_length);
-            buffer += lexeme_length;
-            continue;
-        }
-
-        // DT_I1, DT_I8, DT_I16, DT_I32, DT_I64
-        if(((buffer_end - buffer) >= 2) && *buffer == 'i')
-        {
-            token_type_t type = TOKEN_ILLEGAL;
-
-            if(*(buffer + 1) == '1')
-            {
-                if((buffer_end - buffer) >= 3 && *(buffer + 2) == '6')
-                {
-                    type = TOKEN_DATA_TYPE_I16;
-                    lexeme_length = 3;
-                }
-                else
-                {
-                    type = TOKEN_DATA_TYPE_I1;
-                    lexeme_length = 2;
-                }
-            }
-            else if(*(buffer + 1) == '8')
-            {
-                type = TOKEN_DATA_TYPE_I8;
-                lexeme_length = 2;
-            }
-            else if(*(buffer + 1) == '3' && (buffer_end - buffer) >= 3 && *(buffer + 2) == '2')
-            {
-                type = TOKEN_DATA_TYPE_I32;
-                lexeme_length = 3;
-            }
-            else if(*(buffer + 1) == '6' && (buffer_end - buffer) >= 3 && *(buffer + 2) == '4')
-            {
-                type = TOKEN_DATA_TYPE_I64;
-                lexeme_length = 3;
-            }
-
-            if(type != TOKEN_ILLEGAL && ((buffer + lexeme_length) < buffer_end) &&
-               is_xid_continue(*(buffer + lexeme_length), &byte_amount))
-                type = TOKEN_ILLEGAL;
-
-            if(type != TOKEN_ILLEGAL)
-            {
-                lexer_add_token(tokens, type, buffer, lexeme_length);
-                buffer += lexeme_length;
-                continue;
-            }
-        }
+        // KW_F, VARIADIC, DT_I1, DT_I8, DT_I16, DT_I32, DT_I64
+        if(is_multi_char_token(&buffer, buffer_end, tokens)) continue;
 
         // NUMBER
         if(isdigit(*buffer))
@@ -300,7 +295,7 @@ tokens_t* lexer(source_file_t* source_file)
             continue;
         }
 
-        // Unknown char
+        // Illegal token
         lexer_add_token(tokens, TOKEN_ILLEGAL, buffer, 1);
         buffer++;
     }
