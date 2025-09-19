@@ -22,7 +22,7 @@
 typedef struct source_file
 {
     const char* file_path;
-    const char* buffer;
+    const unsigned char* buffer;
     size_t buffer_size;
     size_t* line_offsets;
     size_t line_count;

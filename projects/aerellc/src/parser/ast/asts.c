@@ -67,8 +67,6 @@ int asts_shrink(asts_t* asts)
 void asts_free(asts_t* asts)
 {
     if(!asts) return;
-    asts->length = 0;
-    asts->capacity = 0;
     for(size_t i = 0; i < asts->length; i++)
     {
         if(asts->data[i])
@@ -82,5 +80,7 @@ void asts_free(asts_t* asts)
         free(asts->data);
         asts->data = NULL;
     }
+    asts->length = 0;
+    asts->capacity = 0;
     free(asts);
 }

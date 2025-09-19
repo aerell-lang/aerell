@@ -20,8 +20,6 @@
 #include "lexer/token/tokens.h"
 #include "source/source_file.h"
 
-int lexer_add_token(tokens_t* tokens, int type, const unsigned char* lexeme, size_t lexeme_length);
-
 tokens_t* lexer(source_file_t* source_file);
 
 #endif

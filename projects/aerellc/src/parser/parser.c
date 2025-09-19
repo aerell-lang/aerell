@@ -82,7 +82,7 @@ asts_t* parseFuncParams(token_t** token_ref, tokens_t* tokens, bool* is_variadic
     if(!token_ref || !*token_ref || !tokens) return NULL;
 
     // Expect current token is open parentheses
-    if(!token_type_is(*token_ref, TOKEN_OPEN_PARENTHESES))
+    if(!token_type_is(*token_ref, TOKEN_PARENT_OPEN))
     {
         printf("Expect '(' for function parameters.\n");
         return NULL;
@@ -93,7 +93,7 @@ asts_t* parseFuncParams(token_t** token_ref, tokens_t* tokens, bool* is_variadic
 
     asts_t* params = asts_create();
 
-    while(!token_type_is(*token_ref, TOKEN_CLOSE_PARENTHESES))
+    while(!token_type_is(*token_ref, TOKEN_PARENT_CLOSE))
     {
         // if variadic consume '...'
         if(token_type_is(*token_ref, TOKEN_VARIADIC))
@@ -115,7 +115,7 @@ asts_t* parseFuncParams(token_t** token_ref, tokens_t* tokens, bool* is_variadic
             *token_ref = tokens_get_token(tokens);
 
             // If current token after coma is ')' printf error
-            if(token_type_is(*token_ref, TOKEN_CLOSE_PARENTHESES))
+            if(token_type_is(*token_ref, TOKEN_PARENT_CLOSE))
             {
                 printf("Trailing comma in function parameters.\n");
                 asts_free(params);
@@ -129,7 +129,7 @@ asts_t* parseFuncParams(token_t** token_ref, tokens_t* tokens, bool* is_variadic
     }
 
     // Expect current token is close parentheses
-    if(!token_type_is(*token_ref, TOKEN_CLOSE_PARENTHESES))
+    if(!token_type_is(*token_ref, TOKEN_PARENT_CLOSE))
     {
         printf("Expect ')' for function parameters.\n");
         asts_free(params);
@@ -149,7 +149,7 @@ ast_func_t* parseFunc(token_t** token_ref, tokens_t* tokens)
     if(!token_ref || !*token_ref || !tokens) return NULL;
 
     // Expect current token is f keyword
-    if(!token_type_is(*token_ref, TOKEN_F))
+    if(!token_type_is(*token_ref, TOKEN_KW_F))
     {
         printf("Expect 'f' keyword for function.\n");
         return NULL;
@@ -204,7 +204,7 @@ asts_t* parser(tokens_t* tokens)
     while(token != NULL && !token_type_is(token, TOKEN_EOF))
     {
         // Function
-        if(token_type_is(token, TOKEN_F))
+        if(token_type_is(token, TOKEN_KW_F))
         {
             asts_add(asts, (ast_t*)parseFunc(&token, tokens));
             continue;

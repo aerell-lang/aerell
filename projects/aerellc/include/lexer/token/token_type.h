@@ -20,18 +20,18 @@
 typedef enum token_type
 {
     // System
-    TOKEN_UNKNOWN,
+    TOKEN_ILLEGAL,
     TOKEN_EOF,
 
     // Symbol
     TOKEN_COMA,
     TOKEN_ASTERISK,
     TOKEN_SEMICOLON,
-    TOKEN_OPEN_PARENTHESES,
-    TOKEN_CLOSE_PARENTHESES,
+    TOKEN_PARENT_OPEN,
+    TOKEN_PARENT_CLOSE,
 
     // Keyword
-    TOKEN_F,
+    TOKEN_KW_F,
 
     // Unique
     TOKEN_VARIADIC,

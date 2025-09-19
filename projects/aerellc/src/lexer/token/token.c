@@ -54,7 +54,7 @@ void token_print(token_t* token)
 void token_free(token_t* token)
 {
     if(!token) return;
-    token->type = TOKEN_UNKNOWN;
+    token->type = TOKEN_ILLEGAL;
     token->lexeme = NULL;
     token->lexeme_length = 0;
     free(token);

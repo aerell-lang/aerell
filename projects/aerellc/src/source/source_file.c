@@ -30,7 +30,7 @@ source_file_t* source_file_create(const char* file_path)
     fseek(file, 0, SEEK_END);
     size_t buffer_size = ftell(file);
 
-    char* buffer = malloc(buffer_size > 0 ? buffer_size + 1 : 1);
+    unsigned char* buffer = malloc(buffer_size > 0 ? buffer_size + 1 : 1);
     if(!buffer)
     {
         fclose(file);
@@ -146,7 +146,7 @@ void source_file_free(source_file_t* source_file)
 {
     if(!source_file) return;
     if(source_file->file_path) free((char*)source_file->file_path);
-    if(source_file->buffer) free((char*)source_file->buffer);
+    if(source_file->buffer) free((unsigned char*)source_file->buffer);
     source_file->buffer_size = 0;
     if(source_file->line_offsets) free(source_file->line_offsets);
     source_file->line_count = 0;

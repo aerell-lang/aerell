@@ -6,3 +6,6 @@ build
 
 # clangd
 .cache
+
+# python
+.venv
