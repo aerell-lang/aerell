@@ -42,4 +42,6 @@ if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
 endif()
 
-add_subdirectory("projects")
+include_directories("include")
+
+add_subdirectory("src")
