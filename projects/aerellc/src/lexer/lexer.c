@@ -25,14 +25,30 @@ typedef struct multi_char_token
 
 const multi_char_token_t multi_char_tokens[] = {
     // Data types
+    {"bool", 4, TOKEN_TYPE_DT_BOOL, true},
+    {"i8", 2, TOKEN_TYPE_DT_I8, true},
+    {"i16", 3, TOKEN_TYPE_DT_I16, true},
     {"i32", 3, TOKEN_TYPE_DT_I32, true},
+    {"i64", 3, TOKEN_TYPE_DT_I64, true},
+    {"isize", 5, TOKEN_TYPE_DT_ISIZE, true},
+    {"u8", 2, TOKEN_TYPE_DT_U8, true},
+    {"u16", 3, TOKEN_TYPE_DT_U16, true},
+    {"u32", 3, TOKEN_TYPE_DT_U32, true},
+    {"u64", 3, TOKEN_TYPE_DT_U64, true},
+    {"usize", 5, TOKEN_TYPE_DT_USIZE, true},
     {"f32", 3, TOKEN_TYPE_DT_F32, true},
+    {"f64", 3, TOKEN_TYPE_DT_F64, true},
+    {"char", 4, TOKEN_TYPE_DT_CHAR, true},
     {"str", 3, TOKEN_TYPE_DT_STR, true},
     // Keywords
     {"f", 1, TOKEN_TYPE_KW_F, true},
     {"void", 4, TOKEN_TYPE_KW_VOID, true},
     {"use", 3, TOKEN_TYPE_KW_USE, true},
+    {"const", 5, TOKEN_TYPE_KW_CONST, true},
+    {"static", 6, TOKEN_TYPE_KW_STATIC, true},
+    {"global", 6, TOKEN_TYPE_KW_GLOBAL, true},
     {"var", 3, TOKEN_TYPE_KW_VAR, true},
+    {"mut", 3, TOKEN_TYPE_KW_MUT, true},
 };
 
 const size_t multi_char_tokens_count = sizeof(multi_char_tokens) / sizeof(multi_char_tokens[0]);

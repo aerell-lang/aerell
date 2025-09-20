@@ -1,0 +1,5 @@
+main.arl:1:18
+
+1| const name str = "Fern
+                    ^^^^^
+Invalid string.

@@ -1,2 +1,2 @@
-f print(v str) void;
-f println(v str) void { print(v + '\n'); }
+f print(var v str) void;
+f println(var v str) void { print(v + '\n'); }
