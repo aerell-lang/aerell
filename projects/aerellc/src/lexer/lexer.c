@@ -17,8 +17,8 @@
 
 typedef struct multi_char_token
 {
-    const char* lexeme;
-    const size_t lexeme_length;
+    const char* content;
+    const size_t content_len;
     const token_type_t type;
     const bool can_be_a_identifier;
 } multi_char_token_t;
@@ -53,9 +53,9 @@ const multi_char_token_t multi_char_tokens[] = {
 
 const size_t multi_char_tokens_count = sizeof(multi_char_tokens) / sizeof(multi_char_tokens[0]);
 
-bool lexer_add_token(tokens_t* tokens, int type, const unsigned char* lexeme, size_t lexeme_length)
+bool lexer_add_token(tokens_t* tokens, int type, const unsigned char* content, size_t content_len)
 {
-    token_t* token = token_create(type, lexeme, lexeme_length);
+    token_t* token = token_create(type, content, content_len);
     if(!token) return false;
     return tokens_add(tokens, token);
 }
@@ -102,9 +102,9 @@ bool is_single_char_token(const unsigned char** buf, tokens_t* tokens)
     default: return false;
     }
 
-    size_t lexeme_length = 1;
-    lexer_add_token(tokens, type, *buf, lexeme_length);
-    (*buf) += lexeme_length;
+    size_t content_len = 1;
+    lexer_add_token(tokens, type, *buf, content_len);
+    (*buf) += content_len;
     return true;
 }
 
@@ -112,16 +112,16 @@ bool is_multi_char_token(const unsigned char** buf, const unsigned char* buf_end
 {
     for(size_t i = 0; i < multi_char_tokens_count; i++)
     {
-        if(((size_t)(*buf - buf_end) >= multi_char_tokens[i].lexeme_length) &&
-           (strncmp((const char*)*buf, multi_char_tokens[i].lexeme, multi_char_tokens[i].lexeme_length) == 0))
+        if(((size_t)(*buf - buf_end) >= multi_char_tokens[i].content_len) &&
+           (strncmp((const char*)*buf, multi_char_tokens[i].content, multi_char_tokens[i].content_len) == 0))
         {
             size_t ba;
-            if(multi_char_tokens[i].can_be_a_identifier && ((*buf + multi_char_tokens[i].lexeme_length) < buf_end) &&
-               is_xid_continue(*(*buf + multi_char_tokens[i].lexeme_length), &ba))
+            if(multi_char_tokens[i].can_be_a_identifier && ((*buf + multi_char_tokens[i].content_len) < buf_end) &&
+               is_xid_continue(*(*buf + multi_char_tokens[i].content_len), &ba))
                 return false;
 
-            lexer_add_token(tokens, multi_char_tokens[i].type, *buf, multi_char_tokens[i].lexeme_length);
-            (*buf) += multi_char_tokens[i].lexeme_length;
+            lexer_add_token(tokens, multi_char_tokens[i].type, *buf, multi_char_tokens[i].content_len);
+            (*buf) += multi_char_tokens[i].content_len;
             return true;
         }
     }
@@ -132,28 +132,28 @@ bool is_number(const unsigned char** buf, const unsigned char* buf_end, tokens_t
 {
     if(isdigit(**buf))
     {
-        size_t lexeme_length = 1;
+        size_t content_len = 1;
         token_type_t type = TOKEN_TYPE_INT;
 
-        while(((*buf) + lexeme_length) < buf_end && isdigit(*((*buf) + lexeme_length))) lexeme_length++;
+        while(((*buf) + content_len) < buf_end && isdigit(*((*buf) + content_len))) content_len++;
 
-        if(((*buf) + lexeme_length) < buf_end && (*((*buf) + lexeme_length) == '.'))
+        if(((*buf) + content_len) < buf_end && (*((*buf) + content_len) == '.'))
         {
-            lexeme_length++;
-            if(((*buf) + lexeme_length) < buf_end && !isdigit(*((*buf) + lexeme_length)))
+            content_len++;
+            if(((*buf) + content_len) < buf_end && !isdigit(*((*buf) + content_len)))
             {
-                lexer_add_token(tokens, TOKEN_TYPE_ILLEGAL, (*buf), lexeme_length);
-                (*buf) += lexeme_length;
+                lexer_add_token(tokens, TOKEN_TYPE_ILLEGAL, (*buf), content_len);
+                (*buf) += content_len;
                 return true;
             }
 
             type = TOKEN_TYPE_FLOAT;
 
-            while(((*buf) + lexeme_length) < buf_end && isdigit(*((*buf) + lexeme_length))) lexeme_length++;
+            while(((*buf) + content_len) < buf_end && isdigit(*((*buf) + content_len))) content_len++;
         }
 
-        lexer_add_token(tokens, type, (*buf), lexeme_length);
-        (*buf) += lexeme_length;
+        lexer_add_token(tokens, type, (*buf), content_len);
+        (*buf) += content_len;
         return true;
     }
     return false;
@@ -164,43 +164,43 @@ bool is_char(const unsigned char** buf, const unsigned char* buf_end, tokens_t* 
     if(**buf == '\'')
     {
         const unsigned char* start = *buf;
-        size_t lexeme_length = 1;
-        (*buf) += lexeme_length;
+        size_t content_len = 1;
+        (*buf) += content_len;
 
         if((*buf) >= buf_end)
         {
-            lexer_add_token(tokens, TOKEN_TYPE_ILLEGAL, start, lexeme_length);
+            lexer_add_token(tokens, TOKEN_TYPE_ILLEGAL, start, content_len);
             return true;
         }
 
         if(**buf == '\\')
         {
             (*buf)++;
-            lexeme_length++;
+            content_len++;
         }
 
         size_t ba = utf8_uchar_len(*(*buf));
         if(ba == 0)
         {
             (*buf)++;
-            lexeme_length++;
-            lexer_add_token(tokens, TOKEN_TYPE_ILLEGAL, start, lexeme_length);
+            content_len++;
+            lexer_add_token(tokens, TOKEN_TYPE_ILLEGAL, start, content_len);
             return true;
         }
 
-        lexeme_length += ba;
+        content_len += ba;
         (*buf) += ba;
 
         if(**buf != '\'')
         {
-            lexer_add_token(tokens, TOKEN_TYPE_ILLEGAL, start, lexeme_length);
+            lexer_add_token(tokens, TOKEN_TYPE_ILLEGAL, start, content_len);
             return true;
         }
 
         (*buf)++;
-        lexeme_length++;
+        content_len++;
 
-        lexer_add_token(tokens, TOKEN_TYPE_CHAR, start, lexeme_length);
+        lexer_add_token(tokens, TOKEN_TYPE_CHAR, start, content_len);
         return true;
     }
     return false;
@@ -211,8 +211,8 @@ bool is_string(const unsigned char** buf, const unsigned char* buf_end, tokens_t
     if(**buf == '"')
     {
         const unsigned char* start = *buf;
-        size_t lexeme_length = 1;
-        (*buf) += lexeme_length;
+        size_t content_len = 1;
+        (*buf) += content_len;
 
         while((*buf) < buf_end)
         {
@@ -220,7 +220,7 @@ bool is_string(const unsigned char** buf, const unsigned char* buf_end, tokens_t
             if(ba == 0)
             {
                 (*buf)++;
-                lexeme_length++;
+                content_len++;
                 continue;
             }
 
@@ -228,7 +228,7 @@ bool is_string(const unsigned char** buf, const unsigned char* buf_end, tokens_t
             if(*(*buf) == '"')
             {
                 (*buf) += ba;
-                lexeme_length += ba;
+                content_len += ba;
                 goto string_done;
             }
 
@@ -241,21 +241,21 @@ bool is_string(const unsigned char** buf, const unsigned char* buf_end, tokens_t
                     if(escape_byte_amount > 0 && *((*buf) + ba) == '"')
                     {
                         (*buf) += ba + escape_byte_amount;
-                        lexeme_length += ba + escape_byte_amount;
+                        content_len += ba + escape_byte_amount;
                         continue;
                     }
                 }
             }
 
             (*buf) += ba;
-            lexeme_length += ba;
+            content_len += ba;
         }
 
-        lexer_add_token(tokens, TOKEN_TYPE_ILLEGAL, start, lexeme_length);
+        lexer_add_token(tokens, TOKEN_TYPE_ILLEGAL, start, content_len);
         return true;
 
     string_done:
-        lexer_add_token(tokens, TOKEN_TYPE_STRING, start, lexeme_length);
+        lexer_add_token(tokens, TOKEN_TYPE_STRING, start, content_len);
         return true;
     }
 
@@ -267,19 +267,19 @@ bool is_identifier(const unsigned char** buf, tokens_t* tokens)
     size_t ba;
     if(is_xid_start(**buf, &ba))
     {
-        size_t lexeme_length = ba;
+        size_t content_len = ba;
 
         const unsigned char* start = (*buf);
 
-        (*buf) += lexeme_length;
+        (*buf) += content_len;
 
         while(is_xid_continue(*(*buf), &ba))
         {
             (*buf) += ba;
-            lexeme_length += ba;
+            content_len += ba;
         }
 
-        lexer_add_token(tokens, TOKEN_TYPE_ID, start, lexeme_length);
+        lexer_add_token(tokens, TOKEN_TYPE_ID, start, content_len);
         return true;
     }
     return false;

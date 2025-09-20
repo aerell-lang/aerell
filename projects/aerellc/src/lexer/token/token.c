@@ -11,13 +11,13 @@
 #include "lexer/token/token_type.h"
 #include "lexer/token/token.h"
 
-token_t* token_create(token_type_t type, const unsigned char* lexeme, size_t lexeme_length)
+token_t* token_create(token_type_t type, const unsigned char* content, size_t content_len)
 {
     token_t* token = malloc(sizeof(token_t));
     if(!token) return NULL;
     token->type = type;
-    token->lexeme = lexeme;
-    token->lexeme_length = lexeme_length;
+    token->content = content;
+    token->content_len = content_len;
     return token;
 }
 
@@ -38,14 +38,17 @@ int token_types_is(token_t* token, size_t types_len, token_type_t types[])
 void token_print(token_t* token)
 {
     if(!token) return;
-    printf("[%s] %.*s\n", token_type_string[token->type], (int)token->lexeme_length, token->lexeme);
+    if(strncmp(token_type_string[token->type], (const char*)token->content, token->content_len) == 0)
+        printf("[%s]\n", token_type_string[token->type]);
+    else
+        printf("[%s] %.*s\n", token_type_string[token->type], (int)token->content_len, token->content);
 }
 
 void token_free(token_t* token)
 {
     if(!token) return;
     token->type = TOKEN_TYPE_ILLEGAL;
-    token->lexeme = NULL;
-    token->lexeme_length = 0;
+    token->content = NULL;
+    token->content_len = 0;
     free(token);
 }
