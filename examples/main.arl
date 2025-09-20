@@ -1,4 +1,4 @@
-use "print.arl";
+use "print";
 
 var NAME str = "Fern Aerell";
 var AGE i32 = 20;

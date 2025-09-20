@@ -10,16 +10,16 @@ const char* token_type_string[] = {
     // Special
     [TOKEN_TYPE_ILLEGAL] = "ILLEGAL",
 
+    // Data types
+    [TOKEN_TYPE_DT_I32] = "i32",
+    [TOKEN_TYPE_DT_F32] = "f32",
+    [TOKEN_TYPE_DT_STR] = "str",
+
     // Keywords
     [TOKEN_TYPE_KW_F] = "f",
     [TOKEN_TYPE_KW_VOID] = "void",
     [TOKEN_TYPE_KW_USE] = "use",
     [TOKEN_TYPE_KW_VAR] = "var",
-
-    // Data types
-    [TOKEN_TYPE_DT_I32] = "i32",
-    [TOKEN_TYPE_DT_F32] = "f32",
-    [TOKEN_TYPE_DT_STR] = "str",
 
     // Operators and delimiters
     [TOKEN_TYPE_ADD] = "+",

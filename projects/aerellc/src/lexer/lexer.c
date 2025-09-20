@@ -24,15 +24,15 @@ typedef struct multi_char_token
 } multi_char_token_t;
 
 const multi_char_token_t multi_char_tokens[] = {
+    // Data types
+    {"i32", 3, TOKEN_TYPE_DT_I32, true},
+    {"f32", 3, TOKEN_TYPE_DT_F32, true},
+    {"str", 3, TOKEN_TYPE_DT_STR, true},
     // Keywords
     {"f", 1, TOKEN_TYPE_KW_F, true},
     {"void", 4, TOKEN_TYPE_KW_VOID, true},
     {"use", 3, TOKEN_TYPE_KW_USE, true},
     {"var", 3, TOKEN_TYPE_KW_VAR, true},
-    // Data types
-    {"i32", 3, TOKEN_TYPE_DT_I32, true},
-    {"f32", 3, TOKEN_TYPE_DT_F32, true},
-    {"str", 3, TOKEN_TYPE_DT_STR, true},
 };
 
 const size_t multi_char_tokens_count = sizeof(multi_char_tokens) / sizeof(multi_char_tokens[0]);
