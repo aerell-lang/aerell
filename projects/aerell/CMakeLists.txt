@@ -8,3 +8,8 @@ add_executable(
     "aerell"
     ${SRC_FILES}
 )
+
+target_link_libraries(
+    "aerell"
+    "lexer"
+)
