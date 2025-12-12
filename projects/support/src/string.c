@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "core/string.h"
+#include "support/string.h"
 
 char* substring(const char* start, const char* end)
 {

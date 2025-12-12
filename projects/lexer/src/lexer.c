@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "core/string.h"
+#include "support/string.h"
 #include "lexer/lexer.h"
 #include "lexer/token/token_type.h"
 

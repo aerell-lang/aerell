@@ -5,12 +5,12 @@ file(
 )
 
 add_library(
-    "core"
+    "support"
     ${SRC_FILES}
 )
 
 target_include_directories(
-    "core"
+    "support"
     PUBLIC
     "${CMAKE_CURRENT_LIST_DIR}/include/public"
     PRIVATE
