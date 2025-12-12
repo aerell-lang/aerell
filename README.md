@@ -8,7 +8,7 @@ Aerell is an open source programming language.
 
 ## License
 
-This project is licensed under the [Apache License 2.0](./LICENSE-APACHE).  
-See the LICENSE-APACHE file for details.
+This project is licensed under the [Apache License 2.0](./LICENSE).  
+See the LICENSE file for details.
 
 Feel free to use, modify, and distribute according to the terms of the Apache License 2.0.
