@@ -1,4 +1,4 @@
-The Aerell Programming Language
+# The Aerell Programming Language
 
 Aerell is an open source programming language.
 
