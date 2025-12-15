@@ -9,7 +9,7 @@ class Linker
 {
   public:
     static void initialize();
-    static bool linking(const char* filename);
+    static bool linking(const char* name);
 
   private:
     static std::vector<std::string> libPathFlags;

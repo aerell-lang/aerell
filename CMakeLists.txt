@@ -22,13 +22,22 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the build type (Debug or Release)" FORCE)
 endif()
 
+# Set sanitizer flags
+set(SANITIZER_FLAGS "-fsanitize=address -fsanitize=undefined -fsanitize-address-use-after-scope")
+
+# Set debug flags
+set(DEBUG_FLAGS "-g -O0 -Wall -Werror -Wextra -fno-omit-frame-pointer ${SANITIZER_FLAGS}")
+
+# Set release flags
+set(RELEASE_FLAGS "-static -O3 -march=native -mtune=native -flto -funroll-loops -fomit-frame-pointer -ffast-math -finline-functions -fdata-sections -ffunction-sections -Os -DNDEBUG -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -g0")
+
 # Flags for Debug
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O0 -Wall -Werror -Wextra -fsanitize=address")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0 -Wall -Werror -Wextra -fsanitize=address")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEBUG_FLAGS}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${DEBUG_FLAGS}")
 
 # Flags for Release
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -static -O3 -march=native -mtune=native -flto -funroll-loops -fomit-frame-pointer -ffast-math -finline-functions -fdata-sections -ffunction-sections -Os -DNDEBUG -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -g0")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static -O3 -march=native -mtune=native -flto -funroll-loops -fomit-frame-pointer -ffast-math -finline-functions -fdata-sections -ffunction-sections -Os -DNDEBUG -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -g0")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${RELEASE_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_FLAGS}")
 
 # Linker flags Release - strip and garbage collection
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--gc-sections -Wl,--strip-all -Wl,--as-needed")
@@ -54,18 +63,26 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 
-llvm_map_components_to_libnames(
-    "llvm_libs"
-    # libraries :
-    "core"
-    "support"
-    "passes"
-    "native"
-    "lto"
-    "windowsmanifest"
-    "windowsdriver"
-    "libdriver"
-)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    llvm_map_components_to_libnames(
+        "LLVM_LIBS"
+        # libraries :
+        "core"
+        "support"
+        "passes"
+        "native"
+        "lto"
+        "windowsmanifest"
+        "windowsdriver"
+        "libdriver"
+    )
+else()
+    set(
+        "LLVM_LIBS"
+        # libraries :
+        "LLVM-21"
+    )
+endif()
 
 # LLD
 find_package(LLD REQUIRED CONFIG)
@@ -73,14 +90,14 @@ find_package(LLD REQUIRED CONFIG)
 message(STATUS "Found LLD ${LLD_VERSION}")
 
 set(
-    "lld_libs"
+    "LLD_LIBS"
     # libraries :
     "lldcommon"
     "lldcoff"
-    "lldelf"
-    "lldmacho"
+    # "lldelf"
+    # "lldmacho"
     "lldmingw"
-    "lldwasm"
+    # "lldwasm"
 )
 
 # Aerell
@@ -92,7 +109,7 @@ file(
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/compiler/*.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/linker/*.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/support/*.cpp"
-    "main.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/main.cpp"
 )
 
 add_executable(
@@ -125,8 +142,8 @@ target_link_directories(
 target_link_libraries(
     ${AERELL_PROJECT_NAME}
     PRIVATE
-    ${llvm_libs}
-    ${lld_libs}
+    ${LLVM_LIBS}
+    ${LLD_LIBS}
 )
 
 # Aerell Lib
@@ -149,6 +166,6 @@ set_target_properties(${AERELL_LIB_PROJECT_NAME} PROPERTIES OUTPUT_NAME "aerell"
 # Install
 install(
     TARGETS 
-    ${AERELL_PROJECT_NAME}
     ${AERELL_LIB_PROJECT_NAME}
+    ${AERELL_PROJECT_NAME}
 )

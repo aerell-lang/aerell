@@ -1,18 +1,52 @@
 #include <cstdlib>
 #include <format>
+#include <sstream>
 
 #include "aerell/linker/linker.h"
-
 #include <aerell/support/utils.h>
-#include <sstream>
 
 #include "lld/Common/Driver.h"
 
 LLD_HAS_DRIVER(coff)
-LLD_HAS_DRIVER(elf)
+// LLD_HAS_DRIVER(elf)
 LLD_HAS_DRIVER(mingw)
-LLD_HAS_DRIVER(macho)
-LLD_HAS_DRIVER(wasm)
+// LLD_HAS_DRIVER(macho)
+// LLD_HAS_DRIVER(wasm)
+
+#define LLD_COFF_DRIVER                                                                                                \
+    {                                                                                                                  \
+        {                                                                                                              \
+            lld::WinLink, &lld::coff::link                                                                             \
+        }                                                                                                              \
+    }
+
+#define LLD_ELF_DRIVER                                                                                                 \
+    {                                                                                                                  \
+        {                                                                                                              \
+            lld::Gnu, &lld::elf::link                                                                                  \
+        }                                                                                                              \
+    }
+
+#define LLD_MINGW_DRIVER                                                                                               \
+    {                                                                                                                  \
+        {                                                                                                              \
+            lld::MinGW, &lld::mingw::link                                                                              \
+        }                                                                                                              \
+    }
+
+#define LLD_MACHO_DRIVER                                                                                               \
+    {                                                                                                                  \
+        {                                                                                                              \
+            lld::Darwin, &lld::macho::link                                                                             \
+        }                                                                                                              \
+    }
+
+#define LLD_WASM_DRIVER                                                                                                \
+    {                                                                                                                  \
+        {                                                                                                              \
+            lld::Wasm, &lld::wasm::link                                                                                \
+        }                                                                                                              \
+    }
 
 namespace aerell
 {
@@ -67,17 +101,14 @@ void Linker::initialize()
     }
 }
 
-bool Linker::linking(const char* filename)
+bool Linker::linking(const char* name)
 {
-    auto libPathStr = std::format("-L{}", getExeDir().append("../lib").lexically_normal().generic_string());
-
-    std::vector<const char*> args = {
-        "ld.lld", "-m", "i386pep", "-e", "_start", "-static", "-laerell", "-lkernel32", filename, "-o", "a.exe",
-    };
+    std::vector<const char*> args = {"ld.lld",   "-m",         "i386pep", "-e", "_start", "-static",
+                                     "-laerell", "-lkernel32", name,      "-o", name};
 
     for(auto& libPathFlag : libPathFlags) args.push_back(libPathFlag.c_str());
 
-    lld::Result result = lld::lldMain(args, llvm::outs(), llvm::errs(), LLD_ALL_DRIVERS);
+    lld::Result result = lld::lldMain(args, llvm::outs(), llvm::errs(), LLD_MINGW_DRIVER);
 
     return result.retCode != 0;
 }

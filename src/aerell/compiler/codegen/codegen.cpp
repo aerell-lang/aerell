@@ -18,7 +18,7 @@ void CodeGen::initialize()
     llvm::InitializeNativeTargetDisassembler();
 }
 
-bool CodeGen::object(const std::unique_ptr<llvm::Module>& module, const char* filename)
+bool CodeGen::gen(Type type, const char* name, const std::unique_ptr<llvm::Module>& module)
 {
     auto targetTriple = llvm::Triple(llvm::sys::getDefaultTargetTriple());
     module->setTargetTriple(targetTriple);
@@ -37,7 +37,7 @@ bool CodeGen::object(const std::unique_ptr<llvm::Module>& module, const char* fi
         targetTriple, "generic", "", opt, RM, std::nullopt, llvm::CodeGenOptLevel::Aggressive);
 
     std::error_code EC;
-    llvm::raw_fd_ostream dest(filename, EC, llvm::sys::fs::OpenFlags());
+    llvm::raw_fd_ostream dest(name, EC, llvm::sys::fs::OpenFlags());
 
     if(EC)
     {
@@ -46,8 +46,9 @@ bool CodeGen::object(const std::unique_ptr<llvm::Module>& module, const char* fi
     }
 
     llvm::legacy::PassManager pass;
-    auto fileType = llvm::CodeGenFileType::ObjectFile; // bisa juga asm: CGFT_AssemblyFile
-    if(targetMachine->addPassesToEmitFile(pass, dest, nullptr, fileType))
+    if(targetMachine->addPassesToEmitFile(
+           pass, dest, nullptr,
+           type == Type::ASM ? llvm::CodeGenFileType::AssemblyFile : llvm::CodeGenFileType::ObjectFile))
     {
         llvm::errs() << "TargetMachine can't emit a file of this type\n";
         return false;
