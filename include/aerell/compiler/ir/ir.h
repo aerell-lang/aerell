@@ -17,6 +17,8 @@ void print(const std::unique_ptr<llvm::Module>& module);
 class IR
 {
   public:
+    static std::unique_ptr<llvm::LLVMContext> llvmContext;
+
     static bool verify(const std::unique_ptr<llvm::Module>& module, llvm::raw_ostream* os);
 
     static void optimize(const std::unique_ptr<llvm::Module>& module);
@@ -24,7 +26,6 @@ class IR
     static std::unique_ptr<llvm::Module> gen(const std::vector<std::unique_ptr<AST>>& asts);
 
   private:
-    static llvm::LLVMContext llvmContext;
     static llvm::IRBuilder<> llvmBuilder;
 
     static std::unique_ptr<llvm::Module> module;

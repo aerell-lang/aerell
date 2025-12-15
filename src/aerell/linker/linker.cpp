@@ -103,14 +103,19 @@ void Linker::initialize()
 
 bool Linker::linking(const char* name)
 {
-    std::vector<const char*> args = {"ld.lld",   "-m",         "i386pep", "-e", "_start", "-static",
-                                     "-laerell", "-lkernel32", name,      "-o", name};
+    auto objName = std::filesystem::path(name).filename().replace_extension("o").string();
+    auto exeName = std::filesystem::path(name).filename().replace_extension("exe").string();
+
+    std::vector<const char*> args = {"ld.lld",   "-m",         "i386pep",       "-e", "_start",       "-static",
+                                     "-laerell", "-lkernel32", objName.c_str(), "-o", exeName.c_str()};
 
     for(auto& libPathFlag : libPathFlags) args.push_back(libPathFlag.c_str());
 
     lld::Result result = lld::lldMain(args, llvm::outs(), llvm::errs(), LLD_MINGW_DRIVER);
 
-    return result.retCode != 0;
+    std::filesystem::remove(objName);
+
+    return result.retCode == 0;
 }
 
 } // namespace aerell

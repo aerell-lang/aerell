@@ -75,6 +75,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
         "windowsmanifest"
         "windowsdriver"
         "libdriver"
+        "orcjit"
     )
 else()
     set(
@@ -100,6 +101,32 @@ set(
     # "lldwasm"
 )
 
+# Aerell Lib
+set("AERELL_LIB_PROJECT_NAME" "aerell_lib")
+set("AERELL_LIB_STATIC_PROJECT_NAME" "${AERELL_LIB_PROJECT_NAME}_static")
+set("AERELL_LIB_SHARED_PROJECT_NAME" "${AERELL_LIB_PROJECT_NAME}_shared")
+
+file(
+    GLOB_RECURSE
+    "AERELL_LIB_SRC_FILES"
+    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/library/*.s"
+)
+
+add_library(
+    ${AERELL_LIB_STATIC_PROJECT_NAME}
+    STATIC
+    ${AERELL_LIB_SRC_FILES}
+)
+
+add_library(
+    ${AERELL_LIB_SHARED_PROJECT_NAME}
+    SHARED
+    ${AERELL_LIB_SRC_FILES}
+)
+
+set_target_properties(${AERELL_LIB_STATIC_PROJECT_NAME} PROPERTIES OUTPUT_NAME "aerell")
+set_target_properties(${AERELL_LIB_SHARED_PROJECT_NAME} PROPERTIES OUTPUT_NAME "aerell")
+
 # Aerell
 set("AERELL_PROJECT_NAME" "aerell")
 
@@ -109,8 +136,16 @@ file(
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/compiler/*.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/linker/*.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/support/*.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/main.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/cli/*.cpp"
 )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set_source_files_properties(
+        "${CMAKE_CURRENT_LIST_DIR}/src/aerell/compiler/compiler_jit.cpp"
+        PROPERTIES
+        COMPILE_OPTIONS "-fno-sanitize=address,undefined"
+    )
+endif()
 
 add_executable(
     ${AERELL_PROJECT_NAME}
@@ -146,26 +181,10 @@ target_link_libraries(
     ${LLD_LIBS}
 )
 
-# Aerell Lib
-set("AERELL_LIB_PROJECT_NAME" "aerell_lib")
-
-file(
-    GLOB_RECURSE
-    "AERELL_LIB_SRC_FILES"
-    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/library/*.s"
-)
-
-add_library(
-    ${AERELL_LIB_PROJECT_NAME}
-    STATIC
-    ${AERELL_LIB_SRC_FILES}
-)
-
-set_target_properties(${AERELL_LIB_PROJECT_NAME} PROPERTIES OUTPUT_NAME "aerell")
-
 # Install
 install(
     TARGETS 
-    ${AERELL_LIB_PROJECT_NAME}
+    ${AERELL_LIB_STATIC_PROJECT_NAME}
+    ${AERELL_LIB_SHARED_PROJECT_NAME}
     ${AERELL_PROJECT_NAME}
 )

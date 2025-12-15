@@ -14,8 +14,8 @@
 namespace aerell
 {
 
-llvm::LLVMContext IR::llvmContext;
-llvm::IRBuilder<> IR::llvmBuilder(llvmContext);
+std::unique_ptr<llvm::LLVMContext> IR::llvmContext = std::make_unique<llvm::LLVMContext>();
+llvm::IRBuilder<> IR::llvmBuilder(*llvmContext);
 
 std::unique_ptr<llvm::Module> IR::module;
 
@@ -48,20 +48,21 @@ void IR::optimize(const std::unique_ptr<llvm::Module>& module)
 
 std::unique_ptr<llvm::Module> IR::gen(const std::vector<std::unique_ptr<AST>>& asts)
 {
-    module = std::make_unique<llvm::Module>("a", llvmContext);
+    if(llvmContext == nullptr) llvmContext = std::make_unique<llvm::LLVMContext>();
+    module = std::make_unique<llvm::Module>("a", *llvmContext);
 
     auto funcExitProcessType = llvm::FunctionType::get(llvmBuilder.getVoidTy(), {llvmBuilder.getInt32Ty()}, false);
     auto funcExitProcess =
         llvm::Function::Create(funcExitProcessType, llvm::Function::ExternalLinkage, "ExitProcess", module.get());
 
     auto funcPrintType =
-        llvm::FunctionType::get(llvmBuilder.getVoidTy(), {llvm::PointerType::getUnqual(llvmContext)}, true);
+        llvm::FunctionType::get(llvmBuilder.getVoidTy(), {llvm::PointerType::getUnqual(*llvmContext)}, true);
     llvm::Function::Create(funcPrintType, llvm::Function::ExternalLinkage, "print", module.get());
 
     auto funcType = llvm::FunctionType::get(llvmBuilder.getVoidTy(), {}, false);
     auto func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "_start", module.get());
 
-    auto* entry = llvm::BasicBlock::Create(llvmContext, "entry", func);
+    auto* entry = llvm::BasicBlock::Create(*llvmContext, "entry", func);
     llvmBuilder.SetInsertPoint(entry);
 
     for(const auto& ast : asts)
