@@ -1,5 +1,7 @@
-#include "aerell/compiler/source/source.h"
+#include <format>
 #include <fstream>
+
+#include "aerell/compiler/source/source.h"
 
 namespace Aerell
 {
@@ -52,7 +54,7 @@ const std::string& Source::getContent() { return this->content; }
 
 std::string Source::getPath() const { return this->path.generic_string(); }
 
-void Source::printErrorMessage(size_t offset, [[maybe_unused]] size_t size, const char* msg)
+void Source::printErrorMessage(size_t offset, size_t size, const char* msg)
 {
     // Find line and column from offset
     auto it = std::upper_bound(lineStarts.begin(), lineStarts.end(), offset);
@@ -61,8 +63,19 @@ void Source::printErrorMessage(size_t offset, [[maybe_unused]] size_t size, cons
     size_t lineStart = lineStarts[line - 1];
     size_t column = offset - lineStart + 1;
 
+    // Prepare print message
+    auto path = std::format("{}:{}:{}", this->getPath(), line, column);
+    auto prefix = std::format(" {}| ", line);
+    size_t end = (line < lineStarts.size()) ? lineStarts[line] : content.size();
+    auto view = std::string_view{content.data() + lineStart, end - lineStart};
+    if(!view.empty() && view.back() == '\n') view.remove_suffix(1);
+
     // Print Message
-    llvm::errs() << this->getPath() << ":" << line << ":" << column << " " << msg << "\n";
+    llvm::errs() << std::string(path.size(), '-') << '\n';
+    llvm::errs() << path << "\n\n";
+    llvm::errs() << prefix << view << "\n";
+    llvm::errs() << std::string(prefix.size() + (column - 1), ' ') << std::string(size, '^') << '\n';
+    llvm::errs() << ' ' << msg << '\n';
 }
 
 } // namespace Aerell

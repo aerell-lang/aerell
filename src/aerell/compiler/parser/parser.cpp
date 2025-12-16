@@ -35,7 +35,7 @@ void Parser::expectErrorMessage(const std::vector<TokenType>& types)
 {
     std::ostringstream oss;
 
-    oss << "Expected [";
+    oss << "Expected ";
 
     bool init = true;
     for(const auto& type : types)
@@ -46,9 +46,7 @@ void Parser::expectErrorMessage(const std::vector<TokenType>& types)
         oss << to_string(type);
     }
 
-    oss << "] but instead [" << to_string((*tokensRef)[pos].type) << "] "
-        << std::string_view{
-               (*tokensRef)[pos].source->getContent().data() + (*tokensRef)[pos].offset, (*tokensRef)[pos].size};
+    oss << " but instead " << to_string((*tokensRef)[pos].type);
 
     (*tokensRef)[pos].source->printErrorMessage((*tokensRef)[pos].offset, (*tokensRef)[pos].size, oss.str().c_str());
 }
