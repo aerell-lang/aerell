@@ -8,7 +8,7 @@
 
 #include "aerell/compiler/codegen/codegen.h"
 
-namespace aerell
+namespace Aerell
 {
 
 bool CodeGen::obj(const char* name, const std::unique_ptr<llvm::Module>& module)
@@ -52,4 +52,4 @@ bool CodeGen::obj(const char* name, const std::unique_ptr<llvm::Module>& module)
     return true;
 }
 
-} // namespace aerell
+} // namespace Aerell

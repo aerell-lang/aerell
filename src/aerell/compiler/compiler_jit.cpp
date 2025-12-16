@@ -9,7 +9,7 @@
 #include <windows.h>
 #endif
 
-namespace aerell
+namespace Aerell
 {
 
 bool Compiler::jit(const char* filePath)
@@ -51,4 +51,4 @@ bool Compiler::jit(const char* filePath)
     return true;
 }
 
-} // namespace aerell
+} // namespace Aerell

@@ -48,7 +48,7 @@ LLD_HAS_DRIVER(mingw)
         }                                                                                                              \
     }
 
-namespace aerell
+namespace Aerell
 {
 
 std::vector<std::string> Linker::libPathFlags;
@@ -118,4 +118,4 @@ bool Linker::linking(const char* name)
     return result.retCode == 0;
 }
 
-} // namespace aerell
+} // namespace Aerell

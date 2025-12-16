@@ -2,7 +2,7 @@
 
 #include "llvm/IR/Module.h"
 
-namespace aerell
+namespace Aerell
 {
 
 class CodeGen
@@ -11,4 +11,4 @@ class CodeGen
     static bool obj(const char* name, const std::unique_ptr<llvm::Module>& module);
 };
 
-} // namespace aerell
+} // namespace Aerell

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace aerell
+namespace Aerell
 {
 
 class AST
@@ -34,4 +34,4 @@ void print(const std::unique_ptr<AST>& ast, size_t indent = 0);
 
 void print(const std::vector<std::unique_ptr<AST>>& asts);
 
-} // namespace aerell
+} // namespace Aerell

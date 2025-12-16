@@ -5,7 +5,7 @@
 
 #include "aerell/compiler/lexer/lexer.h"
 
-namespace aerell
+namespace Aerell
 {
 
 const std::pair<std::string, TokenType> Lexer::symbols[] = {
@@ -108,4 +108,4 @@ bool Lexer::isIdent()
     return true;
 }
 
-} // namespace aerell
+} // namespace Aerell

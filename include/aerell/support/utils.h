@@ -2,9 +2,9 @@
 
 #include <filesystem>
 
-namespace aerell
+namespace Aerell
 {
 
 std::filesystem::path getExeDir();
 
-} // namespace aerell
+} // namespace Aerell

@@ -5,7 +5,7 @@
 #include <optional>
 #include <string>
 
-namespace aerell
+namespace Aerell
 {
 
 class Compiler
@@ -20,4 +20,4 @@ class Compiler
     static std::unique_ptr<llvm::Module> genIR(const char* filePath);
 };
 
-} // namespace aerell
+} // namespace Aerell

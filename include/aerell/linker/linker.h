@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace aerell
+namespace Aerell
 {
 
 class Linker
@@ -15,4 +15,4 @@ class Linker
     static std::vector<std::string> libPathFlags;
 };
 
-} // namespace aerell
+} // namespace Aerell

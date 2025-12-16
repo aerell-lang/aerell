@@ -8,7 +8,7 @@
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/TargetSelect.h>
 
-namespace aerell
+namespace Aerell
 {
 void CLI::printVersion() { llvm::outs() << "Aerell version: 0.0.0"; }
 
@@ -25,7 +25,7 @@ void CLI::printHelp()
     llvm::outs() << " compile <file>    Compile Aerell to executable.\n";
 }
 
-} // namespace aerell
+} // namespace Aerell
 
 int main(int argc, char* argv[])
 {
@@ -36,19 +36,19 @@ int main(int argc, char* argv[])
 
     if(argc == 1)
     {
-        aerell::CLI::printHelp();
+        Aerell::CLI::printHelp();
         return EXIT_SUCCESS;
     }
 
     if(argc == 2 && std::strcmp(argv[1], "help") == 0)
     {
-        aerell::CLI::printHelp();
+        Aerell::CLI::printHelp();
         return EXIT_SUCCESS;
     }
 
     if(argc == 2 && std::strcmp(argv[1], "version") == 0)
     {
-        aerell::CLI::printVersion();
+        Aerell::CLI::printVersion();
         return EXIT_SUCCESS;
     }
 
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
         const auto& file = argv[2];
 
         // JIT
-        if(!aerell::Compiler::jit(file)) return EXIT_FAILURE;
+        if(!Aerell::Compiler::jit(file)) return EXIT_FAILURE;
 
         return EXIT_SUCCESS;
     }
@@ -67,18 +67,18 @@ int main(int argc, char* argv[])
         const auto& file = argv[2];
 
         // Compile
-        if(!aerell::Compiler::compile(file)) return EXIT_FAILURE;
+        if(!Aerell::Compiler::compile(file)) return EXIT_FAILURE;
 
         // Linker
-        aerell::Linker::initialize();
-        if(!aerell::Linker::linking(file)) return EXIT_FAILURE;
+        Aerell::Linker::initialize();
+        if(!Aerell::Linker::linking(file)) return EXIT_FAILURE;
 
         llvm::outs() << "Successfully compiled the file.";
         return EXIT_SUCCESS;
     }
 
     llvm::outs() << "Invalid arguments or too few or too many.\n";
-    aerell::CLI::printHelp();
+    Aerell::CLI::printHelp();
 
     return EXIT_FAILURE;
 }

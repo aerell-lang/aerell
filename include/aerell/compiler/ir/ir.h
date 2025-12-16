@@ -9,7 +9,7 @@
 
 #include <aerell/compiler/ast/ast.h>
 
-namespace aerell
+namespace Aerell
 {
 
 void print(const std::unique_ptr<llvm::Module>& module);
@@ -35,4 +35,4 @@ class IR
     static llvm::Value* literal(Literal& ctx);
 };
 
-} // namespace aerell
+} // namespace Aerell

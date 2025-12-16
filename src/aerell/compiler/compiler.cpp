@@ -13,7 +13,7 @@
 #include <windows.h>
 #endif
 
-namespace aerell
+namespace Aerell
 {
 
 std::optional<std::string> Compiler::read(const char* filePath)
@@ -36,16 +36,16 @@ std::optional<std::string> Compiler::read(const char* filePath)
 std::unique_ptr<llvm::Module> Compiler::genIR(const std::string& fileContent)
 {
     // Lexer
-    auto tokens = aerell::Lexer::gen(fileContent);
+    auto tokens = Aerell::Lexer::gen(fileContent);
 
     // Parser
-    auto asts = aerell::Parser::gen(tokens);
+    auto asts = Aerell::Parser::gen(tokens);
 
     // IR Gen
-    auto module = aerell::IR::gen(asts);
-    aerell::IR::optimize(module);
+    auto module = Aerell::IR::gen(asts);
+    Aerell::IR::optimize(module);
 
-    if(!aerell::IR::verify(module, &llvm::outs())) return nullptr;
+    if(!Aerell::IR::verify(module, &llvm::outs())) return nullptr;
 
     return module;
 }
@@ -63,7 +63,7 @@ bool Compiler::compile(const char* filePath)
     auto module = genIR(filePath);
 
     // Code Gen
-    return aerell::CodeGen::obj(filePath, module);
+    return Aerell::CodeGen::obj(filePath, module);
 }
 
-} // namespace aerell
+} // namespace Aerell

@@ -2,7 +2,7 @@
 
 #include "aerell/compiler/ast/ast.h"
 
-namespace aerell
+namespace Aerell
 {
 
 void print(const std::unique_ptr<AST>& ast, size_t indent)
@@ -27,4 +27,4 @@ void print(const std::vector<std::unique_ptr<AST>>& asts)
     for(const auto& ast : asts) print(ast);
 }
 
-} // namespace aerell
+} // namespace Aerell

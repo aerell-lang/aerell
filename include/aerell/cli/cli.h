@@ -1,6 +1,6 @@
 #pragma once
 
-namespace aerell
+namespace Aerell
 {
 
 class CLI
@@ -12,4 +12,4 @@ class CLI
   private:
 };
 
-} // namespace aerell
+} // namespace Aerell

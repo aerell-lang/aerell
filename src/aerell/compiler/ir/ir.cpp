@@ -11,7 +11,7 @@
 
 #include "aerell/compiler/ir/ir.h"
 
-namespace aerell
+namespace Aerell
 {
 
 std::unique_ptr<llvm::LLVMContext> IR::llvmContext = std::make_unique<llvm::LLVMContext>();
@@ -137,4 +137,4 @@ llvm::Value* IR::literal(Literal& ctx)
     return llvmBuilder.CreateGlobalString(result);
 }
 
-} // namespace aerell
+} // namespace Aerell

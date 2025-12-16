@@ -6,7 +6,7 @@
 #include "aerell/compiler/ast/ast.h"
 #include "aerell/compiler/token/token.h"
 
-namespace aerell
+namespace Aerell
 {
 
 class Parser
@@ -23,4 +23,4 @@ class Parser
     static std::unique_ptr<AST> literal();
 };
 
-} // namespace aerell
+} // namespace Aerell

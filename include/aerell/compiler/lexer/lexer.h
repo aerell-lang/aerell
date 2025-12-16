@@ -5,7 +5,7 @@
 
 #include "aerell/compiler/token/token.h"
 
-namespace aerell
+namespace Aerell
 {
 
 class Lexer
@@ -28,4 +28,4 @@ class Lexer
     static bool isIdent();
 };
 
-} // namespace aerell
+} // namespace Aerell

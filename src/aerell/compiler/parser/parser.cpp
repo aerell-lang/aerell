@@ -6,7 +6,7 @@
 #include <aerell/compiler/ast/ast.h>
 #include "aerell/compiler/parser/parser.h"
 
-namespace aerell
+namespace Aerell
 {
 
 const std::vector<Token>* Parser::tokens = nullptr;
@@ -80,4 +80,4 @@ std::unique_ptr<AST> Parser::literal()
     return literal;
 }
 
-} // namespace aerell
+} // namespace Aerell

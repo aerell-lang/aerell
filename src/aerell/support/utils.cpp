@@ -6,7 +6,7 @@
 #error "Only Win supported"
 #endif
 
-namespace aerell
+namespace Aerell
 {
 
 std::filesystem::path getExeDir()
@@ -20,4 +20,4 @@ std::filesystem::path getExeDir()
 #endif
 }
 
-} // namespace aerell
+} // namespace Aerell
