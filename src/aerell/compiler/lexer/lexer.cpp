@@ -14,32 +14,33 @@ const std::pair<std::string, TokenType> Lexer::symbols[] = {
     {",", TokenType::COMMA},
 };
 
-std::string Lexer::content;
+Source* Lexer::sourceRef = nullptr;
 size_t Lexer::pos = 0;
-
 std::vector<Token> Lexer::tokens;
 
-std::vector<Token> Lexer::gen(const std::string& input)
+std::vector<Token> Lexer::gen(Source* source)
 {
-    content = input;
+    sourceRef = source;
 
-    while(pos < content.size())
+    while(pos < sourceRef->getContent().size())
     {
         if(isWS()) continue;
         if(isComment()) continue;
         if(isSymbl()) continue;
         if(isStr()) continue;
         if(isIdent()) continue;
-        tokens.push_back({.type = TokenType::ILLEGAL, .content = {content[pos]}});
+        tokens.push_back({.type = TokenType::ILLEGAL, .source = source, .offset = pos, .size = 1});
         pos++;
     }
+
+    tokens.push_back({.type = TokenType::EOFF, .source = source, .offset = pos, .size = 1});
 
     return std::move(tokens);
 }
 
 bool Lexer::isWS()
 {
-    if(std::iswspace(content[pos]))
+    if(std::iswspace(sourceRef->getContent()[pos]))
     {
         pos++;
         return true;
@@ -49,9 +50,9 @@ bool Lexer::isWS()
 
 bool Lexer::isComment()
 {
-    if(content[pos] != '#') return false;
+    if(sourceRef->getContent()[pos] != '#') return false;
     pos++;
-    while(pos < content.size() && content[pos] != '\n') pos++;
+    while(pos < sourceRef->getContent().size() && sourceRef->getContent()[pos] != '\n') pos++;
     return true;
 }
 
@@ -62,13 +63,12 @@ bool Lexer::isSymbl()
         const auto& symbolStr = symbol.first;
         size_t size = symbolStr.size();
 
-        if(pos + size > content.size()) continue;
+        if(pos + size > sourceRef->getContent().size()) continue;
 
-        if(std::string_view(content.data() + pos, size) != symbolStr) continue;
+        if(std::string_view{sourceRef->getContent().data() + pos, size} != symbolStr) continue;
+        tokens.push_back({.type = symbol.second, .source = sourceRef, .offset = pos, .size = size});
 
         pos += size;
-
-        tokens.push_back({.type = symbol.second, .content = symbol.first});
 
         return true;
     }
@@ -77,33 +77,37 @@ bool Lexer::isSymbl()
 
 bool Lexer::isStr()
 {
-    if(content[pos] != '"') return false;
+    if(sourceRef->getContent()[pos] != '"') return false;
 
-    size_t start = pos;
+    size_t offset = pos;
     pos++;
 
-    while(pos < content.size() && content[pos] != '"' && content[pos] != '\n') pos++;
+    while(pos < sourceRef->getContent().size() && sourceRef->getContent()[pos] != '"' &&
+          sourceRef->getContent()[pos] != '\n')
+        pos++;
 
     pos++;
-    size_t end = pos;
+    size_t size = pos - offset;
 
-    tokens.push_back({.type = TokenType::STRL, .content = {content.data() + start, end - start}});
+    tokens.push_back({.type = TokenType::STRL, .source = sourceRef, .offset = offset, .size = size});
 
     return true;
 }
 
 bool Lexer::isIdent()
 {
-    if(!std::iswalnum(content[pos]) && content[pos] != '_') return false;
+    if(!std::iswalnum(sourceRef->getContent()[pos]) && sourceRef->getContent()[pos] != '_') return false;
 
-    size_t start = pos;
+    size_t offset = pos;
     pos++;
 
-    while(pos < content.size() && (std::iswalnum(content[pos]) || content[pos] == '_')) pos++;
+    while(pos < sourceRef->getContent().size() &&
+          (std::iswalnum(sourceRef->getContent()[pos]) || sourceRef->getContent()[pos] == '_'))
+        pos++;
 
-    size_t end = pos;
+    size_t size = pos - offset;
 
-    tokens.push_back({.type = TokenType::IDENT, .content = {content.data() + start, end - start}});
+    tokens.push_back({.type = TokenType::IDENT, .source = sourceRef, .offset = offset, .size = size});
 
     return true;
 }

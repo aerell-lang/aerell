@@ -1,9 +1,8 @@
 #pragma once
 
+#include <aerell/compiler/source/source_manager.h>
 #include <llvm/IR/Module.h>
 #include <memory>
-#include <optional>
-#include <string>
 
 namespace Aerell
 {
@@ -15,8 +14,9 @@ class Compiler
     static bool compile(const char* filePath);
 
   private:
-    static std::optional<std::string> read(const char* filePath);
-    static std::unique_ptr<llvm::Module> genIR(const std::string& fileContent);
+    static SourceManager sourceManager;
+
+    static std::unique_ptr<llvm::Module> genIR(Source* source);
     static std::unique_ptr<llvm::Module> genIR(const char* filePath);
 };
 

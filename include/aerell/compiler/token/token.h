@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <aerell/compiler/source/source.h>
 #include <vector>
 
 #include "aerell/compiler/token/token_type.h"
@@ -11,7 +11,9 @@ namespace Aerell
 struct Token
 {
     TokenType type;
-    std::string content;
+    Source* source = nullptr;
+    size_t offset = 0;
+    size_t size = 0;
 };
 
 void print(const Token& token);

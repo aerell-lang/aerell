@@ -1,5 +1,6 @@
 #pragma once
 
+#include <aerell/compiler/source/source.h>
 #include <utility>
 #include <vector>
 
@@ -11,14 +12,13 @@ namespace Aerell
 class Lexer
 {
   public:
-    static std::vector<Token> gen(const std::string& input);
+    static std::vector<Token> gen(Source* source);
 
   private:
     static const std::pair<std::string, TokenType> symbols[];
 
-    static std::string content;
+    static Source* sourceRef;
     static size_t pos;
-
     static std::vector<Token> tokens;
 
     static bool isWS();

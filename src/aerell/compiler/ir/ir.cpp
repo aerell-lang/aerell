@@ -17,50 +17,25 @@ namespace Aerell
 std::unique_ptr<llvm::LLVMContext> IR::llvmContext = std::make_unique<llvm::LLVMContext>();
 llvm::IRBuilder<> IR::llvmBuilder(*llvmContext);
 
-std::unique_ptr<llvm::Module> IR::module;
+std::unique_ptr<llvm::Module> IR::moduleTemp = nullptr;
 
 void print(const std::unique_ptr<llvm::Module>& module) { module->print(llvm::outs(), nullptr); }
 
-bool IR::verify(const std::unique_ptr<llvm::Module>& module, llvm::raw_ostream* os)
-{
-    return !llvm::verifyModule(*module, os);
-}
-
-void IR::optimize(const std::unique_ptr<llvm::Module>& module)
-{
-    llvm::PassBuilder passBuilder;
-
-    llvm::LoopAnalysisManager loopAM;
-    llvm::FunctionAnalysisManager funcAM;
-    llvm::CGSCCAnalysisManager cgsccAM;
-    llvm::ModuleAnalysisManager moduleAM;
-
-    passBuilder.registerModuleAnalyses(moduleAM);
-    passBuilder.registerCGSCCAnalyses(cgsccAM);
-    passBuilder.registerFunctionAnalyses(funcAM);
-    passBuilder.registerLoopAnalyses(loopAM);
-    passBuilder.crossRegisterProxies(loopAM, funcAM, cgsccAM, moduleAM);
-
-    llvm::ModulePassManager modulePM = passBuilder.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O3);
-
-    modulePM.run(*module, moduleAM);
-}
-
-std::unique_ptr<llvm::Module> IR::gen(const std::vector<std::unique_ptr<AST>>& asts)
+bool IR::gen(const std::vector<std::unique_ptr<AST>>& asts, std::unique_ptr<llvm::Module>& module)
 {
     if(llvmContext == nullptr) llvmContext = std::make_unique<llvm::LLVMContext>();
-    module = std::make_unique<llvm::Module>("a", *llvmContext);
+    moduleTemp = std::make_unique<llvm::Module>("a", *llvmContext);
 
     auto funcExitProcessType = llvm::FunctionType::get(llvmBuilder.getVoidTy(), {llvmBuilder.getInt32Ty()}, false);
     auto funcExitProcess =
-        llvm::Function::Create(funcExitProcessType, llvm::Function::ExternalLinkage, "ExitProcess", module.get());
+        llvm::Function::Create(funcExitProcessType, llvm::Function::ExternalLinkage, "ExitProcess", moduleTemp.get());
 
     auto funcPrintType =
-        llvm::FunctionType::get(llvmBuilder.getVoidTy(), {llvm::PointerType::getUnqual(*llvmContext)}, true);
-    llvm::Function::Create(funcPrintType, llvm::Function::ExternalLinkage, "print", module.get());
+        llvm::FunctionType::get(llvmBuilder.getVoidTy(), {llvm::PointerType::getUnqual(*llvmContext)}, false);
+    llvm::Function::Create(funcPrintType, llvm::Function::ExternalLinkage, "print", moduleTemp.get());
 
     auto funcType = llvm::FunctionType::get(llvmBuilder.getVoidTy(), {}, false);
-    auto func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "_start", module.get());
+    auto func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "_start", moduleTemp.get());
 
     auto* entry = llvm::BasicBlock::Create(*llvmContext, "entry", func);
     llvmBuilder.SetInsertPoint(entry);
@@ -82,13 +57,36 @@ std::unique_ptr<llvm::Module> IR::gen(const std::vector<std::unique_ptr<AST>>& a
 
     llvmBuilder.CreateRetVoid();
 
-    return std::move(module);
+    // Optimize
+    llvm::PassBuilder passBuilder;
+
+    llvm::LoopAnalysisManager loopAM;
+    llvm::FunctionAnalysisManager funcAM;
+    llvm::CGSCCAnalysisManager cgsccAM;
+    llvm::ModuleAnalysisManager moduleAM;
+
+    passBuilder.registerModuleAnalyses(moduleAM);
+    passBuilder.registerCGSCCAnalyses(cgsccAM);
+    passBuilder.registerFunctionAnalyses(funcAM);
+    passBuilder.registerLoopAnalyses(loopAM);
+    passBuilder.crossRegisterProxies(loopAM, funcAM, cgsccAM, moduleAM);
+
+    llvm::ModulePassManager modulePM = passBuilder.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O3);
+
+    modulePM.run(*moduleTemp, moduleAM);
+
+    // Verify
+    if(llvm::verifyModule(*moduleTemp, &llvm::errs())) return false;
+
+    module = std::move(moduleTemp);
+
+    return true;
 }
 
 llvm::Value* IR::funcCall(FuncCall& ctx)
 {
     const auto ident = ctx.name;
-    llvm::Function* func = module->getFunction(ident);
+    llvm::Function* func = moduleTemp->getFunction(ident);
     if(func == nullptr) throw std::logic_error(std::format("Use of undeclared identifier '{}'", ident));
     std::vector<llvm::Value*> arguments;
     for(const auto& arg : ctx.args)
@@ -101,7 +99,7 @@ llvm::Value* IR::funcCall(FuncCall& ctx)
 
 llvm::Value* IR::literal(Literal& ctx)
 {
-    std::string input = ctx.value;
+    std::string_view input = ctx.value;
     input = input.substr(1, input.size() - 2);
     std::string result;
     for(size_t i = 0; i < input.size(); ++i)

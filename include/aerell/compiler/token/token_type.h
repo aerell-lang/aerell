@@ -7,6 +7,7 @@ namespace Aerell
 
 enum class TokenType
 {
+    EOFF,
     ILLEGAL,
     // Symbols
     LPAREN, // (
@@ -18,7 +19,8 @@ enum class TokenType
     IDENT // [a-zA-Z_] [a-zA-Z0-9_]*
 };
 
-constexpr std::array<std::pair<TokenType, const char*>, 6> TokenTypeNames{{
+constexpr std::array<std::pair<TokenType, const char*>, 7> TokenTypeNames{{
+    {TokenType::EOFF, "EOF"},
     {TokenType::ILLEGAL, "ILLEGAL"},
     {TokenType::LPAREN, "LPAREN"},
     {TokenType::RPAREN, "RPAREN"},

@@ -5,7 +5,6 @@
 
 #include <llvm/IR/IRBuilder.h>
 #include "llvm/IR/Module.h"
-#include "llvm/Support/raw_ostream.h"
 
 #include <aerell/compiler/ast/ast.h>
 
@@ -19,16 +18,12 @@ class IR
   public:
     static std::unique_ptr<llvm::LLVMContext> llvmContext;
 
-    static bool verify(const std::unique_ptr<llvm::Module>& module, llvm::raw_ostream* os);
-
-    static void optimize(const std::unique_ptr<llvm::Module>& module);
-
-    static std::unique_ptr<llvm::Module> gen(const std::vector<std::unique_ptr<AST>>& asts);
+    static bool gen(const std::vector<std::unique_ptr<AST>>& asts, std::unique_ptr<llvm::Module>& module);
 
   private:
     static llvm::IRBuilder<> llvmBuilder;
 
-    static std::unique_ptr<llvm::Module> module;
+    static std::unique_ptr<llvm::Module> moduleTemp;
 
     static llvm::Value* funcCall(FuncCall& ctx);
 

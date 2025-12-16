@@ -1,4 +1,5 @@
 #include <memory>
+#include <sstream>
 #include <vector>
 
 #include <llvm/Support/raw_ostream.h>
@@ -9,53 +10,105 @@
 namespace Aerell
 {
 
-const std::vector<Token>* Parser::tokens = nullptr;
+const std::vector<Token>* Parser::tokensRef = nullptr;
 size_t Parser::pos = 0;
 
-std::vector<std::unique_ptr<AST>> Parser::gen(const std::vector<Token>& input)
+bool Parser::gen(const std::vector<Token>& tokens, std::vector<std::unique_ptr<AST>>& asts)
 {
-    tokens = &input;
+    tokensRef = &tokens;
 
-    std::vector<std::unique_ptr<AST>> asts;
-
-    while(pos < tokens->size())
+    bool hasError = false;
+    while(pos < tokensRef->size() && (*tokensRef)[pos].type != TokenType::EOFF)
+    {
         if(auto ast = expr()) asts.push_back(std::move(ast));
+        else
+        {
+            hasError = true;
+            if(!is({TokenType::IDENT, TokenType::STRL})) pos++;
+        }
+    }
 
-    return asts;
+    return !hasError;
 }
+
+void Parser::expectErrorMessage(const std::vector<TokenType>& types)
+{
+    std::ostringstream oss;
+
+    oss << "Expected [";
+
+    bool init = true;
+    for(const auto& type : types)
+    {
+        if(init) init = false;
+        else
+            oss << ", ";
+        oss << to_string(type);
+    }
+
+    oss << "] but instead [" << to_string((*tokensRef)[pos].type) << "] "
+        << std::string_view{
+               (*tokensRef)[pos].source->getContent().data() + (*tokensRef)[pos].offset, (*tokensRef)[pos].size};
+
+    (*tokensRef)[pos].source->printErrorMessage((*tokensRef)[pos].offset, (*tokensRef)[pos].size, oss.str().c_str());
+}
+
+bool Parser::expect(const std::vector<TokenType>& types)
+{
+    if(pos < tokensRef->size() &&
+       std::any_of(types.begin(), types.end(), [](const auto& type) { return (*tokensRef)[pos].type != type; }))
+    {
+        expectErrorMessage(types);
+        return false;
+    }
+    return true;
+}
+
+bool Parser::expect(TokenType type) { return expect(std::vector<TokenType>{type}); }
+
+bool Parser::is(const std::vector<TokenType>& types)
+{
+    return pos < tokensRef->size() &&
+           std::any_of(types.begin(), types.end(), [](const auto& type) { return (*tokensRef)[pos].type == type; });
+}
+
+bool Parser::is(TokenType type) { return is(std::vector<TokenType>{type}); }
 
 std::unique_ptr<AST> Parser::expr()
 {
-    if(auto ast = funcCall()) return ast;
-    if(auto ast = literal()) return ast;
+    if(is(TokenType::IDENT)) return funcCall();
+    if(is(TokenType::STRL)) return literal();
+    expectErrorMessage({TokenType::IDENT, TokenType::STRL});
     return nullptr;
 }
 
 std::unique_ptr<AST> Parser::funcCall()
 {
     // IDENT
-    if(pos < tokens->size() && (*tokens)[pos].type != TokenType::IDENT) return nullptr;
-    std::string name = (*tokens)[pos].content;
+    if(!expect(TokenType::IDENT)) return nullptr;
+    std::string_view name{
+        (*tokensRef)[pos].source->getContent().data() + (*tokensRef)[pos].offset, (*tokensRef)[pos].size};
     pos++;
 
     // LPAREN
-    if(pos < tokens->size() && (*tokens)[pos].type != TokenType::LPAREN) return nullptr;
+    if(!expect(TokenType::LPAREN)) return nullptr;
     pos++;
 
     // args
     std::vector<std::unique_ptr<AST>> args;
-    if(auto arg = expr())
-    {
-        args.push_back(std::move(arg));
-        while(pos < tokens->size() && (*tokens)[pos].type == TokenType::COMMA)
+    if(is({TokenType::IDENT, TokenType::STRL}))
+        if(auto arg = expr())
         {
-            pos++;
-            if(auto arg = expr()) args.push_back(std::move(arg));
+            args.push_back(std::move(arg));
+            while(is(TokenType::COMMA))
+            {
+                pos++;
+                if(auto arg = expr()) args.push_back(std::move(arg));
+            }
         }
-    }
 
     // RPAREN
-    if(pos < tokens->size() && (*tokens)[pos].type != TokenType::RPAREN) return nullptr;
+    if(!expect(TokenType::RPAREN)) return nullptr;
     pos++;
 
     // Gen AST
@@ -69,8 +122,9 @@ std::unique_ptr<AST> Parser::funcCall()
 std::unique_ptr<AST> Parser::literal()
 {
     // STRL
-    if(pos < tokens->size() && (*tokens)[pos].type != TokenType::STRL) return nullptr;
-    std::string value = (*tokens)[pos].content;
+    if(!expect(TokenType::STRL)) return nullptr;
+    std::string_view value{
+        (*tokensRef)[pos].source->getContent().data() + (*tokensRef)[pos].offset, (*tokensRef)[pos].size};
     pos++;
 
     // Gen AST

@@ -1,4 +1,3 @@
-#include <fstream>
 #include <memory>
 
 #include "aerell/compiler/compiler.h"
@@ -16,45 +15,28 @@
 namespace Aerell
 {
 
-std::optional<std::string> Compiler::read(const char* filePath)
-{
-    // Read file
-    std::ifstream file(filePath, std::ios::binary);
-    if(!file.is_open())
-    {
-        llvm::errs() << "Failed to open file.\n";
-        return std::nullopt;
-    }
+SourceManager Compiler::sourceManager;
 
-    std::vector<unsigned char> fileBytes((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
-    file.close();
-
-    return {{fileBytes.begin(), fileBytes.end()}};
-}
-
-std::unique_ptr<llvm::Module> Compiler::genIR(const std::string& fileContent)
+std::unique_ptr<llvm::Module> Compiler::genIR(Source* source)
 {
     // Lexer
-    auto tokens = Aerell::Lexer::gen(fileContent);
+    auto tokens = Aerell::Lexer::gen(source);
 
     // Parser
-    auto asts = Aerell::Parser::gen(tokens);
+    std::vector<std::unique_ptr<AST>> asts;
+    if(!Aerell::Parser::gen(tokens, asts)) return nullptr;
 
     // IR Gen
-    auto module = Aerell::IR::gen(asts);
-    Aerell::IR::optimize(module);
-
-    if(!Aerell::IR::verify(module, &llvm::outs())) return nullptr;
+    std::unique_ptr<llvm::Module> module = nullptr;
+    if(!Aerell::IR::gen(asts, module)) return nullptr;
 
     return module;
 }
 
 std::unique_ptr<llvm::Module> Compiler::genIR(const char* filePath)
 {
-    auto fileContent = read(filePath);
-    if(!fileContent.has_value()) return nullptr;
-    return genIR(fileContent.value());
+    if(!sourceManager.import(filePath) || !sourceManager.hasSource()) return nullptr;
+    return genIR(sourceManager.getLastSource());
 }
 
 bool Compiler::compile(const char* filePath)

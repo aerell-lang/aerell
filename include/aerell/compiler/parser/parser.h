@@ -12,11 +12,17 @@ namespace Aerell
 class Parser
 {
   public:
-    static std::vector<std::unique_ptr<AST>> gen(const std::vector<Token>& input);
+    static bool gen(const std::vector<Token>& tokens, std::vector<std::unique_ptr<AST>>& asts);
 
   private:
-    static const std::vector<Token>* tokens;
+    static const std::vector<Token>* tokensRef;
     static size_t pos;
+
+    static void expectErrorMessage(const std::vector<TokenType>& types);
+    static bool expect(const std::vector<TokenType>& types);
+    static bool expect(TokenType type);
+    static bool is(const std::vector<TokenType>& types);
+    static bool is(TokenType type);
 
     static std::unique_ptr<AST> expr();
     static std::unique_ptr<AST> funcCall();
