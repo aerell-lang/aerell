@@ -47,6 +47,7 @@ bool Compiler::compile(const char* filePath)
 {
     // IR Gen
     auto module = genIR(filePath);
+    if(module == nullptr) return false;
 
     // Code Gen
     return Aerell::CodeGen::obj(filePath, module);
