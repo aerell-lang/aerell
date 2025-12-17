@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include <aerell/compiler/token/token.h>
+
 namespace Aerell
 {
 
@@ -17,7 +19,7 @@ class FuncCall : public AST
   public:
     ~FuncCall() {};
 
-    std::string_view name;
+    const Token* name;
     std::vector<std::unique_ptr<AST>> args;
 };
 
@@ -26,7 +28,7 @@ class Literal : public AST
   public:
     ~Literal() {};
 
-    std::string_view value;
+    const Token* value;
 };
 
 void print(const std::unique_ptr<AST>& ast, size_t indent = 0);

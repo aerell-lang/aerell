@@ -96,7 +96,7 @@ bool Lexer::isStr()
 
 bool Lexer::isIdent()
 {
-    if(!std::iswalnum(sourceRef->getContent()[pos]) && sourceRef->getContent()[pos] != '_') return false;
+    if(!std::isalpha(sourceRef->getContent()[pos]) && sourceRef->getContent()[pos] != '_') return false;
 
     size_t offset = pos;
     pos++;

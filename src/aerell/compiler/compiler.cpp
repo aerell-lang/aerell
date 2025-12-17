@@ -1,3 +1,4 @@
+#include <aerell/compiler/semantic/semantic.h>
 #include <memory>
 
 #include "aerell/compiler/compiler.h"
@@ -25,6 +26,9 @@ std::unique_ptr<llvm::Module> Compiler::genIR(Source* source)
     // Parser
     std::vector<std::unique_ptr<AST>> asts;
     if(!Aerell::Parser::gen(tokens, asts)) return nullptr;
+
+    // Semantic
+    if(!Aerell::Semantic::analysis(asts)) return nullptr;
 
     // IR Gen
     std::unique_ptr<llvm::Module> module = nullptr;

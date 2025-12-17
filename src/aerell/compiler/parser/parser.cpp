@@ -12,20 +12,18 @@ namespace Aerell
 
 const std::vector<Token>* Parser::tokensRef = nullptr;
 size_t Parser::pos = 0;
+bool Parser::hasError = false;
 
 bool Parser::gen(const std::vector<Token>& tokens, std::vector<std::unique_ptr<AST>>& asts)
 {
+    if(hasError) hasError = false;
     tokensRef = &tokens;
 
-    bool hasError = false;
     while(pos < tokensRef->size() && (*tokensRef)[pos].type != TokenType::EOFF)
     {
         if(auto ast = expr()) asts.push_back(std::move(ast));
-        else
-        {
-            hasError = true;
-            if(!is({TokenType::IDENT, TokenType::STRL})) pos++;
-        }
+        else if(!is({TokenType::IDENT, TokenType::STRL}))
+            pos++;
     }
 
     return !hasError;
@@ -49,6 +47,8 @@ void Parser::expectErrorMessage(const std::vector<TokenType>& types)
     oss << " but instead " << to_string((*tokensRef)[pos].type);
 
     (*tokensRef)[pos].source->printErrorMessage((*tokensRef)[pos].offset, (*tokensRef)[pos].size, oss.str().c_str());
+
+    if(!hasError) hasError = true;
 }
 
 bool Parser::expect(const std::vector<TokenType>& types)
@@ -84,8 +84,7 @@ std::unique_ptr<AST> Parser::funcCall()
 {
     // IDENT
     if(!expect(TokenType::IDENT)) return nullptr;
-    std::string_view name{
-        (*tokensRef)[pos].source->getContent().data() + (*tokensRef)[pos].offset, (*tokensRef)[pos].size};
+    auto name = &(*tokensRef)[pos];
     pos++;
 
     // LPAREN
@@ -121,8 +120,7 @@ std::unique_ptr<AST> Parser::literal()
 {
     // STRL
     if(!expect(TokenType::STRL)) return nullptr;
-    std::string_view value{
-        (*tokensRef)[pos].source->getContent().data() + (*tokensRef)[pos].offset, (*tokensRef)[pos].size};
+    auto value = &(*tokensRef)[pos];
     pos++;
 
     // Gen AST

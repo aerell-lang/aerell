@@ -17,6 +17,7 @@ class Parser
   private:
     static const std::vector<Token>* tokensRef;
     static size_t pos;
+    static bool hasError;
 
     static void expectErrorMessage(const std::vector<TokenType>& types);
     static bool expect(const std::vector<TokenType>& types);

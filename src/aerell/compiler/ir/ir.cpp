@@ -85,7 +85,7 @@ bool IR::gen(const std::vector<std::unique_ptr<AST>>& asts, std::unique_ptr<llvm
 
 llvm::Value* IR::funcCall(FuncCall& ctx)
 {
-    const auto ident = ctx.name;
+    std::string_view ident{ctx.name->source->getContent().data() + ctx.name->offset, ctx.name->size};
     llvm::Function* func = moduleTemp->getFunction(ident);
     if(func == nullptr) throw std::logic_error(std::format("Use of undeclared identifier '{}'", ident));
     std::vector<llvm::Value*> arguments;
@@ -99,7 +99,7 @@ llvm::Value* IR::funcCall(FuncCall& ctx)
 
 llvm::Value* IR::literal(Literal& ctx)
 {
-    std::string_view input = ctx.value;
+    std::string_view input{ctx.value->source->getContent().data() + ctx.value->offset, ctx.value->size};
     input = input.substr(1, input.size() - 2);
     std::string result;
     for(size_t i = 0; i < input.size(); ++i)
