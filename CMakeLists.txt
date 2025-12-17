@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 4.2)
 project(
     "The Aerell Programming Language"
     VERSION 0.0.0
-    LANGUAGES C CXX ASM
+    LANGUAGES C CXX
+    # LANGUAGES C CXX ASM
 )
 
 # C Standard
@@ -43,7 +44,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s -Wl,--gc-sections -Wl,--strip-all -Wl,--as-needed")
 
 # Set asm command-line rule
-set(CMAKE_ASM_COMPILE_OBJECT "<CMAKE_ASM_COMPILER> <FLAGS> -c <SOURCE> -o <OBJECT>")
+# set(CMAKE_ASM_COMPILE_OBJECT "<CMAKE_ASM_COMPILER> <FLAGS> -c <SOURCE> -o <OBJECT>")
 
 # Optimasi interprocedural (LTO)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
@@ -109,7 +110,8 @@ set("AERELL_LIB_SHARED_PROJECT_NAME" "${AERELL_LIB_PROJECT_NAME}_shared")
 file(
     GLOB_RECURSE
     "AERELL_LIB_SRC_FILES"
-    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/library/*.s"
+    # "${CMAKE_CURRENT_LIST_DIR}/src/aerell/library/*.S"
+    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/library/*.c"
 )
 
 add_library(
@@ -122,6 +124,38 @@ add_library(
     ${AERELL_LIB_SHARED_PROJECT_NAME}
     SHARED
     ${AERELL_LIB_SRC_FILES}
+)
+
+set(
+    "AERELL_LIB_COMPILE_AND_LINK_OPTIONS"
+    "-ffreestanding"
+    "-nostdlib"
+    "-fno-builtin"
+    "-fno-sanitize=address,undefined"
+)
+
+target_compile_options(
+    ${AERELL_LIB_STATIC_PROJECT_NAME}
+    PRIVATE
+    ${AERELL_LIB_COMPILE_AND_LINK_OPTIONS}
+)
+
+target_compile_options(
+    ${AERELL_LIB_SHARED_PROJECT_NAME}
+    PRIVATE
+    ${AERELL_LIB_COMPILE_AND_LINK_OPTIONS}
+)
+
+target_link_options(
+    ${AERELL_LIB_STATIC_PROJECT_NAME}
+    PRIVATE
+    ${AERELL_LIB_COMPILE_AND_LINK_OPTIONS}
+)
+
+target_link_options(
+    ${AERELL_LIB_SHARED_PROJECT_NAME}
+    PRIVATE
+    ${AERELL_LIB_COMPILE_AND_LINK_OPTIONS}
 )
 
 set_target_properties(${AERELL_LIB_STATIC_PROJECT_NAME} PROPERTIES OUTPUT_NAME "aerell")
