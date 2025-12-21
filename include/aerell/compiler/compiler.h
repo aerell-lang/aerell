@@ -33,6 +33,7 @@ class Compiler
     Semantic semantic{symbolTable};
     IR ir;
 
+    std::optional<std::string> findFilePathFromName(std::string_view fileName);
     std::vector<std::vector<Token>> genTokenss(Source* source);
     std::vector<std::unique_ptr<llvm::Module>> genIR(Source* source);
     std::vector<std::unique_ptr<llvm::Module>> genIR(const char* filePath);

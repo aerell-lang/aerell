@@ -1,5 +1,0 @@
-# Print string to the console
-pf p(val str)
-
-# Exit program with status code
-pf ext(cd i32)

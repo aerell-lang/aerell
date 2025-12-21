@@ -1,5 +1,6 @@
 #include <memory>
 
+#include <aerell/support/utils.h>
 #include "aerell/compiler/compiler.h"
 #include <aerell/compiler/semantic/semantic.h>
 #include <aerell/compiler/ir/ir.h>
@@ -10,8 +11,22 @@
 namespace Aerell
 {
 
+std::optional<std::string> Compiler::findFilePathFromName(std::string_view fileName)
+{
+    std::vector<std::string> paths{mainSource->getPath(), getExeDir().append("../src/std.arl").generic_string()};
+
+    for(const auto& path : paths)
+    {
+        auto filePath = std::filesystem::path(path).replace_filename(fileName).replace_extension("arl");
+        if(std::filesystem::exists(filePath)) return filePath.generic_string();
+    }
+
+    return std::nullopt;
+}
+
 std::vector<std::vector<Token>> Compiler::genTokenss(Source* source)
 {
+    llvm::outs() << source->getPath() << "\n";
     if(mainSource == nullptr) mainSource = source;
     std::vector<std::vector<Token>> tokenss;
 
@@ -23,17 +38,19 @@ std::vector<std::vector<Token>> Compiler::genTokenss(Source* source)
         if(token.type != TokenType::STRL) break;
         x++;
 
-        auto filePath = std::filesystem::path(mainSource->getPath())
-                            .replace_filename(
-                                std::string_view{token.source->getContent().data() + token.offset + 1, token.size - 2})
-                            .replace_extension("arl")
-                            .generic_string();
+        auto filePath =
+            this->findFilePathFromName({token.source->getContent().data() + token.offset + 1, token.size - 2});
+        if(!filePath.has_value())
+        {
+            token.source->printErrorMessage(token.offset, token.size, "File does not exist");
+            continue;
+        }
 
-        if(sourceManager.contain(filePath.c_str())) continue;
+        if(sourceManager.contain(filePath.value().c_str())) continue;
 
         std::string errorMessage;
         llvm::raw_string_ostream os(errorMessage);
-        if(!sourceManager.import(filePath.c_str(), os))
+        if(!sourceManager.import(filePath.value().c_str(), os))
         {
             token.source->printErrorMessage(token.offset, token.size, errorMessage.c_str());
             continue;
