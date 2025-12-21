@@ -222,3 +222,23 @@ install(
     ${AERELL_LIB_SHARED_PROJECT_NAME}
     ${AERELL_PROJECT_NAME}
 )
+
+install(
+    FILES
+    "LICENSE"
+    DESTINATION
+    ${CMAKE_INSTALL_PREFIX}
+)
+
+file(
+    GLOB_RECURSE
+    "STD_SRC_FILE"
+    "${CMAKE_CURRENT_LIST_DIR}/src/std/*.arl"
+)
+
+install(
+    FILES
+    ${STD_SRC_FILE}
+    DESTINATION
+    "${CMAKE_INSTALL_PREFIX}/src"
+)
