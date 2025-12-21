@@ -6,8 +6,8 @@ namespace Aerell
 class CLI
 {
   public:
-    static void printVersion();
-    static void printHelp();
+    void printVersion();
+    void printHelp();
 
   private:
 };

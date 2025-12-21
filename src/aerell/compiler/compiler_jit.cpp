@@ -12,11 +12,11 @@
 namespace Aerell
 {
 
-bool Compiler::jit(const char* filePath)
+bool Compiler::jit([[maybe_unused]] const char* filePath)
 {
     // IR Gen
-    auto module = genIR(filePath);
-    if(module == nullptr) return false;
+    auto modules = genIR(filePath);
+    if(modules.empty()) return false;
 
     // JIT
     auto jit = llvm::orc::LLJITBuilder().create();
@@ -32,10 +32,15 @@ bool Compiler::jit(const char* filePath)
 #error "Only win supported"
 #endif
 
-    if(auto error = (*jit)->addIRModule(llvm::orc::ThreadSafeModule(std::move(module), std::move(IR::llvmContext))))
+    llvm::orc::ThreadSafeContext ctx{std::move(this->ir.getContext())};
+
+    for(auto& module : modules)
     {
-        llvm::errs() << error << "\n";
-        return false;
+        if(auto error = (*jit)->addIRModule(llvm::orc::ThreadSafeModule(std::move(module), ctx)))
+        {
+            llvm::errs() << error << "\n";
+            return false;
+        }
     }
 
     auto entrySym = (*jit)->lookup("_start");

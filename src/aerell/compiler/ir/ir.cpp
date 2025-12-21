@@ -1,7 +1,3 @@
-#include <exception>
-#include <format>
-#include <stdexcept>
-
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/IRBuilder.h"
@@ -14,48 +10,23 @@
 namespace Aerell
 {
 
-std::unique_ptr<llvm::LLVMContext> IR::llvmContext = std::make_unique<llvm::LLVMContext>();
-llvm::IRBuilder<> IR::llvmBuilder(*llvmContext);
-
-std::unique_ptr<llvm::Module> IR::moduleTemp = nullptr;
-
 void print(const std::unique_ptr<llvm::Module>& module) { module->print(llvm::outs(), nullptr); }
 
-bool IR::gen(const std::vector<std::unique_ptr<AST>>& asts, std::unique_ptr<llvm::Module>& module)
+std::unique_ptr<llvm::LLVMContext>& IR::getContext() { return this->llvmContext; }
+
+bool IR::gen(const char* name, const std::vector<std::unique_ptr<AST>>& asts, std::unique_ptr<llvm::Module>& module)
 {
+    if(hasError) hasError = false;
     if(llvmContext == nullptr) llvmContext = std::make_unique<llvm::LLVMContext>();
-    moduleTemp = std::make_unique<llvm::Module>("a", *llvmContext);
-
-    auto funcExitProcessType = llvm::FunctionType::get(llvmBuilder.getVoidTy(), {llvmBuilder.getInt32Ty()}, false);
-    auto funcExitProcess =
-        llvm::Function::Create(funcExitProcessType, llvm::Function::ExternalLinkage, "ExitProcess", moduleTemp.get());
-
-    auto funcPrintType =
-        llvm::FunctionType::get(llvmBuilder.getVoidTy(), {llvm::PointerType::getUnqual(*llvmContext)}, false);
-    llvm::Function::Create(funcPrintType, llvm::Function::ExternalLinkage, "print", moduleTemp.get());
-
-    auto funcType = llvm::FunctionType::get(llvmBuilder.getVoidTy(), {}, false);
-    auto func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "_start", moduleTemp.get());
-
-    auto* entry = llvm::BasicBlock::Create(*llvmContext, "entry", func);
-    llvmBuilder.SetInsertPoint(entry);
+    if(moduleTemp == nullptr) moduleTemp = std::make_unique<llvm::Module>(name, *llvmContext);
 
     for(const auto& ast : asts)
-    {
-        try
-        {
-            if(auto* funcCallCtx = dynamic_cast<FuncCall*>(ast.get())) funcCall(*funcCallCtx);
-            if(auto* literalCtx = dynamic_cast<Literal*>(ast.get())) literal(*literalCtx);
-        }
-        catch(const std::exception& error)
-        {
-            llvm::errs() << error.what() << "\n";
-        }
-    }
+        if(auto* funcCtx = dynamic_cast<Func*>(ast.get())) func(*funcCtx);
 
-    llvmBuilder.CreateCall(funcExitProcess, {llvmBuilder.getInt32(0)});
+    if(hasError) return false;
 
-    llvmBuilder.CreateRetVoid();
+    // Verify
+    if(llvm::verifyModule(*moduleTemp, &llvm::errs())) return false;
 
     // Optimize
     llvm::PassBuilder passBuilder;
@@ -75,64 +46,146 @@ bool IR::gen(const std::vector<std::unique_ptr<AST>>& asts, std::unique_ptr<llvm
 
     modulePM.run(*moduleTemp, moduleAM);
 
-    // Verify
-    if(llvm::verifyModule(*moduleTemp, &llvm::errs())) return false;
-
     module = std::move(moduleTemp);
 
-    return true;
+    return !hasError;
+}
+
+llvm::Value* IR::expr(const std::unique_ptr<AST>& ast)
+{
+    if(auto* funcCallCtx = dynamic_cast<FuncCall*>(ast.get())) return funcCall(*funcCallCtx);
+    if(auto* literalCtx = dynamic_cast<Literal*>(ast.get())) return literal(*literalCtx);
+    return nullptr;
+}
+
+llvm::Function* IR::funcDecl(const Token& ident, SymbolFunc& ctx)
+{
+    // Return
+    llvm::Type* ret = llvmBuilder.getVoidTy();
+    switch(ctx.getRet())
+    {
+    case Type::VOID: ret = llvmBuilder.getVoidTy(); break;
+    case Type::I32: ret = llvmBuilder.getInt32Ty(); break;
+    case Type::STR: ret = llvmBuilder.getPtrTy(); break;
+    }
+
+    // Params
+    std::vector<llvm::Type*> params;
+    for(auto param : ctx.getParams()) switch(param)
+        {
+        case VOID:
+            ident.source->printErrorMessage(ident.offset, ident.size, "[IR] Invalid param type");
+            this->hasError = true;
+            break;
+        case STR: params.emplace_back(llvmBuilder.getPtrTy()); break;
+        case I32: params.emplace_back(llvmBuilder.getInt32Ty()); break;
+        }
+
+    // Public
+    auto pub = llvm::Function::InternalLinkage;
+    if(ctx.getPub()) pub = llvm::Function::ExternalLinkage;
+
+    // Declare function
+    auto fType = llvm::FunctionType::get(ret, params, ctx.getVrdic());
+    return llvm::Function::Create(fType, pub, ident.getText(), moduleTemp.get());
+}
+
+void IR::func(Func& ctx)
+{
+    auto* funcDecl = this->funcDecl(*ctx.ident, *ctx.symbol);
+
+    if(!ctx.stmts.has_value()) return;
+
+    // Block
+    auto* entry = llvm::BasicBlock::Create(*llvmContext, "entry", funcDecl);
+    llvmBuilder.SetInsertPoint(entry);
+
+    // Statements
+    for(const auto& stmt : ctx.stmts.value()) expr(stmt);
+
+    // Return void if ret is null
+    if(ctx.ret == nullptr) llvmBuilder.CreateRetVoid();
 }
 
 llvm::Value* IR::funcCall(FuncCall& ctx)
 {
-    std::string_view ident{ctx.name->source->getContent().data() + ctx.name->offset, ctx.name->size};
+    std::string_view ident = ctx.ident->getText();
     llvm::Function* func = moduleTemp->getFunction(ident);
-    if(func == nullptr) throw std::logic_error(std::format("Use of undeclared identifier '{}'", ident));
-    std::vector<llvm::Value*> arguments;
-    for(const auto& arg : ctx.args)
+
+    if(func == nullptr)
     {
-        if(auto* funcCallCtx = dynamic_cast<FuncCall*>(arg.get())) arguments.push_back(funcCall(*funcCallCtx));
-        if(auto* literalCtx = dynamic_cast<Literal*>(arg.get())) arguments.push_back(literal(*literalCtx));
+        if(ctx.symbolCalled == nullptr)
+        {
+            ctx.ident->source->printErrorMessage(ctx.ident->offset, ctx.ident->size, "[IR] Undefined function");
+            this->hasError = true;
+            return nullptr;
+        }
+
+        if(this->funcDecl(*ctx.ident, *ctx.symbolCalled) == nullptr)
+        {
+            ctx.ident->source->printErrorMessage(ctx.ident->offset, ctx.ident->size, "[IR] Failed to declare function");
+            this->hasError = true;
+            return nullptr;
+        }
+
+        func = moduleTemp->getFunction(ident);
     }
-    return llvmBuilder.CreateCall(func, arguments);
+
+    std::vector<llvm::Value*> args;
+    for(const auto& arg : ctx.args)
+        if(auto value = expr(arg)) args.push_back(value);
+
+    return llvmBuilder.CreateCall(func, args);
 }
 
 llvm::Value* IR::literal(Literal& ctx)
 {
-    std::string_view input{ctx.value->source->getContent().data() + ctx.value->offset, ctx.value->size};
-    input = input.substr(1, input.size() - 2);
-    std::string result;
-    for(size_t i = 0; i < input.size(); ++i)
+    auto value = ctx.value;
+    if(value->type == TokenType::INTL)
     {
-        if(input[i] == '\\' && i + 1 < input.size())
+        std::string_view intl{value->source->getContent().data() + value->offset, value->size};
+        return llvmBuilder.getInt32(std::stoi(std::string(intl)));
+    }
+
+    if(value->type == TokenType::STRL)
+    {
+        std::string_view strl{value->source->getContent().data() + value->offset, value->size};
+        strl = strl.substr(1, strl.size() - 2);
+        std::string result;
+        for(size_t i = 0; i < strl.size(); ++i)
         {
-            switch(input[i + 1])
+            if(strl[i] == '\\' && i + 1 < strl.size())
             {
-            case 'n':
-                result += '\n';
-                i++;
-                break;
-            case 't':
-                result += '\t';
-                i++;
-                break;
-            case '\\':
-                result += '\\';
-                i++;
-                break;
-            case '"':
-                result += '"';
-                i++;
-                break;
-            default: result += input[i]; break;
+                switch(strl[i + 1])
+                {
+                case 'n':
+                    result += '\n';
+                    i++;
+                    break;
+                case 't':
+                    result += '\t';
+                    i++;
+                    break;
+                case '\\':
+                    result += '\\';
+                    i++;
+                    break;
+                case '"':
+                    result += '"';
+                    i++;
+                    break;
+                default: result += strl[i]; break;
+                }
+            }
+            else
+            {
+                result += strl[i];
             }
         }
-        else
-        {
-            result += input[i];
-        }
+        return llvmBuilder.CreateGlobalString(result);
     }
-    return llvmBuilder.CreateGlobalString(result);
+
+    return nullptr;
 }
 
 } // namespace Aerell

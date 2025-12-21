@@ -12,20 +12,23 @@ namespace Aerell
 class Lexer
 {
   public:
-    static std::vector<Token> gen(Source* source);
+    std::vector<Token> gen(Source* source);
 
   private:
     static const std::pair<std::string, TokenType> symbols[];
+    static const std::pair<std::string, TokenType> keywords[];
 
-    static Source* sourceRef;
-    static size_t pos;
-    static std::vector<Token> tokens;
+    Source* sourceRef = nullptr;
+    size_t pos = 0;
+    std::vector<Token> tokens;
 
-    static bool isWS();
-    static bool isComment();
-    static bool isSymbl();
-    static bool isStr();
-    static bool isIdent();
+    bool isWS();
+    bool isComment();
+    bool isSymbols();
+    bool isKeywords();
+    bool isInt();
+    bool isStr();
+    bool isIdent();
 };
 
 } // namespace Aerell

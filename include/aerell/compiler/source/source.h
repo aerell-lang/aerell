@@ -12,10 +12,11 @@ class Source
   public:
     Source(const char* path);
 
-    bool exist();
-    bool read();
+    bool exist(llvm::raw_ostream& errs);
+    bool read(llvm::raw_ostream& errs);
 
     const std::string& getContent();
+    const char* getContentData();
     std::string getPath() const;
 
     void printErrorMessage(size_t offset, size_t size, const char* msg);

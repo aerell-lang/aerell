@@ -8,11 +8,12 @@ namespace Aerell
 class Linker
 {
   public:
-    static void initialize();
-    static bool linking(const char* name);
+    Linker();
+    bool linking(const std::vector<std::string>& filePaths);
 
   private:
     static std::vector<std::string> libPathFlags;
+    static bool findLibPathFlagsInit;
 };
 
 } // namespace Aerell

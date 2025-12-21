@@ -10,6 +10,7 @@
 
 namespace Aerell
 {
+
 void CLI::printVersion() { llvm::outs() << "Aerell version: 0.0.0"; }
 
 void CLI::printHelp()
@@ -21,8 +22,8 @@ void CLI::printHelp()
     llvm::outs() << "Available commands:\n";
     llvm::outs() << " help              Print this usage information.\n";
     llvm::outs() << " version           Print the Aerell version.\n";
-    llvm::outs() << " run <file>        Run a Aerell program.\n";
-    llvm::outs() << " compile <file>    Compile Aerell to executable.\n";
+    llvm::outs() << " run <file>        Run an Aerell file.\n";
+    llvm::outs() << " compile <file>    Compile an Aerell file to executable.\n";
 }
 
 } // namespace Aerell
@@ -34,21 +35,25 @@ int main(int argc, char* argv[])
     llvm::InitializeNativeTargetAsmPrinter();
     llvm::InitializeNativeTargetDisassembler();
 
+    Aerell::CLI cli;
+    Aerell::Compiler compiler;
+    Aerell::Linker linker;
+
     if(argc == 1)
     {
-        Aerell::CLI::printHelp();
+        cli.printHelp();
         return EXIT_SUCCESS;
     }
 
     if(argc == 2 && std::strcmp(argv[1], "help") == 0)
     {
-        Aerell::CLI::printHelp();
+        cli.printHelp();
         return EXIT_SUCCESS;
     }
 
     if(argc == 2 && std::strcmp(argv[1], "version") == 0)
     {
-        Aerell::CLI::printVersion();
+        cli.printVersion();
         return EXIT_SUCCESS;
     }
 
@@ -57,7 +62,7 @@ int main(int argc, char* argv[])
         const auto& file = argv[2];
 
         // JIT
-        if(!Aerell::Compiler::jit(file)) return EXIT_FAILURE;
+        if(!compiler.jit(file)) return EXIT_FAILURE;
 
         return EXIT_SUCCESS;
     }
@@ -67,18 +72,18 @@ int main(int argc, char* argv[])
         const auto& file = argv[2];
 
         // Compile
-        if(!Aerell::Compiler::compile(file)) return EXIT_FAILURE;
+        std::vector<std::string> files;
+        if(!compiler.compile(file, files)) return EXIT_FAILURE;
 
         // Linker
-        Aerell::Linker::initialize();
-        if(!Aerell::Linker::linking(file)) return EXIT_FAILURE;
+        if(!linker.linking(files)) return EXIT_FAILURE;
 
         llvm::outs() << "Successfully compiled the file.";
         return EXIT_SUCCESS;
     }
 
     llvm::outs() << "Invalid arguments or too few or too many.\n";
-    Aerell::CLI::printHelp();
+    cli.printHelp();
 
     return EXIT_FAILURE;
 }

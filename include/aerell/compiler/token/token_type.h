@@ -9,23 +9,41 @@ enum class TokenType
 {
     EOFF,
     ILLEGAL,
+    // Keywords
+    F,  // f
+    PF, // pf
+    // Data Types
+    STR, // str
+    I32, // i32
     // Symbols
     LPAREN, // (
     RPAREN, // )
+    LBRACE, // {
+    RBRACE, // }
     COMMA,  // ,
+    VRDIC,  // ...
     // Literals
     STRL, // " .* exclude("\n) "
+    INTL, // [0-9]+
     // Identifier
     IDENT // [a-zA-Z_] [a-zA-Z0-9_]*
 };
 
-constexpr std::array<std::pair<TokenType, const char*>, 7> TokenTypeNames{{
+constexpr std::array<std::pair<TokenType, const char*>, 15> TokenTypeNames{{
     {TokenType::EOFF, "EOF"},
     {TokenType::ILLEGAL, "ILLEGAL"},
+    {TokenType::F, "F"},
+    {TokenType::PF, "PF"},
+    {TokenType::STR, "STR"},
+    {TokenType::I32, "I32"},
     {TokenType::LPAREN, "LPAREN"},
     {TokenType::RPAREN, "RPAREN"},
+    {TokenType::LBRACE, "LBRACE"},
+    {TokenType::RBRACE, "RBRACE"},
     {TokenType::COMMA, "COMMA"},
+    {TokenType::VRDIC, "VRDIC"},
     {TokenType::STRL, "STRL"},
+    {TokenType::INTL, "INTL"},
     {TokenType::IDENT, "IDENT"},
 }};
 

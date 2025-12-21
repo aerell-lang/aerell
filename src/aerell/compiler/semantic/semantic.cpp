@@ -1,54 +1,64 @@
 #include "aerell/compiler/semantic/semantic.h"
+#include <aerell/support/utils.h>
 
 namespace Aerell
 {
 
-bool Semantic::hasError = false;
+Semantic::Semantic(SymbolTable& symbolTable) : symbolTable(&symbolTable) {}
 
 bool Semantic::analysis(std::vector<std::unique_ptr<AST>>& asts)
 {
-    if(hasError) hasError = false;
-
-    for(auto& ast : asts) expr(ast);
+    for(const auto& ast : asts)
+        if(auto* funcCtx = dynamic_cast<Func*>(ast.get())) func(*funcCtx);
 
     return !hasError;
 }
 
-TokenType Semantic::expr(std::unique_ptr<AST>& ast)
+Type Semantic::expr(const std::unique_ptr<AST>& ast)
 {
     if(auto* funcCallCtx = dynamic_cast<FuncCall*>(ast.get())) return funcCall(*funcCallCtx);
     if(auto* literalCtx = dynamic_cast<Literal*>(ast.get())) return literal(*literalCtx);
-    hasError = true;
-    return TokenType::ILLEGAL;
+    return Type::VOID;
 }
 
-TokenType Semantic::funcCall(FuncCall& ctx)
+void Semantic::func(Func& ctx)
 {
-    const char* funcPrintIdent = "print";
-    auto funcPrintRet = TokenType::EOFF;
-    std::vector<TokenType> funcPrintArgs{TokenType::STRL};
-
-    std::string_view funcCallIdent{ctx.name->source->getContent().data() + ctx.name->offset, ctx.name->size};
-    std::vector<TokenType> funcCallArgs;
-    for(auto& arg : ctx.args) funcCallArgs.push_back(expr(arg));
-
-    if(funcCallIdent != funcPrintIdent)
-    {
-        ctx.name->source->printErrorMessage(ctx.name->offset, ctx.name->size, "Use of undeclared identifier");
-        hasError = true;
-        return TokenType::ILLEGAL;
-    }
-
-    if(funcCallArgs != funcPrintArgs)
-    {
-        ctx.name->source->printErrorMessage(ctx.name->offset, ctx.name->size, "Incorrect arguments to called function");
-        hasError = true;
-        return TokenType::ILLEGAL;
-    }
-
-    return funcPrintRet;
+    if(ctx.stmts == std::nullopt) return;
+    for(const auto& stmt : ctx.stmts.value()) expr(stmt);
 }
 
-TokenType Semantic::literal(Literal& ctx) { return ctx.value->type; }
+Type Semantic::funcCall(FuncCall& ctx)
+{
+    const auto& identTkn = ctx.ident;
+    std::string_view indentSv(identTkn->source->getContent().data() + identTkn->offset, identTkn->size);
+
+    auto symbolFunc = ctx.symbolCalled;
+    if(symbolFunc == nullptr) return Type::VOID;
+
+    std::vector<Type> args;
+    for(const auto& arg : ctx.args)
+    {
+        auto type = expr(arg);
+        if(type == Type::VOID) continue;
+        args.push_back(type);
+    }
+
+    if(args != symbolFunc->getParams())
+    {
+        identTkn->source->printErrorMessage(identTkn->offset, identTkn->size, "[S] The function argument is incorrect");
+        hasError = true;
+        return Type::VOID;
+    }
+
+    return symbolFunc->getRet();
+}
+
+Type Semantic::literal(Literal& ctx)
+{
+    if(ctx.value->type == TokenType::INTL) return Type::I32;
+    if(ctx.value->type == TokenType::STRL) return Type::STR;
+    else
+        return Type::VOID;
+}
 
 } // namespace Aerell

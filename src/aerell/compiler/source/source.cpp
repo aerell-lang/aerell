@@ -8,24 +8,24 @@ namespace Aerell
 
 Source::Source(const char* path) { this->path = std::filesystem::weakly_canonical(path); }
 
-bool Source::exist()
+bool Source::exist(llvm::raw_ostream& errs)
 {
     if(!std::filesystem::exists(this->path))
     {
-        llvm::errs() << "'" << this->path.c_str() << "' does not exist.\n";
+        errs << "File does not exist.\n";
         return false;
     }
 
     if(std::filesystem::is_directory(this->path))
     {
-        llvm::errs() << "'" << this->path.c_str() << "' is not a file.\n";
+        errs << "This path is not a file.\n";
         return false;
     }
 
     return true;
 }
 
-bool Source::read()
+bool Source::read(llvm::raw_ostream& errs)
 {
     if(!this->content.empty()) this->content.clear();
     if(!this->lineStarts.empty()) this->lineStarts.clear();
@@ -33,7 +33,7 @@ bool Source::read()
     std::ifstream file(this->path, std::ios::binary);
     if(!file.is_open())
     {
-        llvm::errs() << "Failed to open '" << this->path.c_str() << "'.\n";
+        errs << "Failed to open file.\n";
         return false;
     }
 
@@ -51,6 +51,8 @@ bool Source::read()
 }
 
 const std::string& Source::getContent() { return this->content; }
+
+const char* Source::getContentData() { return this->content.data(); }
 
 std::string Source::getPath() const { return this->path.generic_string(); }
 

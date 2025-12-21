@@ -1,0 +1,8 @@
+# Hello World example
+
+"std" # Import standard library
+
+pf _start() {
+    p("Hello World!\n") # Print hello world
+    ext(0) # Exit 0
+}

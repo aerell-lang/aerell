@@ -1,5 +1,7 @@
 #pragma once
 
+#include <aerell/compiler/symbol/symbol_table.h>
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -12,22 +14,48 @@ namespace Aerell
 class Parser
 {
   public:
-    static bool gen(const std::vector<Token>& tokens, std::vector<std::unique_ptr<AST>>& asts);
+    Parser(SymbolTable& symbolTable);
+
+    bool gen(const std::vector<Token>& tokens, std::vector<std::unique_ptr<AST>>& asts);
 
   private:
-    static const std::vector<Token>* tokensRef;
-    static size_t pos;
-    static bool hasError;
+    enum class Rule
+    {
+        STMT,
+        FUNC,
+        FUNC_PARAM,
+        DATA_TYPE,
+        BLOCK,
+        EXPR,
+        FUNC_CALL,
+        LITERAL
+    };
 
-    static void expectErrorMessage(const std::vector<TokenType>& types);
-    static bool expect(const std::vector<TokenType>& types);
-    static bool expect(TokenType type);
-    static bool is(const std::vector<TokenType>& types);
-    static bool is(TokenType type);
+    typedef std::map<Rule, std::vector<TokenType>> Rules;
 
-    static std::unique_ptr<AST> expr();
-    static std::unique_ptr<AST> funcCall();
-    static std::unique_ptr<AST> literal();
+    static Rules rules;
+    SymbolTable* symbolTable = nullptr;
+    const std::vector<Token>* tokensRef = nullptr;
+    size_t pos = 0;
+    bool hasError = false;
+
+    void expectErrorMessage(const std::vector<TokenType>& types);
+    void expectErrorMessage(Rule rule);
+    bool expect(const std::vector<TokenType>& types);
+    bool expect(TokenType type);
+    bool expect(Rule rule);
+    bool is(const std::vector<TokenType>& types);
+    bool is(TokenType type);
+    bool is(Rule rule);
+
+    std::unique_ptr<AST> stmt();
+    std::unique_ptr<AST> func();
+    std::optional<FuncParam> funcParam();
+    const Token* dataType();
+    std::optional<std::vector<std::unique_ptr<AST>>> block();
+    std::unique_ptr<AST> expr();
+    std::unique_ptr<AST> funcCall();
+    std::unique_ptr<AST> literal();
 };
 
 } // namespace Aerell

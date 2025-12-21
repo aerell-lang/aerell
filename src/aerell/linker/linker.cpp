@@ -52,9 +52,12 @@ namespace Aerell
 {
 
 std::vector<std::string> Linker::libPathFlags;
+bool Linker::findLibPathFlagsInit = true;
 
-void Linker::initialize()
+Linker::Linker()
 {
+    if(!findLibPathFlagsInit) return;
+
     const char* pathEnv = std::getenv("PATH");
     if(pathEnv == nullptr) return;
 
@@ -99,21 +102,32 @@ void Linker::initialize()
                 libPathFlags.push_back(std::format("-L{}", libPath.generic_string()));
         }
     }
+
+    findLibPathFlagsInit = false;
 }
 
-bool Linker::linking(const char* name)
+bool Linker::linking(const std::vector<std::string>& filePaths)
 {
-    auto objName = std::filesystem::path(name).filename().replace_extension("o").string();
-    auto exeName = std::filesystem::path(name).filename().replace_extension("exe").string();
+    if(filePaths.empty()) return false;
 
-    std::vector<const char*> args = {"ld.lld",   "-m",         "i386pep",       "-e", "_start",       "-static",
-                                     "-laerell", "-lkernel32", objName.c_str(), "-o", exeName.c_str()};
+    auto exeName = std::filesystem::path(filePaths.back()).filename().replace_extension("exe").string();
+
+    std::vector<std::string> objNames;
+    for(auto& filePath : filePaths)
+        objNames.push_back(std::filesystem::path(filePath).filename().replace_extension("o").string());
+
+    std::vector<const char*> args = {"ld.lld", "-m", "i386pep", "-e", "_start", "-static", "-laerell", "-lkernel32"};
 
     for(auto& libPathFlag : libPathFlags) args.push_back(libPathFlag.c_str());
 
+    for(const auto& objName : objNames) args.push_back(objName.c_str());
+
+    args.push_back("-o");
+    args.push_back(exeName.c_str());
+
     lld::Result result = lld::lldMain(args, llvm::outs(), llvm::errs(), LLD_MINGW_DRIVER);
 
-    std::filesystem::remove(objName);
+    for(const auto& objName : objNames) std::filesystem::remove(objName);
 
     return result.retCode == 0;
 }

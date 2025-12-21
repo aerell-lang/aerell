@@ -1,5 +1,6 @@
 #pragma once
 
+#include <aerell/compiler/symbol/symbol_table.h>
 #include <memory>
 #include <vector>
 
@@ -11,14 +12,18 @@ namespace Aerell
 class Semantic
 {
   public:
-    static bool analysis(std::vector<std::unique_ptr<AST>>& asts);
+    Semantic(SymbolTable& symbolTable);
+    bool analysis(std::vector<std::unique_ptr<AST>>& asts);
 
   private:
-    static bool hasError;
+    bool hasError = false;
+    SymbolTable* symbolTable;
 
-    static TokenType expr(std::unique_ptr<AST>& ast);
-    static TokenType funcCall(FuncCall& ctx);
-    static TokenType literal(Literal& ctx);
+    Type expr(const std::unique_ptr<AST>& ast);
+
+    void func(Func& ctx);
+    Type funcCall(FuncCall& ctx);
+    Type literal(Literal& ctx);
 };
 
 } // namespace Aerell

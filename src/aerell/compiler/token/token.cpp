@@ -5,6 +5,8 @@
 namespace Aerell
 {
 
+std::string_view Token::getText() const { return {this->source->getContentData() + this->offset, this->size}; }
+
 void print(const Token& token)
 {
     llvm::outs() << "[" << to_string(token.type) << "] "

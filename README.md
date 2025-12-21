@@ -54,51 +54,16 @@ After building, you can run the `aerell` executable. It provides a command-line 
 ```
 A command-line utility for Aerell development.
 
-Usage:
-  aerell <command>
+Usage: aerell <command>
 
 Available commands:
   help              Print this usage information.
   version           Print the Aerell version.
-  run <file>        Run an Aerell program.
-  compile <file>    Compile an Aerell program to an executable.
+  run <file>        Run an Aerell file.
+  compile <file>    Compile an Aerell file to an executable.
 ```
 
-At the current stage, Aerell only supports printing string literals.
-
-### Example
-
-File: `examples/helloworld.arl`
-
-```arl
-# Simple Hello World! program
-
-print("Hello World!")
-```
-
-Run the program:
-
-```bash
-aerell run examples/helloworld.arl
-```
-
-Output:
-
-```
-Hello World!
-```
-
-Compile the program:
-
-```bash
-aerell compile examples/helloworld.arl
-```
-
-This will generate `helloworld.exe`. When executed, the output will be the same:
-
-```
-Hello World!
-```
+You can see example source code that can be run or compiled in the [`examples`](./examples) folder. These examples demonstrate the language features and provide a good starting point for learning how to write Aerell file.
 
 The project is currently developed and tested on **Windows**. Other platforms are not fully supported yet, as some parts of the codebase are Windows-specific.
 
