@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdlib>
 #include <format>
 #include <sstream>
@@ -110,7 +111,10 @@ bool Linker::linking(const std::vector<std::string>& filePaths)
 {
     if(filePaths.empty()) return false;
 
-    auto exeName = std::filesystem::path(filePaths.back()).filename().replace_extension("exe").string();
+    auto exeName = std::filesystem::path(filePaths[std::max(0, ((int)filePaths.size()) - 2)])
+                       .filename()
+                       .replace_extension("exe")
+                       .string();
 
     std::vector<std::string> objNames;
     for(auto& filePath : filePaths)

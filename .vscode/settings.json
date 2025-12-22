@@ -3,6 +3,7 @@
         "compiler",
         "examples",
         "vscode",
-        "token"
+        "token",
+        "linker"
     ]
 }
