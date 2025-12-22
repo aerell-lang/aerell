@@ -230,15 +230,9 @@ install(
     ${CMAKE_INSTALL_PREFIX}
 )
 
-file(
-    GLOB_RECURSE
-    "STD_SRC_FILE"
-    "${CMAKE_CURRENT_LIST_DIR}/src/std/*.arl"
-)
-
 install(
-    FILES
-    ${STD_SRC_FILE}
+    DIRECTORY
+    "${CMAKE_CURRENT_LIST_DIR}/src/std"
     DESTINATION
     "${CMAKE_INSTALL_PREFIX}/src"
 )

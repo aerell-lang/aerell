@@ -32,17 +32,12 @@ class Compiler
 
   private:
     SourceManager sourceManager;
-
     Lexer lexer;
-
     SymbolTable symbolTable = {nullptr};
     Parser parser = {symbolTable};
     Semantic semantic{symbolTable};
     IR ir;
 
-    std::optional<std::string> findFilePathFromName(std::string_view mainSourcePath, std::string_view fileName);
-
-    Tokens lexing(const char* mainSourcePath, Source* source);
     Tokens lexing(Source* source);
 };
 

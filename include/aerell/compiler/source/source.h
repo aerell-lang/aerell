@@ -10,13 +10,12 @@ namespace Aerell
 class Source
 {
   public:
-    Source(const char* path);
+    Source(std::filesystem::path&& path);
 
-    bool exist(llvm::raw_ostream& errs);
     bool read(llvm::raw_ostream& errs);
 
-    const std::string& getContent();
-    const char* getContentData();
+    const std::string& getContent() const;
+    const char* getContentData() const;
     const std::string& getPath() const;
 
     void printErrorMessage(size_t offset, size_t size, const char* msg);

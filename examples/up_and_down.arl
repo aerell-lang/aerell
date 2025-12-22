@@ -1,5 +1,3 @@
-"std"
-
 pf up() {
     p("This up function called\n")
 }

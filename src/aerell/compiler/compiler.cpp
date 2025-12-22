@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <memory>
 
 #include <aerell/support/utils.h>
@@ -12,52 +11,31 @@
 namespace Aerell
 {
 
-std::optional<std::string> Compiler::findFilePathFromName(std::string_view mainSourcePath, std::string_view fileName)
+Compiler::Tokens Compiler::lexing(Source* source)
 {
-    static std::string stdSourcePath;
-    if(stdSourcePath.empty()) stdSourcePath = getExeDir().append("../src/std.arl").generic_string();
-
-    std::vector<std::string_view> paths{mainSourcePath, stdSourcePath};
-
-    for(const auto& path : paths)
-    {
-        auto filePath = std::filesystem::weakly_canonical(path).replace_filename(fileName).replace_extension("arl");
-        if(std::filesystem::exists(filePath)) return filePath.generic_string();
-    }
-
-    return std::nullopt;
-}
-
-Compiler::Tokens Compiler::lexing(const char* mainSourcePath, Source* source)
-{
-    if(mainSourcePath == nullptr) mainSourcePath = source->getPath().c_str();
-
     // Tokenize
     Tokens cTokens;
     size_t lastImportIndex = 0;
 
     auto mainTokens = this->lexer.lexing(source);
+
     for(auto token : mainTokens)
     {
         if(token.type != TokenType::STRL) break;
         lastImportIndex++;
 
-        auto filePath = this->findFilePathFromName(mainSourcePath, token.getText().substr(1, token.size - 2));
-        if(!filePath.has_value())
-        {
-            token.source->printErrorMessage(token.offset, token.size, "File does not exist");
-            continue;
-        }
-
         std::string errorMessage;
         llvm::raw_string_ostream os(errorMessage);
-        if(!sourceManager.import(filePath.value().c_str(), os))
+        int status = sourceManager.import(std::string(token.getText().substr(1, token.size - 2)).c_str(), os);
+        if(status == 0)
         {
-            if(!errorMessage.empty()) token.source->printErrorMessage(token.offset, token.size, errorMessage.c_str());
+            token.source->printErrorMessage(token.offset, token.size, errorMessage.c_str());
             continue;
         }
+        else if(status == 2)
+            continue;
 
-        for(auto& token : lexing(mainSourcePath, sourceManager.getLastSource())) cTokens.push_back(std::move(token));
+        for(auto& token : lexing(sourceManager.getLastSource())) cTokens.push_back(std::move(token));
     }
 
     cTokens.emplace_back(
@@ -66,19 +44,32 @@ Compiler::Tokens Compiler::lexing(const char* mainSourcePath, Source* source)
     return cTokens;
 }
 
-Compiler::Tokens Compiler::lexing(Source* source)
-{
-    // Tokenize
-    return this->lexing(nullptr, source);
-}
-
 Compiler::Tokens Compiler::lexing(const char* filePath)
 {
-    // Import file
-    if(!this->sourceManager.import(filePath, llvm::outs())) return {};
+    Compiler::Tokens mainTokens;
 
-    // Tokenize
-    return this->lexing(this->sourceManager.getLastSource());
+    std::vector<std::pair<const char*, bool>> autoImportSources{
+        {"std/std", false},
+        {filePath, true},
+    };
+
+    for(const auto& autoImportSource : autoImportSources)
+    {
+        // Import file
+        int status = this->sourceManager.import(autoImportSource.first, llvm::errs(), autoImportSource.second);
+        if(status == 0)
+        {
+            llvm::errs() << '\n';
+            continue;
+        }
+        else if(status == 2)
+            continue;
+
+        // Lexing
+        for(auto& tokens : this->lexing(this->sourceManager.getLastSource())) mainTokens.push_back(std::move(tokens));
+    }
+
+    return mainTokens;
 }
 
 bool Compiler::parsing(const Tokens& cTokens, Asts& cAsts)

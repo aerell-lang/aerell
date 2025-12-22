@@ -1,2 +1,2 @@
-"rt"
-"io"
+"std/rt"
+"std/io"
