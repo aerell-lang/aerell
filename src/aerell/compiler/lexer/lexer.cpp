@@ -88,13 +88,15 @@ bool Lexer::isKeywords()
 
         if(pos + size > sourceRef->getContent().size()) continue;
 
-        if(std::string_view{sourceRef->getContent().data() + pos, size} != keywordStr) continue;
+        if((std::string_view{sourceRef->getContent().data() + pos, size} != keywordStr) ||
+           std::iswalnum(sourceRef->getContent()[pos + size]) || sourceRef->getContent()[pos + size] == '_')
+            continue;
+
         tokens.push_back({.type = keyword.second, .source = sourceRef, .offset = pos, .size = size});
 
         pos += size;
 
-        return (!std::iswalnum(sourceRef->getContent()[pos]) && sourceRef->getContent()[pos] != '_') ||
-               std::iswspace(sourceRef->getContent()[pos]);
+        return true;
     }
     return false;
 }

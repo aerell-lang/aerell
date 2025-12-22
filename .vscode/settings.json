@@ -6,6 +6,7 @@
         "token",
         "linker",
         "std",
-        "ir"
+        "ir",
+        "lexer"
     ]
 }
