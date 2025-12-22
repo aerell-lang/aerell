@@ -269,13 +269,6 @@ std::unique_ptr<AST> Parser::funcCall()
     auto indent = &(*tokensRef)[pos];
     pos++;
 
-    auto symbolFunc = this->symbolTable->findFunc(indent->getText());
-    if(symbolFunc == nullptr)
-    {
-        indent->source->printErrorMessage(indent->offset, indent->size, "[P] Undefined function");
-        return nullptr;
-    }
-
     // LPAREN
     if(!expect(TokenType::LPAREN)) return nullptr;
     pos++;
@@ -293,12 +286,6 @@ std::unique_ptr<AST> Parser::funcCall()
             }
         }
 
-    if(symbolFunc->getParams().size() != args.size())
-    {
-        indent->source->printErrorMessage(indent->offset, indent->size, "[P] Invalid number of function arguments");
-        return nullptr;
-    }
-
     // RPAREN
     if(!expect(TokenType::RPAREN)) return nullptr;
     pos++;
@@ -306,7 +293,6 @@ std::unique_ptr<AST> Parser::funcCall()
     // Gen AST
     auto funcCall = std::make_unique<FuncCall>();
     funcCall->ident = indent;
-    funcCall->symbolCalled = symbolFunc;
     funcCall->args = std::move(args);
 
     return funcCall;

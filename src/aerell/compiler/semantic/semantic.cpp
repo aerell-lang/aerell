@@ -29,11 +29,15 @@ void Semantic::func(Func& ctx)
 
 Type Semantic::funcCall(FuncCall& ctx)
 {
-    const auto& identTkn = ctx.ident;
-    std::string_view indentSv(identTkn->source->getContent().data() + identTkn->offset, identTkn->size);
+    const auto& indent = ctx.ident;
 
-    auto symbolFunc = ctx.symbolCalled;
-    if(symbolFunc == nullptr) return Type::VOID;
+    auto symbolFunc = this->symbolTable->findFunc(indent->getText());
+    if(symbolFunc == nullptr)
+    {
+        indent->source->printErrorMessage(indent->offset, indent->size, "[P] Undefined function");
+        if(!this->hasError) this->hasError = true;
+        return Type::VOID;
+    }
 
     std::vector<Type> args;
     for(const auto& arg : ctx.args)
@@ -43,12 +47,21 @@ Type Semantic::funcCall(FuncCall& ctx)
         args.push_back(type);
     }
 
-    if(args != symbolFunc->getParams())
+    if(symbolFunc->getParams().size() != args.size())
     {
-        identTkn->source->printErrorMessage(identTkn->offset, identTkn->size, "[S] The function argument is incorrect");
-        hasError = true;
+        indent->source->printErrorMessage(indent->offset, indent->size, "[S] Invalid number of function arguments");
+        if(!this->hasError) this->hasError = true;
         return Type::VOID;
     }
+
+    if(args != symbolFunc->getParams())
+    {
+        indent->source->printErrorMessage(indent->offset, indent->size, "[S] The function argument is incorrect");
+        if(!this->hasError) this->hasError = true;
+        return Type::VOID;
+    }
+
+    ctx.symbolCalled = symbolFunc;
 
     return symbolFunc->getRet();
 }

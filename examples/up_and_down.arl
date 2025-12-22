@@ -1,0 +1,15 @@
+"std"
+
+pf up() {
+    p("This up function called\n")
+}
+
+pf _start() {
+    down()
+    up()
+    ext(0)
+}
+
+pf down() {
+    p("This down function called\n")
+}

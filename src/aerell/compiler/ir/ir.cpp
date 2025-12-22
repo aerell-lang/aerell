@@ -90,7 +90,9 @@ llvm::Function* IR::funcDecl(const Token& ident, SymbolFunc& ctx)
 
 void IR::func(Func& ctx)
 {
-    auto* funcDecl = this->funcDecl(*ctx.ident, *ctx.symbol);
+    auto* funcDecl = moduleTemp->getFunction(ctx.ident->getText());
+
+    if(funcDecl == nullptr) funcDecl = this->funcDecl(*ctx.ident, *ctx.symbol);
 
     if(!ctx.stmts.has_value()) return;
 
