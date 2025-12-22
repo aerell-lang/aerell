@@ -5,6 +5,7 @@
         "vscode",
         "token",
         "linker",
-        "std"
+        "std",
+        "ir"
     ]
 }

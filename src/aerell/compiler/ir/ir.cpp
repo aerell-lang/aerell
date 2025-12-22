@@ -44,6 +44,13 @@ bool IR::optimize(Module& module)
 IR::Module IR::getStartModule()
 {
     llvmBuilder.SetInsertPoint(this->startFuncEntry);
+
+    auto exitFuncType = llvm::FunctionType::get(llvmBuilder.getVoidTy(), {llvmBuilder.getInt32Ty()}, false);
+    auto exitFunc =
+        llvm::Function::Create(exitFuncType, llvm::Function::ExternalLinkage, "exit", this->moduleStart.get());
+
+    llvmBuilder.CreateCall(exitFunc, {llvmBuilder.getInt32(0)});
+
     llvmBuilder.CreateRetVoid();
 
     // Verify
