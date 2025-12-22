@@ -22,8 +22,6 @@ class Token
   private:
 };
 
-void print(const Token& token);
-
 void print(const std::vector<Token>& tokens);
 
 } // namespace Aerell
