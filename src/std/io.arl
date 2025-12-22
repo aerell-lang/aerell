@@ -1,2 +1,2 @@
 # Print string to the console
-pf p(val str)
+pf print(value str)
