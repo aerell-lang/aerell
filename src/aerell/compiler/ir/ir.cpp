@@ -145,14 +145,7 @@ void IR::func(Func& ctx)
     const auto& ident = *ctx.ident;
 
     auto* funcDecl = this->moduleTemp->getFunction(ident.getText());
-    if(funcDecl != nullptr)
-    {
-        ident.source->printErrorMessage(ident.offset, ident.size, "[IR] Duplicate function");
-        this->hasError = true;
-        return;
-    }
-
-    funcDecl = this->funcDecl(ident, *ctx.symbol, this->moduleTemp);
+    if(funcDecl == nullptr) funcDecl = this->funcDecl(ident, *ctx.symbol, this->moduleTemp);
 
     if(!ctx.stmts.has_value()) return;
 
