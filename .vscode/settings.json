@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "compiler",
         "examples",
-        "vscode"
+        "vscode",
+        "token"
     ]
 }
