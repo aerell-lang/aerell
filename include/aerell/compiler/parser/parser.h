@@ -1,10 +1,11 @@
 #pragma once
 
-#include <aerell/compiler/symbol/symbol_table.h>
 #include <map>
 #include <memory>
 #include <vector>
 
+#include <aerell/compiler/symbol/symbol_table.h>
+#include <aerell/compiler/lexer/lexer.h>
 #include "aerell/compiler/ast/ast.h"
 #include "aerell/compiler/token/token.h"
 
@@ -16,7 +17,7 @@ class Parser
   public:
     Parser(SymbolTable& symbolTable);
 
-    bool gen(const std::vector<Token>& tokens, std::vector<std::unique_ptr<AST>>& asts);
+    bool parsing(const Lexer::Tokens& tokens, AST::Asts& asts);
 
   private:
     enum class Rule

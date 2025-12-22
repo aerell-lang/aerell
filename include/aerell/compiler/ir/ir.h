@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
 #include <llvm/IR/IRBuilder.h>
 #include "llvm/IR/Module.h"
@@ -12,25 +11,28 @@
 namespace Aerell
 {
 
-void print(const std::unique_ptr<llvm::Module>& module);
-
 class IR
 {
   public:
-    std::unique_ptr<llvm::LLVMContext>& getContext();
-    bool gen(const char* name, const std::vector<std::unique_ptr<AST>>& asts, std::unique_ptr<llvm::Module>& module);
+    typedef std::unique_ptr<llvm::Module> Module;
+    typedef std::unique_ptr<llvm::LLVMContext> Context;
+
+    Context& getContext();
+    bool generating(const char* sourceFileName, const AST::Asts& asts, Module& module);
 
   private:
     bool hasError = false;
-    std::unique_ptr<llvm::LLVMContext> llvmContext{std::make_unique<llvm::LLVMContext>()};
+    Context llvmContext{std::make_unique<llvm::LLVMContext>()};
     llvm::IRBuilder<> llvmBuilder{*llvmContext};
-    std::unique_ptr<llvm::Module> moduleTemp{nullptr};
+    Module moduleTemp{nullptr};
 
-    llvm::Value* expr(const std::unique_ptr<AST>& ast);
+    llvm::Value* expr(const AST::Ast& ast);
     llvm::Function* funcDecl(const Token& ident, SymbolFunc& ctx);
     void func(Func& ctx);
     llvm::Value* funcCall(FuncCall& ctx);
     llvm::Value* literal(Literal& ctx);
 };
+
+void print(const IR::Module& module);
 
 } // namespace Aerell

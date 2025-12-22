@@ -2,7 +2,6 @@
 
 #include <aerell/compiler/symbol/symbol_table.h>
 #include <memory>
-#include <vector>
 
 #include <aerell/compiler/ast/ast.h>
 
@@ -13,7 +12,7 @@ class Semantic
 {
   public:
     Semantic(SymbolTable& symbolTable);
-    bool analysis(std::vector<std::unique_ptr<AST>>& asts);
+    bool analysis(const AST::Asts& asts);
 
   private:
     bool hasError = false;

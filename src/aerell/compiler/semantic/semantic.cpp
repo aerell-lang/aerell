@@ -6,12 +6,12 @@ namespace Aerell
 
 Semantic::Semantic(SymbolTable& symbolTable) : symbolTable(&symbolTable) {}
 
-bool Semantic::analysis(std::vector<std::unique_ptr<AST>>& asts)
+bool Semantic::analysis(const AST::Asts& asts)
 {
     for(const auto& ast : asts)
         if(auto* funcCtx = dynamic_cast<Func*>(ast.get())) func(*funcCtx);
 
-    return !hasError;
+    return !this->hasError;
 }
 
 Type Semantic::expr(const std::unique_ptr<AST>& ast)

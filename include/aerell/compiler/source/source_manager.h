@@ -12,14 +12,13 @@ namespace Aerell
 class SourceManager
 {
   public:
-    bool import(const char* path, llvm::raw_ostream& errs);
-    bool contain(const char* path);
-    Source* getFirstSource();
+    bool import(const char* sourcePath, llvm::raw_ostream& errs);
     Source* getLastSource();
     bool hasSource();
 
   private:
     std::vector<std::unique_ptr<Source>> sources;
+    bool contain(const char* sourcePath);
 };
 
 } // namespace Aerell

@@ -6,7 +6,11 @@
 namespace Aerell
 {
 
-Source::Source(const char* path) { this->path = std::filesystem::weakly_canonical(path); }
+Source::Source(const char* path)
+{
+    this->path = std::filesystem::weakly_canonical(path);
+    this->pathStr = this->path.generic_string();
+}
 
 bool Source::exist(llvm::raw_ostream& errs)
 {
@@ -54,7 +58,7 @@ const std::string& Source::getContent() { return this->content; }
 
 const char* Source::getContentData() { return this->content.data(); }
 
-std::string Source::getPath() const { return this->path.generic_string(); }
+const std::string& Source::getPath() const { return this->pathStr; }
 
 void Source::printErrorMessage(size_t offset, size_t size, const char* msg)
 {

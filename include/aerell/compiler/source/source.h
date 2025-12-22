@@ -17,12 +17,13 @@ class Source
 
     const std::string& getContent();
     const char* getContentData();
-    std::string getPath() const;
+    const std::string& getPath() const;
 
     void printErrorMessage(size_t offset, size_t size, const char* msg);
 
   private:
     std::filesystem::path path;
+    std::string pathStr;
     std::string content;
     std::vector<size_t> lineStarts;
 };

@@ -12,10 +12,8 @@
 namespace Aerell
 {
 
-bool Compiler::jit([[maybe_unused]] const char* filePath)
+bool Compiler::jit(Modules& modules)
 {
-    // IR Gen
-    auto modules = genIR(filePath);
     if(modules.empty()) return false;
 
     // JIT

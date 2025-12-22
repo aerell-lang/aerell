@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 
 #include <aerell/compiler/source/source_manager.h>
@@ -19,12 +18,20 @@ namespace Aerell
 class Compiler
 {
   public:
-    bool jit(const char* filePath);
-    bool compile(const char* filePath, std::vector<std::string>& outputs);
+    typedef std::vector<Lexer::Tokens> Tokens;
+    typedef std::vector<AST::Asts> Asts;
+    typedef std::vector<IR::Module> Modules;
+
+    Tokens lexing(const char* filePath);
+    bool parsing(const Tokens& cTokens, Asts& cAsts);
+    bool analysis(const Asts& cAsts);
+    bool generating(const Tokens& tokens, const Asts& cAsts, Modules& modules);
+
+    bool jit(Modules& modules);
+    bool compile(const Modules& modules, std::vector<std::string>& outputs);
 
   private:
     SourceManager sourceManager;
-    Source* mainSource = nullptr;
 
     Lexer lexer;
 
@@ -33,10 +40,16 @@ class Compiler
     Semantic semantic{symbolTable};
     IR ir;
 
-    std::optional<std::string> findFilePathFromName(std::string_view fileName);
-    std::vector<std::vector<Token>> genTokenss(Source* source);
-    std::vector<std::unique_ptr<llvm::Module>> genIR(Source* source);
-    std::vector<std::unique_ptr<llvm::Module>> genIR(const char* filePath);
+    std::optional<std::string> findFilePathFromName(std::string_view mainSourcePath, std::string_view fileName);
+
+    Tokens lexing(const char* mainSourcePath, Source* source);
+    Tokens lexing(Source* source);
 };
+
+void print(const Compiler::Tokens& cTokens);
+
+void print(const Compiler::Asts& cAsts);
+
+void print(const Compiler::Modules& modules);
 
 } // namespace Aerell

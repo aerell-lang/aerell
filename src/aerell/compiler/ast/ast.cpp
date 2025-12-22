@@ -5,7 +5,7 @@
 namespace Aerell
 {
 
-void print(const std::unique_ptr<AST>& ast, size_t indent)
+void print(const AST::Ast& ast, size_t indent)
 {
     if(auto* func = dynamic_cast<Func*>(ast.get()))
     {
@@ -67,7 +67,7 @@ void print(const std::unique_ptr<AST>& ast, size_t indent)
     }
 }
 
-void print(const std::vector<std::unique_ptr<AST>>& asts)
+void print(const AST::Asts& asts)
 {
     for(const auto& ast : asts) print(ast);
 }

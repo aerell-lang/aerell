@@ -10,15 +10,13 @@
 namespace Aerell
 {
 
-void print(const std::unique_ptr<llvm::Module>& module) { module->print(llvm::outs(), nullptr); }
+IR::Context& IR::getContext() { return this->llvmContext; }
 
-std::unique_ptr<llvm::LLVMContext>& IR::getContext() { return this->llvmContext; }
-
-bool IR::gen(const char* name, const std::vector<std::unique_ptr<AST>>& asts, std::unique_ptr<llvm::Module>& module)
+bool IR::generating(const char* sourceFileName, const AST::Asts& asts, Module& module)
 {
     if(hasError) hasError = false;
     if(llvmContext == nullptr) llvmContext = std::make_unique<llvm::LLVMContext>();
-    if(moduleTemp == nullptr) moduleTemp = std::make_unique<llvm::Module>(name, *llvmContext);
+    if(moduleTemp == nullptr) moduleTemp = std::make_unique<llvm::Module>(sourceFileName, *llvmContext);
 
     for(const auto& ast : asts)
         if(auto* funcCtx = dynamic_cast<Func*>(ast.get())) func(*funcCtx);
@@ -51,7 +49,7 @@ bool IR::gen(const char* name, const std::vector<std::unique_ptr<AST>>& asts, st
     return !hasError;
 }
 
-llvm::Value* IR::expr(const std::unique_ptr<AST>& ast)
+llvm::Value* IR::expr(const AST::Ast& ast)
 {
     if(auto* funcCallCtx = dynamic_cast<FuncCall*>(ast.get())) return funcCall(*funcCallCtx);
     if(auto* literalCtx = dynamic_cast<Literal*>(ast.get())) return literal(*literalCtx);
@@ -187,5 +185,7 @@ llvm::Value* IR::literal(Literal& ctx)
 
     return nullptr;
 }
+
+void print(const IR::Module& module) { module->print(llvm::outs(), nullptr); }
 
 } // namespace Aerell

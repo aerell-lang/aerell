@@ -1,10 +1,10 @@
 #pragma once
 
-#include <aerell/compiler/source/source.h>
 #include <utility>
 #include <vector>
 
 #include "aerell/compiler/token/token.h"
+#include <aerell/compiler/source/source.h>
 
 namespace Aerell
 {
@@ -12,7 +12,9 @@ namespace Aerell
 class Lexer
 {
   public:
-    std::vector<Token> gen(Source* source);
+    typedef std::vector<Token> Tokens;
+
+    Tokens lexing(Source* source);
 
   private:
     static const std::pair<std::string, TokenType> symbols[];
@@ -20,7 +22,7 @@ class Lexer
 
     Source* sourceRef = nullptr;
     size_t pos = 0;
-    std::vector<Token> tokens;
+    Tokens tokens;
 
     bool isWS();
     bool isComment();

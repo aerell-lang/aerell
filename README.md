@@ -57,10 +57,17 @@ A command-line utility for Aerell development.
 Usage: aerell <command>
 
 Available commands:
-  help              Print this usage information.
-  version           Print the Aerell version.
-  run <file>        Run an Aerell file.
-  compile <file>    Compile an Aerell file to an executable.
+ help                Print this usage information.
+ version             Print the Aerell compiler version.
+ run <file>          Execute the source file using JIT compilation.
+ build <file>        Build the source file into a standalone executable.
+
+Available internal commands:
+ lex <file>          Tokenize the source file and print the lexer output.
+ parse <file>        Parse the source file and print the AST structure.
+ analyze <file>      Perform semantic analysis on the source file.
+ generate <file>     Generate LLVM IR from source and print the IR output.
+ compile <file>      Compile the source file into an object file.
 ```
 
 You can see example source code that can be run or compiled in the [`examples`](./examples) folder. These examples demonstrate the language features and provide a good starting point for learning how to write Aerell file.

@@ -24,13 +24,13 @@ Parser::Rules Parser::rules{
 
 Parser::Parser(SymbolTable& symbolTable) : symbolTable(&symbolTable) {}
 
-bool Parser::gen(const std::vector<Token>& tokens, std::vector<std::unique_ptr<AST>>& asts)
+bool Parser::parsing(const Lexer::Tokens& tokens, AST::Asts& asts)
 {
-    if(hasError) hasError = false;
-    tokensRef = &tokens;
-    pos = 0;
+    if(this->hasError) this->hasError = false;
+    this->tokensRef = &tokens;
+    this->pos = 0;
 
-    while(pos < tokensRef->size() && (*tokensRef)[pos].type != TokenType::EOFF)
+    while(this->pos < this->tokensRef->size() && (*this->tokensRef)[this->pos].type != TokenType::EOFF)
     {
         if(is(Rule::FUNC))
         {
@@ -41,10 +41,10 @@ bool Parser::gen(const std::vector<Token>& tokens, std::vector<std::unique_ptr<A
             }
         }
         expectErrorMessage(Rule::FUNC);
-        pos++;
+        this->pos++;
     }
 
-    return !hasError;
+    return !this->hasError;
 }
 
 void Parser::expectErrorMessage(const std::vector<TokenType>& types)

@@ -1,3 +1,4 @@
+#include <aerell/compiler/compiler.h>
 #include <memory>
 
 #include <aerell/support/utils.h>
@@ -11,9 +12,12 @@
 namespace Aerell
 {
 
-std::optional<std::string> Compiler::findFilePathFromName(std::string_view fileName)
+std::optional<std::string> Compiler::findFilePathFromName(std::string_view mainSourcePath, std::string_view fileName)
 {
-    std::vector<std::string> paths{mainSource->getPath(), getExeDir().append("../src/std.arl").generic_string()};
+    static std::string stdSourcePath;
+    if(stdSourcePath.empty()) stdSourcePath = getExeDir().append("../src/std.arl").generic_string();
+
+    std::vector<std::string_view> paths{mainSourcePath, stdSourcePath};
 
     for(const auto& path : paths)
     {
@@ -24,83 +28,117 @@ std::optional<std::string> Compiler::findFilePathFromName(std::string_view fileN
     return std::nullopt;
 }
 
-std::vector<std::vector<Token>> Compiler::genTokenss(Source* source)
+Compiler::Tokens Compiler::lexing(const char* mainSourcePath, Source* source)
 {
-    llvm::outs() << source->getPath() << "\n";
-    if(mainSource == nullptr) mainSource = source;
-    std::vector<std::vector<Token>> tokenss;
+    if(mainSourcePath == nullptr) mainSourcePath = source->getPath().c_str();
 
-    size_t x = 0;
+    // Tokenize
+    Tokens cTokens;
+    size_t lastImportIndex = 0;
 
-    auto tokens = this->lexer.gen(source);
-    for(auto token : tokens)
+    auto mainTokens = this->lexer.lexing(source);
+    for(auto token : mainTokens)
     {
         if(token.type != TokenType::STRL) break;
-        x++;
+        lastImportIndex++;
 
-        auto filePath =
-            this->findFilePathFromName({token.source->getContent().data() + token.offset + 1, token.size - 2});
+        auto filePath = this->findFilePathFromName(mainSourcePath, token.getText().substr(1, token.size - 2));
         if(!filePath.has_value())
         {
             token.source->printErrorMessage(token.offset, token.size, "File does not exist");
             continue;
         }
 
-        if(sourceManager.contain(filePath.value().c_str())) continue;
-
         std::string errorMessage;
         llvm::raw_string_ostream os(errorMessage);
-        if(!sourceManager.import(filePath.value().c_str(), os))
+        if(!sourceManager.import(filePath.value().c_str(), os) && !errorMessage.empty())
         {
             token.source->printErrorMessage(token.offset, token.size, errorMessage.c_str());
             continue;
         }
 
-        for(auto& token : genTokenss(sourceManager.getLastSource())) tokenss.push_back(std::move(token));
+        for(auto& token : lexing(mainSourcePath, sourceManager.getLastSource())) cTokens.push_back(std::move(token));
     }
 
-    tokenss.emplace_back(std::make_move_iterator(tokens.begin() + x), std::make_move_iterator(tokens.end()));
-    return tokenss;
+    cTokens.emplace_back(
+        std::make_move_iterator(mainTokens.begin() + lastImportIndex), std::make_move_iterator(mainTokens.end()));
+
+    return cTokens;
 }
 
-std::vector<std::unique_ptr<llvm::Module>> Compiler::genIR(Source* source)
+Compiler::Tokens Compiler::lexing(Source* source)
 {
-    // Lexer
-    auto tokenss = genTokenss(source);
+    // Tokenize
+    return this->lexing(nullptr, source);
+}
 
-    std::vector<std::unique_ptr<llvm::Module>> modules;
-    for(const auto& tokens : tokenss)
+Compiler::Tokens Compiler::lexing(const char* filePath)
+{
+    // Import file
+    if(!this->sourceManager.import(filePath, llvm::outs())) return {};
+
+    // Tokenize
+    return this->lexing(this->sourceManager.getLastSource());
+}
+
+bool Compiler::parsing(const Tokens& cTokens, Asts& cAsts)
+{
+    bool hasError = false;
+
+    for(const Lexer::Tokens& tokens : cTokens)
     {
         if(tokens.empty()) continue;
 
-        // Parser
-        std::vector<std::unique_ptr<AST>> asts;
-        if(!this->parser.gen(tokens, asts)) continue;
+        AST::Asts asts;
+        if(!this->parser.parsing(tokens, asts))
+        {
+            if(!hasError) hasError = true;
+            continue;
+        }
 
-        // Semantic
-        if(!this->semantic.analysis(asts)) continue;
+        cAsts.push_back(std::move(asts));
+    }
 
-        // IR Gen
-        std::unique_ptr<llvm::Module> module = nullptr;
-        if(!this->ir.gen(tokens.front().source->getPath().c_str(), asts, module)) continue;
+    return !hasError;
+}
+
+bool Compiler::analysis(const Asts& cAsts)
+{
+    bool hasError = false;
+
+    for(const AST::Asts& asts : cAsts)
+    {
+        if(!this->semantic.analysis(asts))
+            if(!hasError) hasError = true;
+    }
+
+    return !hasError;
+}
+
+bool Compiler::generating(const Tokens& tokens, const Asts& cAsts, Modules& modules)
+{
+    bool hasError = false;
+
+    size_t index = 0;
+    for(const AST::Asts& asts : cAsts)
+    {
+        auto sourceFileName = tokens[index].front().source->getPath().c_str();
+        index++;
+        IR::Module module = nullptr;
+        if(!this->ir.generating(sourceFileName, asts, module))
+        {
+            if(!hasError) hasError = true;
+            continue;
+        }
 
         modules.push_back(std::move(module));
     }
 
-    return modules;
+    return !hasError;
 }
 
-std::vector<std::unique_ptr<llvm::Module>> Compiler::genIR(const char* filePath)
+bool Compiler::compile(const Modules& modules, std::vector<std::string>& outputs)
 {
-    if(sourceManager.contain(filePath) || !sourceManager.import(filePath, llvm::errs()) || !sourceManager.hasSource())
-        return {};
-    return genIR(sourceManager.getLastSource());
-}
-
-bool Compiler::compile(const char* filePath, std::vector<std::string>& outputs)
-{
-    // IR Gen
-    auto modules = genIR(filePath);
     if(modules.empty()) return false;
 
     // Code Gen
@@ -114,6 +152,21 @@ bool Compiler::compile(const char* filePath, std::vector<std::string>& outputs)
     }
 
     return std::all_of(success.begin(), success.end(), [](const auto& status) { return status == true; });
+}
+
+void print(const Compiler::Tokens& cTokens)
+{
+    for(const Lexer::Tokens& tokens : cTokens) print(tokens);
+}
+
+void print(const Compiler::Asts& cAsts)
+{
+    for(const AST::Asts& asts : cAsts) print(asts);
+}
+
+void print(const Compiler::Modules& modules)
+{
+    for(const IR::Module& module : modules) print(module);
 }
 
 } // namespace Aerell

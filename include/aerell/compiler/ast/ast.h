@@ -13,6 +13,9 @@ namespace Aerell
 class AST
 {
   public:
+    typedef std::unique_ptr<AST> Ast;
+    typedef std::vector<Ast> Asts;
+
     virtual ~AST() {};
 };
 
@@ -30,7 +33,7 @@ class Func : public AST
     const Token* ident = nullptr;
     std::vector<FuncParam> params;
     const Token* ret = nullptr;
-    std::optional<std::vector<std::unique_ptr<AST>>> stmts = std::nullopt;
+    std::optional<Asts> stmts = std::nullopt;
     SymbolFunc* symbol = nullptr;
 };
 
@@ -41,7 +44,7 @@ class FuncCall : public AST
 
     const Token* ident = nullptr;
     SymbolFunc* symbolCalled = nullptr;
-    std::vector<std::unique_ptr<AST>> args;
+    Asts args;
 };
 
 class Literal : public AST
@@ -52,8 +55,8 @@ class Literal : public AST
     const Token* value = nullptr;
 };
 
-void print(const std::unique_ptr<AST>& ast, size_t indent = 0);
+void print(const AST::Ast& ast, size_t indent = 0);
 
-void print(const std::vector<std::unique_ptr<AST>>& asts);
+void print(const AST::Asts& asts);
 
 } // namespace Aerell
