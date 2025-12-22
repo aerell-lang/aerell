@@ -1,8 +1,8 @@
-#include <aerell/compiler/compiler.h>
+#include <filesystem>
 #include <memory>
 
 #include <aerell/support/utils.h>
-#include "aerell/compiler/compiler.h"
+#include <aerell/compiler/compiler.h>
 #include <aerell/compiler/semantic/semantic.h>
 #include <aerell/compiler/ir/ir.h>
 #include <aerell/compiler/codegen/codegen.h>
@@ -21,7 +21,7 @@ std::optional<std::string> Compiler::findFilePathFromName(std::string_view mainS
 
     for(const auto& path : paths)
     {
-        auto filePath = std::filesystem::path(path).replace_filename(fileName).replace_extension("arl");
+        auto filePath = std::filesystem::weakly_canonical(path).replace_filename(fileName).replace_extension("arl");
         if(std::filesystem::exists(filePath)) return filePath.generic_string();
     }
 
@@ -51,9 +51,9 @@ Compiler::Tokens Compiler::lexing(const char* mainSourcePath, Source* source)
 
         std::string errorMessage;
         llvm::raw_string_ostream os(errorMessage);
-        if(!sourceManager.import(filePath.value().c_str(), os) && !errorMessage.empty())
+        if(!sourceManager.import(filePath.value().c_str(), os))
         {
-            token.source->printErrorMessage(token.offset, token.size, errorMessage.c_str());
+            if(!errorMessage.empty()) token.source->printErrorMessage(token.offset, token.size, errorMessage.c_str());
             continue;
         }
 

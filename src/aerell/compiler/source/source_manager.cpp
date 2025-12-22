@@ -1,5 +1,7 @@
-#include "aerell/compiler/source/source_manager.h"
+#include <algorithm>
 #include <memory>
+
+#include "aerell/compiler/source/source_manager.h"
 
 namespace Aerell
 {
@@ -18,9 +20,9 @@ bool SourceManager::import(const char* sourcePath, llvm::raw_ostream& errs)
 
 bool SourceManager::contain(const char* sourcePath)
 {
-    for(const auto& source : this->sources)
-        if(source->getPath() == sourcePath) return true;
-    return false;
+    return std::any_of(this->sources.begin(), this->sources.end(), [&](const auto& source) {
+        return source->getPath() == sourcePath;
+    });
 }
 
 Source* SourceManager::getLastSource() { return this->sources.back().get(); }
