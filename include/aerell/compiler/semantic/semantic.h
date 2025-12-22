@@ -18,10 +18,11 @@ class Semantic
     bool hasError = false;
     SymbolTable* symbolTable;
 
-    Type expr(const std::unique_ptr<AST>& ast);
+    void stmt(const std::unique_ptr<AST>& ast);
+    std::optional<Type> expr(const std::unique_ptr<AST>& ast);
 
     void func(Func& ctx);
-    Type funcCall(FuncCall& ctx);
+    std::optional<Type> funcCall(FuncCall& ctx);
     Type literal(Literal& ctx);
 };
 

@@ -20,16 +20,24 @@ class IR
     Context& getContext();
     bool generating(const char* sourceFileName, const AST::Asts& asts, Module& module);
 
+    Module getStartModule();
+
   private:
     bool hasError = false;
     Context llvmContext{std::make_unique<llvm::LLVMContext>()};
     llvm::IRBuilder<> llvmBuilder{*llvmContext};
     Module moduleTemp{nullptr};
+    Module moduleStart{nullptr};
+    llvm::BasicBlock* startFuncEntry{nullptr};
 
-    llvm::Value* expr(const AST::Ast& ast);
-    llvm::Function* funcDecl(const Token& ident, SymbolFunc& ctx);
+    bool verify(Module& module);
+    bool optimize(Module& module);
+
+    void stmt(const AST::Ast& ast, const Module& module);
+    llvm::Value* expr(const AST::Ast& ast, const Module& module);
+    llvm::Function* funcDecl(const Token& ident, SymbolFunc& ctx, const Module& module);
     void func(Func& ctx);
-    llvm::Value* funcCall(FuncCall& ctx);
+    llvm::Value* funcCall(FuncCall& ctx, const Module& module);
     llvm::Value* literal(Literal& ctx);
 };
 

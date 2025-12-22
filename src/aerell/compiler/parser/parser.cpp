@@ -12,7 +12,7 @@ namespace Aerell
 {
 
 Parser::Rules Parser::rules{
-    {Rule::STMT, {TokenType::IDENT, TokenType::INTL, TokenType::STRL}},
+    {Rule::STMT, {TokenType::F, TokenType::PF, TokenType::IDENT, TokenType::INTL, TokenType::STRL}},
     {Rule::FUNC, {TokenType::F, TokenType::PF}},
     {Rule::FUNC_PARAM, {TokenType::IDENT}},
     {Rule::DATA_TYPE, {TokenType::I32, TokenType::STR}},
@@ -32,15 +32,15 @@ bool Parser::parsing(const Lexer::Tokens& tokens, AST::Asts& asts)
 
     while(this->pos < this->tokensRef->size() && (*this->tokensRef)[this->pos].type != TokenType::EOFF)
     {
-        if(is(Rule::FUNC))
+        if(is(Rule::STMT))
         {
-            if(auto ast = func())
+            if(auto ast = stmt())
             {
                 asts.push_back(std::move(ast));
                 continue;
             }
         }
-        expectErrorMessage(Rule::FUNC);
+        expectErrorMessage(Rule::STMT);
         this->pos++;
     }
 
@@ -98,6 +98,7 @@ bool Parser::is(Rule rule) { return is(rules[rule]); }
 
 std::unique_ptr<AST> Parser::stmt()
 {
+    if(is(Rule::FUNC)) return func();
     if(is(Rule::EXPR)) return expr();
     expectErrorMessage(Rule::STMT);
     return nullptr;

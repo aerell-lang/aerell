@@ -8,17 +8,21 @@ Semantic::Semantic(SymbolTable& symbolTable) : symbolTable(&symbolTable) {}
 
 bool Semantic::analysis(const AST::Asts& asts)
 {
-    for(const auto& ast : asts)
-        if(auto* funcCtx = dynamic_cast<Func*>(ast.get())) func(*funcCtx);
-
+    for(const auto& ast : asts) stmt(ast);
     return !this->hasError;
 }
 
-Type Semantic::expr(const std::unique_ptr<AST>& ast)
+void Semantic::stmt(const std::unique_ptr<AST>& ast)
+{
+    if(auto* funcCtx = dynamic_cast<Func*>(ast.get())) return func(*funcCtx);
+    if(expr(ast).has_value()) return;
+}
+
+std::optional<Type> Semantic::expr(const std::unique_ptr<AST>& ast)
 {
     if(auto* funcCallCtx = dynamic_cast<FuncCall*>(ast.get())) return funcCall(*funcCallCtx);
     if(auto* literalCtx = dynamic_cast<Literal*>(ast.get())) return literal(*literalCtx);
-    return Type::VOID;
+    return std::nullopt;
 }
 
 void Semantic::func(Func& ctx)
@@ -27,43 +31,43 @@ void Semantic::func(Func& ctx)
     for(const auto& stmt : ctx.stmts.value()) expr(stmt);
 }
 
-Type Semantic::funcCall(FuncCall& ctx)
+std::optional<Type> Semantic::funcCall(FuncCall& ctx)
 {
     const auto& indent = ctx.ident;
 
     auto symbolFunc = this->symbolTable->findFunc(indent->getText());
     if(symbolFunc == nullptr)
     {
-        indent->source->printErrorMessage(indent->offset, indent->size, "[P] Undefined function");
+        indent->source->printErrorMessage(indent->offset, indent->size, "[S] Undefined function");
         if(!this->hasError) this->hasError = true;
-        return Type::VOID;
+        return std::nullopt;
     }
 
     std::vector<Type> args;
     for(const auto& arg : ctx.args)
     {
         auto type = expr(arg);
-        if(type == Type::VOID) continue;
-        args.push_back(type);
+        if(!type.has_value()) continue;
+        args.push_back(type.value());
     }
 
     if(symbolFunc->getParams().size() != args.size())
     {
         indent->source->printErrorMessage(indent->offset, indent->size, "[S] Invalid number of function arguments");
         if(!this->hasError) this->hasError = true;
-        return Type::VOID;
+        return std::nullopt;
     }
 
     if(args != symbolFunc->getParams())
     {
         indent->source->printErrorMessage(indent->offset, indent->size, "[S] The function argument is incorrect");
         if(!this->hasError) this->hasError = true;
-        return Type::VOID;
+        return std::nullopt;
     }
 
     ctx.symbolCalled = symbolFunc;
 
-    return symbolFunc->getRet();
+    return ctx.symbolCalled->getRet();
 }
 
 Type Semantic::literal(Literal& ctx)

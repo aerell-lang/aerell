@@ -12,20 +12,14 @@ namespace Aerell
 
 IR::Context& IR::getContext() { return this->llvmContext; }
 
-bool IR::generating(const char* sourceFileName, const AST::Asts& asts, Module& module)
+bool IR::verify(Module& module)
 {
-    if(hasError) hasError = false;
-    if(llvmContext == nullptr) llvmContext = std::make_unique<llvm::LLVMContext>();
-    if(moduleTemp == nullptr) moduleTemp = std::make_unique<llvm::Module>(sourceFileName, *llvmContext);
-
-    for(const auto& ast : asts)
-        if(auto* funcCtx = dynamic_cast<Func*>(ast.get())) func(*funcCtx);
-
-    if(hasError) return false;
-
     // Verify
-    if(llvm::verifyModule(*moduleTemp, &llvm::errs())) return false;
+    return !llvm::verifyModule(*module, &llvm::errs());
+}
 
+bool IR::optimize(Module& module)
+{
     // Optimize
     llvm::PassBuilder passBuilder;
 
@@ -42,57 +36,116 @@ bool IR::generating(const char* sourceFileName, const AST::Asts& asts, Module& m
 
     llvm::ModulePassManager modulePM = passBuilder.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O3);
 
-    modulePM.run(*moduleTemp, moduleAM);
+    modulePM.run(*module, moduleAM);
 
-    module = std::move(moduleTemp);
+    return true;
+}
+
+IR::Module IR::getStartModule()
+{
+    llvmBuilder.SetInsertPoint(this->startFuncEntry);
+    llvmBuilder.CreateRetVoid();
+
+    // Verify
+    if(!this->verify(this->moduleStart)) return nullptr;
+
+    // Optimize
+    this->optimize(this->moduleStart);
+
+    return std::move(this->moduleStart);
+}
+
+bool IR::generating(const char* sourceFileName, const AST::Asts& asts, Module& module)
+{
+    if(this->hasError) this->hasError = false;
+    if(this->llvmContext == nullptr) this->llvmContext = std::make_unique<llvm::LLVMContext>();
+    if(this->moduleTemp == nullptr) this->moduleTemp = std::make_unique<llvm::Module>(sourceFileName, *llvmContext);
+    if(this->moduleStart == nullptr)
+    {
+        this->moduleStart = std::make_unique<llvm::Module>("start", *llvmContext);
+        auto startFuncType = llvm::FunctionType::get(llvmBuilder.getVoidTy(), {}, false);
+        auto startFunc =
+            llvm::Function::Create(startFuncType, llvm::Function::ExternalLinkage, "_start", this->moduleStart.get());
+        this->startFuncEntry = llvm::BasicBlock::Create(*llvmContext, "entry", startFunc);
+    }
+
+    for(const auto& ast : asts)
+    {
+        llvmBuilder.SetInsertPoint(this->startFuncEntry);
+        this->stmt(ast, this->moduleStart);
+    }
+
+    // HasError & Verify
+    if(hasError || !this->verify(this->moduleTemp)) return false;
+
+    // Optimize
+    this->optimize(this->moduleTemp);
+
+    module = std::move(this->moduleTemp);
 
     return !hasError;
 }
 
-llvm::Value* IR::expr(const AST::Ast& ast)
+void IR::stmt(const AST::Ast& ast, const Module& module)
 {
-    if(auto* funcCallCtx = dynamic_cast<FuncCall*>(ast.get())) return funcCall(*funcCallCtx);
+    if(auto* funcCtx = dynamic_cast<Func*>(ast.get())) return func(*funcCtx);
+    if(expr(ast, module)) return;
+    this->hasError = true;
+    llvm::errs() << "[IR] Invalid statement\n";
+}
+
+llvm::Value* IR::expr(const AST::Ast& ast, const Module& module)
+{
+    if(auto* funcCallCtx = dynamic_cast<FuncCall*>(ast.get())) return funcCall(*funcCallCtx, module);
     if(auto* literalCtx = dynamic_cast<Literal*>(ast.get())) return literal(*literalCtx);
     return nullptr;
 }
 
-llvm::Function* IR::funcDecl(const Token& ident, SymbolFunc& ctx)
+llvm::Function* IR::funcDecl(const Token& ident, SymbolFunc& ctx, const Module& module)
 {
     // Return
-    llvm::Type* ret = llvmBuilder.getVoidTy();
+    llvm::Type* retLlvm = llvmBuilder.getVoidTy();
     switch(ctx.getRet())
     {
-    case Type::VOID: ret = llvmBuilder.getVoidTy(); break;
-    case Type::I32: ret = llvmBuilder.getInt32Ty(); break;
-    case Type::STR: ret = llvmBuilder.getPtrTy(); break;
+    case Type::VOID: retLlvm = llvmBuilder.getVoidTy(); break;
+    case Type::I32: retLlvm = llvmBuilder.getInt32Ty(); break;
+    case Type::STR: retLlvm = llvmBuilder.getPtrTy(); break;
     }
 
     // Params
-    std::vector<llvm::Type*> params;
+    std::vector<llvm::Type*> paramsLlvm;
     for(auto param : ctx.getParams()) switch(param)
         {
         case VOID:
             ident.source->printErrorMessage(ident.offset, ident.size, "[IR] Invalid param type");
             this->hasError = true;
             break;
-        case STR: params.emplace_back(llvmBuilder.getPtrTy()); break;
-        case I32: params.emplace_back(llvmBuilder.getInt32Ty()); break;
+        case STR: paramsLlvm.emplace_back(llvmBuilder.getPtrTy()); break;
+        case I32: paramsLlvm.emplace_back(llvmBuilder.getInt32Ty()); break;
         }
 
     // Public
-    auto pub = llvm::Function::InternalLinkage;
-    if(ctx.getPub()) pub = llvm::Function::ExternalLinkage;
+    auto pubLlvm = llvm::Function::InternalLinkage;
+    if(ctx.getPub()) pubLlvm = llvm::Function::ExternalLinkage;
 
     // Declare function
-    auto fType = llvm::FunctionType::get(ret, params, ctx.getVrdic());
-    return llvm::Function::Create(fType, pub, ident.getText(), moduleTemp.get());
+    auto fType = llvm::FunctionType::get(retLlvm, paramsLlvm, ctx.getVrdic());
+    return llvm::Function::Create(fType, pubLlvm, ident.getText(), module.get());
 }
 
 void IR::func(Func& ctx)
 {
-    auto* funcDecl = moduleTemp->getFunction(ctx.ident->getText());
+    const auto& ident = *ctx.ident;
 
-    if(funcDecl == nullptr) funcDecl = this->funcDecl(*ctx.ident, *ctx.symbol);
+    auto* funcDecl = this->moduleTemp->getFunction(ident.getText());
+    if(funcDecl != nullptr)
+    {
+        ident.source->printErrorMessage(ident.offset, ident.size, "[IR] Duplicate function");
+        this->hasError = true;
+        return;
+    }
+
+    funcDecl = this->funcDecl(ident, *ctx.symbol, this->moduleTemp);
 
     if(!ctx.stmts.has_value()) return;
 
@@ -101,16 +154,16 @@ void IR::func(Func& ctx)
     llvmBuilder.SetInsertPoint(entry);
 
     // Statements
-    for(const auto& stmt : ctx.stmts.value()) expr(stmt);
+    for(const auto& stmtCtx : ctx.stmts.value()) stmt(stmtCtx, this->moduleTemp);
 
     // Return void if ret is null
     if(ctx.ret == nullptr) llvmBuilder.CreateRetVoid();
 }
 
-llvm::Value* IR::funcCall(FuncCall& ctx)
+llvm::Value* IR::funcCall(FuncCall& ctx, const Module& module)
 {
     std::string_view ident = ctx.ident->getText();
-    llvm::Function* func = moduleTemp->getFunction(ident);
+    llvm::Function* func = module->getFunction(ident);
 
     if(func == nullptr)
     {
@@ -121,19 +174,19 @@ llvm::Value* IR::funcCall(FuncCall& ctx)
             return nullptr;
         }
 
-        if(this->funcDecl(*ctx.ident, *ctx.symbolCalled) == nullptr)
+        if(this->funcDecl(*ctx.ident, *ctx.symbolCalled, module) == nullptr)
         {
             ctx.ident->source->printErrorMessage(ctx.ident->offset, ctx.ident->size, "[IR] Failed to declare function");
             this->hasError = true;
             return nullptr;
         }
 
-        func = moduleTemp->getFunction(ident);
+        func = module->getFunction(ident);
     }
 
     std::vector<llvm::Value*> args;
     for(const auto& arg : ctx.args)
-        if(auto value = expr(arg)) args.push_back(value);
+        if(auto value = expr(arg, module)) args.push_back(value);
 
     return llvmBuilder.CreateCall(func, args);
 }

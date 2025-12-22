@@ -29,6 +29,7 @@ Compiler::Tokens Compiler::lexing(Source* source)
         int status = sourceManager.import(std::string(token.getText().substr(1, token.size - 2)).c_str(), os);
         if(status == 0)
         {
+            errorMessage = {"[I] " + errorMessage};
             token.source->printErrorMessage(token.offset, token.size, errorMessage.c_str());
             continue;
         }
@@ -124,6 +125,11 @@ bool Compiler::generating(const Tokens& tokens, const Asts& cAsts, Modules& modu
 
         modules.push_back(std::move(module));
     }
+
+    auto startModule = this->ir.getStartModule();
+    if(startModule != nullptr) modules.push_back(std::move(startModule));
+    else if(!hasError)
+        hasError = true;
 
     return !hasError;
 }
