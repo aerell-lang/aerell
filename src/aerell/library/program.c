@@ -2,10 +2,10 @@
 #include <windows.h>
 #endif
 
-void ext(int cd)
+void exit(int code)
 {
 #if defined(_WIN32)
-    ExitProcess(cd);
+    ExitProcess(code);
 #else
 #error "Only Win supported"
 #endif

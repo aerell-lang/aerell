@@ -1,2 +1,2 @@
 # Exit program with status code
-pf ext(cd i32)
+pf exit(code i32)
