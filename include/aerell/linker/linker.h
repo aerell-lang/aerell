@@ -17,7 +17,6 @@ class Linker
 {
   public:
     Linker();
-    bool linking(std::string_view filePath);
     bool linking(const std::vector<std::string>& filePaths);
 
   private:

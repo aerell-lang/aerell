@@ -33,10 +33,11 @@ class Compiler
     bool parsing(const Tokens& cTokens, Asts& cAsts);
     bool analysis(const Asts& cAsts);
     bool generating(const Tokens& tokens, const Asts& cAsts, IR::Modules& modules);
-    bool jit(IR::Modules& modules);
+    bool jit(IR::Module& module);
     IR::Module linking(IR::Modules& modules);
+    void optimize(IR::Modules& modules);
+    void optimize(IR::Module& module);
     bool compile(IR::Modules& modules, std::vector<std::string>& outputs);
-    std::optional<std::string> compile(IR::Modules& modules);
 
   private:
     SourceManager sourceManager;
@@ -47,6 +48,8 @@ class Compiler
     IR ir;
 
     Tokens lexing(Source* source);
+
+    std::optional<std::string> compile(IR::Module& module);
 };
 
 void print(const Compiler::Tokens& cTokens);

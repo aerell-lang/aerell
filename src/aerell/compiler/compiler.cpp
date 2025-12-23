@@ -105,10 +105,8 @@ bool Compiler::analysis(const Asts& cAsts)
     bool hasError = false;
 
     for(const AST::Asts& asts : cAsts)
-    {
         if(!this->semantic.analysis(asts))
             if(!hasError) hasError = true;
-    }
 
     return !hasError;
 }
@@ -139,36 +137,30 @@ bool Compiler::generating(const Tokens& tokens, const Asts& cAsts, IR::Modules& 
     return !hasError;
 }
 
-IR::Module Compiler::linking(IR::Modules& modules)
+IR::Module Compiler::linking(IR::Modules& modules) { return this->ir.linking(modules); }
+
+void Compiler::optimize(IR::Modules& modules)
 {
-    auto module = this->ir.linking(modules);
-    if(module == nullptr) return nullptr;
-    this->ir.optimize(module);
-    return module;
+    for(auto& module : modules) this->ir.optimize(module);
 }
+
+void Compiler::optimize(IR::Module& module) { this->ir.optimize(module); }
 
 bool Compiler::compile(IR::Modules& modules, std::vector<std::string>& outputs)
 {
     if(modules.empty()) return false;
 
     // Code Gen
-    std::vector<bool> success;
-    for(auto& module : modules)
-    {
-        this->ir.optimize(module);
-        const auto& filePath = module->getSourceFileName();
-        bool status = Aerell::CodeGen::obj(filePath.c_str(), module);
-        if(status) outputs.push_back(filePath);
-        success.push_back(status);
-    }
-
-    return std::all_of(success.begin(), success.end(), [](const auto& status) { return status == true; });
+    return std::all_of(modules.begin(), modules.end(), [&](auto& module) {
+        auto output = this->compile(module);
+        if(!output.has_value()) return false;
+        outputs.push_back(output.value());
+        return true;
+    });
 }
 
-std::optional<std::string> Compiler::compile(IR::Modules& modules)
+std::optional<std::string> Compiler::compile(IR::Module& module)
 {
-    auto module = this->linking(modules);
-    if(module == nullptr) return std::nullopt;
     const auto& filePath = module->getSourceFileName();
     if(!Aerell::CodeGen::obj(filePath.c_str(), module)) return std::nullopt;
     return filePath;

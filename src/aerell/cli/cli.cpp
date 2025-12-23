@@ -121,22 +121,30 @@ int main(int argc, char* argv[])
             return EXIT_SUCCESS;
         }
 
-        // JIT
-        if(isRun && compiler.jit(modules)) return EXIT_SUCCESS;
+        if(isRun)
+        {
+            auto module = compiler.linking(modules);
+            if(module == nullptr) return EXIT_FAILURE;
+            compiler.optimize(module);
+
+            // JIT
+            if(compiler.jit(module)) return EXIT_SUCCESS;
+
+            return EXIT_FAILURE;
+        }
 
         // Compile
+        compiler.optimize(modules);
+        std::vector<std::string> outputs;
+        if(!compiler.compile(modules, outputs)) return EXIT_FAILURE;
         if(isCompile)
         {
-            std::vector<std::string> outputs;
-            if(!compiler.compile(modules, outputs)) return EXIT_FAILURE;
             llvm::outs() << "Successfully compiled the file.";
             return EXIT_SUCCESS;
         }
 
         // Linker
-        auto output = compiler.compile(modules);
-        if(!output.has_value()) return EXIT_FAILURE;
-        if(!linker.linking(output.value())) return EXIT_FAILURE;
+        if(!linker.linking(outputs)) return EXIT_FAILURE;
 
         return EXIT_SUCCESS;
     }
