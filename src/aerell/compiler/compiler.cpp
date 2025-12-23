@@ -19,10 +19,10 @@
 namespace Aerell
 {
 
-Compiler::Tokens Compiler::lexing(Source* source)
+bool Compiler::lexing(Source* source, Tokens& cTokens)
 {
-    // Tokenize
-    Tokens cTokens;
+    bool hasError = false;
+
     size_t lastImportIndex = 0;
 
     auto mainTokens = this->lexer.lexing(source);
@@ -39,24 +39,32 @@ Compiler::Tokens Compiler::lexing(Source* source)
         {
             errorMessage = {"[I] " + errorMessage};
             token.source->printErrorMessage(token.offset, token.size, errorMessage.c_str());
+            if(!hasError) hasError = true;
             continue;
         }
         else if(status == 2)
             continue;
 
-        for(auto& token : lexing(sourceManager.getLastSource())) cTokens.push_back(std::move(token));
+        Tokens cTokensTemp;
+        if(!this->lexing(this->sourceManager.getLastSource(), cTokensTemp))
+        {
+            if(!hasError) hasError = true;
+            continue;
+        }
+
+        for(auto& tokens : cTokensTemp) cTokens.push_back(std::move(tokens));
     }
 
     mainTokens = {
         std::make_move_iterator(mainTokens.begin() + lastImportIndex), std::make_move_iterator(mainTokens.end())};
     if(mainTokens.size() != 1 && mainTokens[0].type != TokenType::EOFF) cTokens.emplace_back(mainTokens);
 
-    return cTokens;
+    return !hasError;
 }
 
-Compiler::Tokens Compiler::lexing(const char* filePath)
+bool Compiler::lexing(const char* filePath, Tokens& cTokens)
 {
-    Compiler::Tokens mainTokens;
+    bool hasError = false;
 
     std::vector<std::pair<const char*, bool>> autoImportSources{
         {"std/std", false},
@@ -70,16 +78,24 @@ Compiler::Tokens Compiler::lexing(const char* filePath)
         if(status == 0)
         {
             llvm::errs() << '\n';
+            if(!hasError) hasError = true;
             continue;
         }
         else if(status == 2)
             continue;
 
+        Tokens cTokensTemp;
+        if(!this->lexing(this->sourceManager.getLastSource(), cTokensTemp))
+        {
+            if(!hasError) hasError = true;
+            continue;
+        }
+
         // Lexing
-        for(auto& tokens : this->lexing(this->sourceManager.getLastSource())) mainTokens.push_back(std::move(tokens));
+        for(auto& tokens : cTokensTemp) cTokens.push_back(std::move(tokens));
     }
 
-    return mainTokens;
+    return !hasError;
 }
 
 bool Compiler::parsing(const Tokens& cTokens, Asts& cAsts)

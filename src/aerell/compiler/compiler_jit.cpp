@@ -20,9 +20,9 @@
 namespace Aerell
 {
 
-bool Compiler::jit(IR::Module& module)
+bool Compiler::jit(IR::Modules& modules)
 {
-    if(module == nullptr) return false;
+    if(modules.empty()) return false;
 
     // JIT
     auto jit = llvm::orc::LLJITBuilder().create();
@@ -40,11 +40,12 @@ bool Compiler::jit(IR::Module& module)
 
     llvm::orc::ThreadSafeContext ctx{std::move(this->ir.getContext())};
 
-    if(auto error = (*jit)->addIRModule(llvm::orc::ThreadSafeModule(std::move(module), ctx)))
-    {
-        llvm::errs() << error << "\n";
-        return false;
-    }
+    for(auto& module : modules)
+        if(auto error = (*jit)->addIRModule(llvm::orc::ThreadSafeModule(std::move(module), ctx)))
+        {
+            llvm::errs() << error << "\n";
+            return false;
+        }
 
     auto entrySym = (*jit)->lookup("_start");
     if(!entrySym)

@@ -29,11 +29,11 @@ class Compiler
     typedef std::vector<Lexer::Tokens> Tokens;
     typedef std::vector<AST::Asts> Asts;
 
-    Tokens lexing(const char* filePath);
+    bool lexing(const char* filePath, Tokens& cTokens);
     bool parsing(const Tokens& cTokens, Asts& cAsts);
     bool analysis(const Asts& cAsts);
     bool generating(const Tokens& tokens, const Asts& cAsts, IR::Modules& modules);
-    bool jit(IR::Module& module);
+    bool jit(IR::Modules& modules);
     IR::Module linking(IR::Modules& modules);
     void optimize(IR::Modules& modules);
     void optimize(IR::Module& module);
@@ -47,7 +47,7 @@ class Compiler
     Semantic semantic{symbolTable};
     IR ir;
 
-    Tokens lexing(Source* source);
+    bool lexing(Source* source, Tokens& cTokens);
 
     std::optional<std::string> compile(IR::Module& module);
 };

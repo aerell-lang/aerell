@@ -92,7 +92,8 @@ int main(int argc, char* argv[])
         const auto& filePath = argv[2];
 
         // Lexing
-        auto tokens = compiler.lexing(filePath);
+        Aerell::Compiler::Tokens tokens;
+        if(!compiler.lexing(filePath, tokens)) return EXIT_FAILURE;
         if(isLex)
         {
             print(tokens);
@@ -121,7 +122,15 @@ int main(int argc, char* argv[])
         // IR Gen
         Aerell::IR::Modules modules;
         if(!compiler.generating(tokens, asts, modules)) return EXIT_FAILURE;
-        if(isGenerate || isCompile || isBuild) compiler.optimize(modules);
+
+        // IR Linking
+        auto moduleTemp = compiler.linking(modules);
+        if(moduleTemp == nullptr) return EXIT_FAILURE;
+        compiler.optimize(moduleTemp);
+
+        modules.clear();
+        modules.push_back(std::move(moduleTemp));
+
         if(isGenerate)
         {
             Aerell::print(modules);
@@ -129,15 +138,10 @@ int main(int argc, char* argv[])
             return EXIT_SUCCESS;
         }
 
+        // JIT
         if(isRun)
         {
-            auto module = compiler.linking(modules);
-            if(module == nullptr) return EXIT_FAILURE;
-            compiler.optimize(module);
-
-            // JIT
-            if(!compiler.jit(module)) return EXIT_FAILURE;
-
+            if(!compiler.jit(modules)) return EXIT_FAILURE;
             return EXIT_SUCCESS;
         }
 
