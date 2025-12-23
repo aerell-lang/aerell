@@ -47,8 +47,9 @@ Compiler::Tokens Compiler::lexing(Source* source)
         for(auto& token : lexing(sourceManager.getLastSource())) cTokens.push_back(std::move(token));
     }
 
-    cTokens.emplace_back(
-        std::make_move_iterator(mainTokens.begin() + lastImportIndex), std::make_move_iterator(mainTokens.end()));
+    mainTokens = {
+        std::make_move_iterator(mainTokens.begin() + lastImportIndex), std::make_move_iterator(mainTokens.end())};
+    if(mainTokens.size() != 1 && mainTokens[0].type != TokenType::EOFF) cTokens.emplace_back(mainTokens);
 
     return cTokens;
 }
@@ -141,10 +142,21 @@ IR::Module Compiler::linking(IR::Modules& modules) { return this->ir.linking(mod
 
 void Compiler::optimize(IR::Modules& modules)
 {
-    for(auto& module : modules) this->ir.optimize(module);
+    IR::Modules optimizeModules;
+    for(auto& module : modules)
+    {
+        this->optimize(module);
+        if(module == nullptr) continue;
+        optimizeModules.push_back(std::move(module));
+    }
+    modules = std::move(optimizeModules);
 }
 
-void Compiler::optimize(IR::Module& module) { this->ir.optimize(module); }
+void Compiler::optimize(IR::Module& module)
+{
+    this->ir.optimize(module);
+    if(module->empty()) module = nullptr;
+}
 
 bool Compiler::compile(IR::Modules& modules, std::vector<std::string>& outputs)
 {
@@ -178,7 +190,12 @@ void print(const Compiler::Asts& cAsts)
 
 void print(const IR::Modules& modules)
 {
-    for(const IR::Module& module : modules) print(module);
+    for(const IR::Module& module : modules)
+    {
+        llvm::outs() << "\n```\n";
+        print(module);
+        llvm::outs() << "```\n";
+    }
 }
 
 } // namespace Aerell

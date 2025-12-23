@@ -205,6 +205,7 @@ std::unique_ptr<AST> Parser::func()
     func->ret = ret;
     func->stmts = std::move(stmts);
     func->symbol = symbolFunc;
+    func->path = ident->source->getPath().c_str();
 
     return func;
 }
@@ -275,7 +276,7 @@ std::unique_ptr<AST> Parser::funcCall()
 {
     // IDENT
     if(!expect(Rule::FUNC_CALL)) return nullptr;
-    auto indent = &(*tokensRef)[pos];
+    auto ident = &(*tokensRef)[pos];
     pos++;
 
     // LPAREN
@@ -301,8 +302,9 @@ std::unique_ptr<AST> Parser::funcCall()
 
     // Gen AST
     auto funcCall = std::make_unique<FuncCall>();
-    funcCall->ident = indent;
+    funcCall->ident = ident;
     funcCall->args = std::move(args);
+    funcCall->path = ident->source->getPath().c_str();
 
     return funcCall;
 }
@@ -317,6 +319,7 @@ std::unique_ptr<AST> Parser::literal()
     // Gen AST
     auto literal = std::make_unique<Literal>();
     literal->value = value;
+    literal->path = value->source->getPath().c_str();
 
     return literal;
 }

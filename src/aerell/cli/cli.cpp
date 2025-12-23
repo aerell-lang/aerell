@@ -96,6 +96,7 @@ int main(int argc, char* argv[])
         if(isLex)
         {
             print(tokens);
+            llvm::outs() << "\nLexing finished.";
             return EXIT_SUCCESS;
         }
 
@@ -105,19 +106,26 @@ int main(int argc, char* argv[])
         if(isParse)
         {
             print(asts);
+            llvm::outs() << "\nParsing completed.";
             return EXIT_SUCCESS;
         }
 
         // Analysis
         if(!compiler.analysis(asts)) return EXIT_FAILURE;
-        if(isAnalyze) return EXIT_SUCCESS;
+        if(isAnalyze)
+        {
+            llvm::outs() << "Analysis completed.";
+            return EXIT_SUCCESS;
+        }
 
         // IR Gen
         Aerell::IR::Modules modules;
         if(!compiler.generating(tokens, asts, modules)) return EXIT_FAILURE;
+        if(isGenerate || isCompile || isBuild) compiler.optimize(modules);
         if(isGenerate)
         {
             Aerell::print(modules);
+            llvm::outs() << "\nGenerating completed.";
             return EXIT_SUCCESS;
         }
 
@@ -128,23 +136,23 @@ int main(int argc, char* argv[])
             compiler.optimize(module);
 
             // JIT
-            if(compiler.jit(module)) return EXIT_SUCCESS;
+            if(!compiler.jit(module)) return EXIT_FAILURE;
 
-            return EXIT_FAILURE;
+            return EXIT_SUCCESS;
         }
 
         // Compile
-        compiler.optimize(modules);
         std::vector<std::string> outputs;
         if(!compiler.compile(modules, outputs)) return EXIT_FAILURE;
         if(isCompile)
         {
-            llvm::outs() << "Successfully compiled the file.";
+            llvm::outs() << "Compile completed.";
             return EXIT_SUCCESS;
         }
 
         // Linker
         if(!linker.linking(outputs)) return EXIT_FAILURE;
+        llvm::outs() << "Build completed.";
 
         return EXIT_SUCCESS;
     }

@@ -22,6 +22,8 @@ namespace Aerell
 
 bool Compiler::jit(IR::Module& module)
 {
+    if(module == nullptr) return false;
+
     // JIT
     auto jit = llvm::orc::LLJITBuilder().create();
     if(!jit)

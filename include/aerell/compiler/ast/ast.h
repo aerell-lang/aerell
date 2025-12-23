@@ -25,6 +25,8 @@ class AST
     typedef std::vector<Ast> Asts;
 
     virtual ~AST() {};
+
+    const char* path = nullptr;
 };
 
 class FuncParam
