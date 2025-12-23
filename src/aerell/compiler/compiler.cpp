@@ -1,12 +1,20 @@
+/*
+ * This file is part of The Aerell Programming Language
+ *
+ * Copyright 2025 The Aerell Programming Language Authors
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
+
 #include <memory>
+
+#include <llvm/Support/raw_ostream.h>
 
 #include <aerell/support/utils.h>
 #include <aerell/compiler/compiler.h>
 #include <aerell/compiler/semantic/semantic.h>
 #include <aerell/compiler/ir/ir.h>
 #include <aerell/compiler/codegen/codegen.h>
-
-#include <llvm/Support/raw_ostream.h>
 
 namespace Aerell
 {

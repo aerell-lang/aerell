@@ -1,0 +1,17 @@
+{
+  "Aerell Language File Header": {
+    "prefix": "aerell-header",
+    "scope": "",
+    "body": [
+      "/*",
+      " * This file is part of The Aerell Programming Language",
+      " *",
+      " * Copyright 2025 The Aerell Programming Language Authors",
+      " * Licensed under the Apache License, Version 2.0.",
+      " * See the LICENSE file for details.",
+      " */",
+      "$0"
+    ],
+    "description": "Insert Aerell Programming Language file header (Apache 2.0)"
+  }
+}

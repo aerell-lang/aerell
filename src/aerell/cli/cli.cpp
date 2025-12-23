@@ -1,9 +1,17 @@
-#include "aerell/cli/cli.h"
-#include <aerell/linker/linker.h>
-#include <aerell/compiler/compiler.h>
+/*
+ * This file is part of The Aerell Programming Language
+ *
+ * Copyright 2025 The Aerell Programming Language Authors
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/TargetSelect.h>
+
+#include "aerell/cli/cli.h"
+#include <aerell/linker/linker.h>
+#include <aerell/compiler/compiler.h>
 
 namespace Aerell
 {

@@ -1,9 +1,17 @@
-#include "aerell/compiler/compiler.h"
-#include "aerell/compiler/ir/ir.h"
+/*
+ * This file is part of The Aerell Programming Language
+ *
+ * Copyright 2025 The Aerell Programming Language Authors
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
 
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/Support/raw_ostream.h>
 #include "llvm/ExecutionEngine/Orc/LLJIT.h"
+
+#include "aerell/compiler/compiler.h"
+#include "aerell/compiler/ir/ir.h"
 
 #if defined(_WIN32)
 #include <windows.h>
