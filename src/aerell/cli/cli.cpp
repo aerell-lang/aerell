@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
         if(isAnalyze) return EXIT_SUCCESS;
 
         // IR Gen
-        Aerell::Compiler::Modules modules;
+        Aerell::IR::Modules modules;
         if(!compiler.generating(tokens, asts, modules)) return EXIT_FAILURE;
         if(isGenerate)
         {
@@ -117,16 +117,18 @@ int main(int argc, char* argv[])
         if(isRun && compiler.jit(modules)) return EXIT_SUCCESS;
 
         // Compile
-        std::vector<std::string> files;
-        if((isCompile || isBuild) && !compiler.compile(modules, files)) return EXIT_FAILURE;
-        if(!isBuild)
+        if(isCompile)
         {
+            std::vector<std::string> outputs;
+            if(!compiler.compile(modules, outputs)) return EXIT_FAILURE;
             llvm::outs() << "Successfully compiled the file.";
             return EXIT_SUCCESS;
         }
 
         // Linker
-        if(!linker.linking(files)) return EXIT_FAILURE;
+        auto output = compiler.compile(modules);
+        if(!output.has_value()) return EXIT_FAILURE;
+        if(!linker.linking(output.value())) return EXIT_FAILURE;
 
         return EXIT_SUCCESS;
     }

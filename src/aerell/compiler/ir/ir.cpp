@@ -4,6 +4,7 @@
 #include "llvm/IR/Verifier.h"
 #include "llvm/Passes/PassBuilder.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Linker/Linker.h"
 
 #include "aerell/compiler/ir/ir.h"
 
@@ -18,7 +19,7 @@ bool IR::verify(Module& module)
     return !llvm::verifyModule(*module, &llvm::errs());
 }
 
-bool IR::optimize(Module& module)
+void IR::optimize(Module& module)
 {
     // Optimize
     llvm::PassBuilder passBuilder;
@@ -37,8 +38,6 @@ bool IR::optimize(Module& module)
     llvm::ModulePassManager modulePM = passBuilder.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O3);
 
     modulePM.run(*module, moduleAM);
-
-    return true;
 }
 
 IR::Module IR::getStartModule()
@@ -56,10 +55,43 @@ IR::Module IR::getStartModule()
     // Verify
     if(!this->verify(this->moduleStart)) return nullptr;
 
-    // Optimize
-    this->optimize(this->moduleStart);
-
     return std::move(this->moduleStart);
+}
+
+bool IR::linking(Module& module, Module& moduleDest)
+{
+    llvm::Linker linker(*moduleDest);
+
+    auto sourceFileName = module->getSourceFileName();
+    if(linker.linkInModule(std::move(module)))
+    {
+        llvm::errs() << "Failed to link module '" << sourceFileName << "' to '" << moduleDest->getSourceFileName()
+                     << "'\n";
+        return false;
+    }
+
+    return true;
+}
+
+IR::Module IR::linking(Modules& modules)
+{
+    if(modules.empty()) return nullptr;
+
+    auto mainModule = std::move(modules[std::max(0, ((int)modules.size()) - 1)]);
+
+    llvm::Linker linker(*mainModule);
+
+    for(auto& module : modules)
+    {
+        if(module == nullptr) continue;
+
+        auto sourceFileName = module->getSourceFileName();
+        if(linker.linkInModule(std::move(module)))
+            llvm::errs() << "Failed to link module '" << sourceFileName << "' to '" << mainModule->getSourceFileName()
+                         << "'\n";
+    }
+
+    return mainModule;
 }
 
 bool IR::generating(const char* sourceFileName, const AST::Asts& asts, Module& module)
@@ -84,9 +116,6 @@ bool IR::generating(const char* sourceFileName, const AST::Asts& asts, Module& m
 
     // HasError & Verify
     if(hasError || !this->verify(this->moduleTemp)) return false;
-
-    // Optimize
-    this->optimize(this->moduleTemp);
 
     module = std::move(this->moduleTemp);
 

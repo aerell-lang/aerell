@@ -79,8 +79,6 @@ bool Compiler::parsing(const Tokens& cTokens, Asts& cAsts)
 
     for(const Lexer::Tokens& tokens : cTokens)
     {
-        if(tokens.empty()) continue;
-
         AST::Asts asts;
         if(!this->parser.parsing(tokens, asts))
         {
@@ -107,7 +105,7 @@ bool Compiler::analysis(const Asts& cAsts)
     return !hasError;
 }
 
-bool Compiler::generating(const Tokens& tokens, const Asts& cAsts, Modules& modules)
+bool Compiler::generating(const Tokens& tokens, const Asts& cAsts, IR::Modules& modules)
 {
     bool hasError = false;
 
@@ -127,21 +125,29 @@ bool Compiler::generating(const Tokens& tokens, const Asts& cAsts, Modules& modu
     }
 
     auto startModule = this->ir.getStartModule();
-    if(startModule != nullptr) modules.push_back(std::move(startModule));
-    else if(!hasError)
-        hasError = true;
+    if(startModule == nullptr && !hasError) hasError = true;
+    if(!this->ir.linking(startModule, modules[std::max(0, ((int)modules.size()) - 1)]) && !hasError) hasError = true;
 
     return !hasError;
 }
 
-bool Compiler::compile(const Modules& modules, std::vector<std::string>& outputs)
+IR::Module Compiler::linking(IR::Modules& modules)
+{
+    auto module = this->ir.linking(modules);
+    if(module == nullptr) return nullptr;
+    this->ir.optimize(module);
+    return module;
+}
+
+bool Compiler::compile(IR::Modules& modules, std::vector<std::string>& outputs)
 {
     if(modules.empty()) return false;
 
     // Code Gen
     std::vector<bool> success;
-    for(const auto& module : modules)
+    for(auto& module : modules)
     {
+        this->ir.optimize(module);
         const auto& filePath = module->getSourceFileName();
         bool status = Aerell::CodeGen::obj(filePath.c_str(), module);
         if(status) outputs.push_back(filePath);
@@ -149,6 +155,15 @@ bool Compiler::compile(const Modules& modules, std::vector<std::string>& outputs
     }
 
     return std::all_of(success.begin(), success.end(), [](const auto& status) { return status == true; });
+}
+
+std::optional<std::string> Compiler::compile(IR::Modules& modules)
+{
+    auto module = this->linking(modules);
+    if(module == nullptr) return std::nullopt;
+    const auto& filePath = module->getSourceFileName();
+    if(!Aerell::CodeGen::obj(filePath.c_str(), module)) return std::nullopt;
+    return filePath;
 }
 
 void print(const Compiler::Tokens& cTokens)
@@ -161,7 +176,7 @@ void print(const Compiler::Asts& cAsts)
     for(const AST::Asts& asts : cAsts) print(asts);
 }
 
-void print(const Compiler::Modules& modules)
+void print(const IR::Modules& modules)
 {
     for(const IR::Module& module : modules) print(module);
 }

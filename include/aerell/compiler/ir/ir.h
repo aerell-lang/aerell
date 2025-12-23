@@ -15,12 +15,15 @@ class IR
 {
   public:
     typedef std::unique_ptr<llvm::Module> Module;
+    typedef std::vector<std::unique_ptr<llvm::Module>> Modules;
     typedef std::unique_ptr<llvm::LLVMContext> Context;
 
     Context& getContext();
     bool generating(const char* sourceFileName, const AST::Asts& asts, Module& module);
-
     Module getStartModule();
+    bool linking(Module& module, Module& moduleDest);
+    Module linking(Modules& modules);
+    void optimize(Module& module);
 
   private:
     bool hasError = false;
@@ -31,7 +34,6 @@ class IR
     llvm::BasicBlock* startFuncEntry{nullptr};
 
     bool verify(Module& module);
-    bool optimize(Module& module);
 
     void stmt(const AST::Ast& ast, const Module& module);
     llvm::Value* expr(const AST::Ast& ast, const Module& module);

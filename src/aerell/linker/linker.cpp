@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <cstdlib>
 #include <format>
 #include <sstream>
@@ -107,14 +106,29 @@ Linker::Linker()
     findLibPathFlagsInit = false;
 }
 
+bool Linker::linking(std::string_view filePath)
+{
+    auto exeName = std::filesystem::path(filePath).filename().replace_extension("exe").generic_string();
+
+    auto objName = std::filesystem::path(exeName).filename().replace_extension("o").generic_string();
+
+    std::vector<const char*> args = {"ld.lld",   "-m",         "i386pep",       "-e", "_start",       "-static",
+                                     "-laerell", "-lkernel32", objName.c_str(), "-o", exeName.c_str()};
+
+    for(auto& libPathFlag : libPathFlags) args.push_back(libPathFlag.c_str());
+
+    lld::Result result = lld::lldMain(args, llvm::outs(), llvm::errs(), LLD_MINGW_DRIVER);
+
+    std::filesystem::remove(objName);
+
+    return result.retCode == 0;
+}
+
 bool Linker::linking(const std::vector<std::string>& filePaths)
 {
     if(filePaths.empty()) return false;
 
-    auto exeName = std::filesystem::path(filePaths[std::max(0, ((int)filePaths.size()) - 2)])
-                       .filename()
-                       .replace_extension("exe")
-                       .string();
+    auto exeName = std::filesystem::path(filePaths.back()).filename().replace_extension("exe").generic_string();
 
     std::vector<std::string> objNames;
     for(auto& filePath : filePaths)

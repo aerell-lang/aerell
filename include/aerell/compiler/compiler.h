@@ -20,15 +20,15 @@ class Compiler
   public:
     typedef std::vector<Lexer::Tokens> Tokens;
     typedef std::vector<AST::Asts> Asts;
-    typedef std::vector<IR::Module> Modules;
 
     Tokens lexing(const char* filePath);
     bool parsing(const Tokens& cTokens, Asts& cAsts);
     bool analysis(const Asts& cAsts);
-    bool generating(const Tokens& tokens, const Asts& cAsts, Modules& modules);
-
-    bool jit(Modules& modules);
-    bool compile(const Modules& modules, std::vector<std::string>& outputs);
+    bool generating(const Tokens& tokens, const Asts& cAsts, IR::Modules& modules);
+    bool jit(IR::Modules& modules);
+    IR::Module linking(IR::Modules& modules);
+    bool compile(IR::Modules& modules, std::vector<std::string>& outputs);
+    std::optional<std::string> compile(IR::Modules& modules);
 
   private:
     SourceManager sourceManager;
@@ -45,6 +45,6 @@ void print(const Compiler::Tokens& cTokens);
 
 void print(const Compiler::Asts& cAsts);
 
-void print(const Compiler::Modules& modules);
+void print(const IR::Modules& modules);
 
 } // namespace Aerell
