@@ -8,12 +8,12 @@
 
 #pragma once
 
-#include <aerell/compiler/symbol/symbol_var.h>
 #include <memory>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
 
+#include <aerell/compiler/symbol/symbol_var.h>
 #include <aerell/compiler/symbol/symbol_func.h>
 #include "aerell/compiler/symbol/symbol.h"
 

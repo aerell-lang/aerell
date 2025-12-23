@@ -8,6 +8,7 @@
         "std",
         "ir",
         "lexer",
-        "codegen"
+        "codegen",
+        "library"
     ]
 }
