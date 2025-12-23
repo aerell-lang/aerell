@@ -33,17 +33,18 @@ bool CodeGen::obj(const char* name, const std::unique_ptr<llvm::Module>& module)
     }
 
     llvm::TargetOptions opt;
-    auto RM = std::optional<llvm::Reloc::Model>();
     llvm::TargetMachine* targetMachine = target->createTargetMachine(
-        targetTriple, "generic", "", opt, RM, std::nullopt, llvm::CodeGenOptLevel::Aggressive);
+        targetTriple, "generic", "", opt, std::nullopt, std::nullopt, llvm::CodeGenOptLevel::Aggressive);
 
-    std::error_code EC;
+    module->setDataLayout(targetMachine->createDataLayout());
+
+    std::error_code errorCode;
     llvm::raw_fd_ostream dest(
-        std::filesystem::path(name).filename().replace_extension("o").string(), EC, llvm::sys::fs::OpenFlags());
+        std::filesystem::path(name).filename().replace_extension("o").string(), errorCode, llvm::sys::fs::OpenFlags());
 
-    if(EC)
+    if(errorCode)
     {
-        llvm::errs() << "Could not open file: " << EC.message() << "\n";
+        llvm::errs() << "Could not open file: " << errorCode.message() << "\n";
         return false;
     }
 
