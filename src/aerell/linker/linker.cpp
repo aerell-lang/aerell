@@ -124,7 +124,9 @@ bool Linker::linking(const std::vector<std::string>& filePaths)
     for(auto& filePath : filePaths)
         objNames.push_back(std::filesystem::path(filePath).filename().replace_extension("o").string());
 
-    std::vector<const char*> args = {"ld.lld", "-m", "i386pep", "-e", "_start", "-static", "-laerell", "-lkernel32"};
+    std::vector<const char*> args = {"ld.lld",     "-m",       "i386pep",    "-e",          "_start",
+                                     "-static",    "-laerell", "-lkernel32", "--strip-all", "--gc-sections",
+                                     "--as-needed"};
 
     for(auto& libPathFlag : libPathFlags) args.push_back(libPathFlag.c_str());
 
