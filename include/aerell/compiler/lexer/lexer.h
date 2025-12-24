@@ -9,7 +9,6 @@
 #pragma once
 
 #include <utility>
-#include <vector>
 
 #include "aerell/compiler/token/token.h"
 #include <aerell/compiler/source/source.h>
@@ -20,9 +19,7 @@ namespace Aerell
 class Lexer
 {
   public:
-    typedef std::vector<Token> Tokens;
-
-    Tokens lexing(Source* source);
+    Token::Vec lexing(Source* source);
 
   private:
     static const std::pair<std::string, TokenType> symbols[];
@@ -30,7 +27,7 @@ class Lexer
 
     Source* sourceRef = nullptr;
     size_t pos = 0;
-    Tokens tokens;
+    Token::Vec tokens;
 
     bool isWS();
     bool isComment();

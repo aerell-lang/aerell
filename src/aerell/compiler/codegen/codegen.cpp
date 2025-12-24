@@ -19,10 +19,10 @@
 namespace Aerell
 {
 
-bool CodeGen::obj(const char* name, const std::unique_ptr<llvm::Module>& module)
+bool CodeGen::obj(const char* name, const IR::Ptr& ptr)
 {
     auto targetTriple = llvm::Triple(llvm::sys::getDefaultTargetTriple());
-    module->setTargetTriple(targetTriple);
+    ptr->setTargetTriple(targetTriple);
 
     std::string error;
     auto target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
@@ -36,7 +36,7 @@ bool CodeGen::obj(const char* name, const std::unique_ptr<llvm::Module>& module)
     llvm::TargetMachine* targetMachine = target->createTargetMachine(
         targetTriple, "generic", "", opt, std::nullopt, std::nullopt, llvm::CodeGenOptLevel::Aggressive);
 
-    module->setDataLayout(targetMachine->createDataLayout());
+    ptr->setDataLayout(targetMachine->createDataLayout());
 
     std::error_code errorCode;
     llvm::raw_fd_ostream dest(
@@ -55,7 +55,7 @@ bool CodeGen::obj(const char* name, const std::unique_ptr<llvm::Module>& module)
         return false;
     }
 
-    pass.run(*module);
+    pass.run(*ptr);
     dest.flush();
 
     return true;

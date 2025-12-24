@@ -15,19 +15,19 @@ namespace Aerell
 
 std::string_view Token::getText() const { return {this->source->getContentData() + this->offset, this->size}; }
 
-void print(const std::vector<Token>& tokens)
+void print(const Token::Vec& vec)
 {
     const char* path = nullptr;
     size_t maxWidth = 0;
 
-    for(const auto& token : tokens)
+    for(const auto& token : vec)
     {
         const char* t = to_string(token.type);
         size_t width = std::strlen(t);
         maxWidth = std::max(maxWidth, width);
     }
 
-    for(const auto& token : tokens)
+    for(const auto& token : vec)
     {
         auto sourcePath = token.source->getPath().c_str();
         if(path != sourcePath)
@@ -46,6 +46,11 @@ void print(const std::vector<Token>& tokens)
 
         llvm::outs() << t << " " << token.getText() << '\n';
     }
+}
+
+void print(const Token::Vecs& vecs)
+{
+    for(const auto& vec : vecs) print(vec);
 }
 
 } // namespace Aerell

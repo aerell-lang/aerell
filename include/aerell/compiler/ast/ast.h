@@ -21,12 +21,18 @@ namespace Aerell
 class AST
 {
   public:
-    typedef std::unique_ptr<AST> Ast;
-    typedef std::vector<Ast> Asts;
+    using Ptr = std::unique_ptr<AST>;
+    using Children = std::vector<Ptr>;
+
+    struct ChildrenWithSource
+    {
+        const char* source = nullptr;
+        Children children;
+    };
+
+    using Groups = std::vector<ChildrenWithSource>;
 
     virtual ~AST() {};
-
-    const char* path = nullptr;
 };
 
 class FuncParam
@@ -43,7 +49,7 @@ class Func : public AST
     const Token* ident = nullptr;
     std::vector<FuncParam> params;
     const Token* ret = nullptr;
-    std::optional<Asts> stmts = std::nullopt;
+    std::optional<Children> stmts = std::nullopt;
     SymbolFunc* symbol = nullptr;
 };
 
@@ -53,8 +59,8 @@ class FuncCall : public AST
     ~FuncCall() {};
 
     const Token* ident = nullptr;
-    SymbolFunc* symbolCalled = nullptr;
-    Asts args;
+    const SymbolFunc* symbolCalled = nullptr;
+    Children args;
 };
 
 class Literal : public AST
@@ -65,8 +71,12 @@ class Literal : public AST
     const Token* value = nullptr;
 };
 
-void print(const AST::Ast& ast, size_t indent = 0);
+void print(const AST::Ptr& ptr, size_t indent = 0);
 
-void print(const AST::Asts& asts);
+void print(const AST::Children& children);
+
+void print(const AST::ChildrenWithSource& childrenWithSource);
+
+void print(const AST::Groups& groups);
 
 } // namespace Aerell

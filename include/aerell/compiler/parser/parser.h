@@ -25,7 +25,7 @@ class Parser
   public:
     Parser(SymbolTable& symbolTable);
 
-    bool parsing(const Lexer::Tokens& tokens, AST::Asts& asts);
+    bool parsing(const Token::Vec& vec, AST::ChildrenWithSource& childrenWithSource);
 
   private:
     enum class Rule

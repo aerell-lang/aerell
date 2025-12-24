@@ -7,6 +7,7 @@
  */
 
 #include "aerell/compiler/semantic/semantic.h"
+#include <aerell/compiler/symbol/symbol_print.h>
 #include <aerell/support/utils.h>
 
 namespace Aerell
@@ -14,9 +15,9 @@ namespace Aerell
 
 Semantic::Semantic(SymbolTable& symbolTable) : symbolTable(&symbolTable) {}
 
-bool Semantic::analysis(const AST::Asts& asts)
+bool Semantic::analysis(const AST::ChildrenWithSource& childrenWithSource)
 {
-    for(const auto& ast : asts) stmt(ast);
+    for(const AST::Ptr& ptr : childrenWithSource.children) stmt(ptr);
     return !this->hasError;
 }
 
@@ -26,7 +27,7 @@ void Semantic::stmt(const std::unique_ptr<AST>& ast)
     if(expr(ast).has_value()) return;
 }
 
-std::optional<Type> Semantic::expr(const std::unique_ptr<AST>& ast)
+std::optional<DataType> Semantic::expr(const std::unique_ptr<AST>& ast)
 {
     if(auto* funcCallCtx = dynamic_cast<FuncCall*>(ast.get())) return funcCall(*funcCallCtx);
     if(auto* literalCtx = dynamic_cast<Literal*>(ast.get())) return literal(*literalCtx);
@@ -36,14 +37,17 @@ std::optional<Type> Semantic::expr(const std::unique_ptr<AST>& ast)
 void Semantic::func(Func& ctx)
 {
     if(ctx.stmts == std::nullopt) return;
+    const auto& blockScope = ctx.symbol->getBlockScope();
+    this->symbolTable = blockScope;
     for(const auto& stmt : ctx.stmts.value()) expr(stmt);
+    this->symbolTable = blockScope->getParentScope();
 }
 
-std::optional<Type> Semantic::funcCall(FuncCall& ctx)
+std::optional<DataType> Semantic::funcCall(FuncCall& ctx)
 {
     const auto& indent = ctx.ident;
 
-    auto symbolFunc = this->symbolTable->findFunc(indent->getText());
+    auto symbolFunc = this->symbolTable->findFunc(indent->getText(), true);
     if(symbolFunc == nullptr)
     {
         indent->source->printErrorMessage(indent->offset, indent->size, "[S] Undefined function");
@@ -51,7 +55,7 @@ std::optional<Type> Semantic::funcCall(FuncCall& ctx)
         return std::nullopt;
     }
 
-    std::vector<Type> args;
+    std::vector<DataType> args;
     for(const auto& arg : ctx.args)
     {
         auto type = expr(arg);
@@ -78,12 +82,12 @@ std::optional<Type> Semantic::funcCall(FuncCall& ctx)
     return ctx.symbolCalled->getRet();
 }
 
-Type Semantic::literal(Literal& ctx)
+std::optional<DataType> Semantic::literal(Literal& ctx)
 {
-    if(ctx.value->type == TokenType::INTL) return Type::I32;
-    if(ctx.value->type == TokenType::STRL) return Type::STR;
+    if(ctx.value->type == TokenType::INTL) return DataType::I32;
+    if(ctx.value->type == TokenType::STRL) return DataType::STR;
     else
-        return Type::VOID;
+        return std::nullopt;
 }
 
 } // namespace Aerell

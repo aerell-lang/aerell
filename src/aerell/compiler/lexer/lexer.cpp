@@ -27,7 +27,7 @@ const std::pair<std::string, TokenType> Lexer::keywords[] = {
     {"i32", TokenType::I32},
 };
 
-Lexer::Tokens Lexer::lexing(Source* source)
+Token::Vec Lexer::lexing(Source* source)
 {
     sourceRef = source;
     pos = 0;

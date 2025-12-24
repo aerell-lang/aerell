@@ -13,14 +13,19 @@
 namespace Aerell
 {
 
+class SymbolTable;
 class Symbol
 {
   public:
-    Symbol(SymbolType type);
+    Symbol(SymbolTable* scope, SymbolType symbolType);
     virtual ~Symbol();
 
+    const SymbolType& getSymbolType() const;
+    const SymbolTable* getScope() const;
+
   private:
-    SymbolType type;
+    SymbolTable* scope;
+    SymbolType symbolType;
 };
 
 } // namespace Aerell

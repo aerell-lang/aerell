@@ -20,18 +20,18 @@ class Semantic
 {
   public:
     Semantic(SymbolTable& symbolTable);
-    bool analysis(const AST::Asts& asts);
+    bool analysis(const AST::ChildrenWithSource& childrenWithSource);
 
   private:
     bool hasError = false;
-    SymbolTable* symbolTable;
+    const SymbolTable* symbolTable;
 
     void stmt(const std::unique_ptr<AST>& ast);
-    std::optional<Type> expr(const std::unique_ptr<AST>& ast);
+    std::optional<DataType> expr(const std::unique_ptr<AST>& ast);
 
     void func(Func& ctx);
-    std::optional<Type> funcCall(FuncCall& ctx);
-    Type literal(Literal& ctx);
+    std::optional<DataType> funcCall(FuncCall& ctx);
+    std::optional<DataType> literal(Literal& ctx);
 };
 
 } // namespace Aerell

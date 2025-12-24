@@ -10,10 +10,10 @@
 
 #include <memory>
 
+#include <llvm/Support/raw_ostream.h>
+
 #include <aerell/support/utils.h>
 #include <aerell/compiler/source/source.h>
-
-#include <llvm/Support/raw_ostream.h>
 
 namespace Aerell
 {

@@ -13,20 +13,18 @@
 namespace Aerell
 {
 
-enum Type
+enum DataType
 {
-    VOID,
     I32,
     STR
 };
 
-constexpr std::array<std::pair<Type, const char*>, 3> TypeNames{{
-    {Type::VOID, "VOID"},
-    {Type::I32, "I32"},
-    {Type::STR, "STR"},
+constexpr std::array<std::pair<DataType, const char*>, 3> TypeNames{{
+    {DataType::I32, "I32"},
+    {DataType::STR, "STR"},
 }};
 
-constexpr const char* to_string(Type t)
+constexpr const char* to_string(DataType t)
 {
     for(auto& [k, v] : TypeNames)
         if(k == t) return v;

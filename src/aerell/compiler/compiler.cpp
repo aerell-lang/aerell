@@ -19,7 +19,9 @@
 namespace Aerell
 {
 
-bool Compiler::lexing(Source* source, Tokens& cTokens)
+const SymbolTable& Compiler::getSymbolTable() const { return this->symbolTable; }
+
+bool Compiler::lexing(Source* source, Token::Vecs& vecs)
 {
     bool hasError = false;
 
@@ -45,24 +47,24 @@ bool Compiler::lexing(Source* source, Tokens& cTokens)
         else if(status == 2)
             continue;
 
-        Tokens cTokensTemp;
-        if(!this->lexing(this->sourceManager.getLastSource(), cTokensTemp))
+        Token::Vecs vecsTemp;
+        if(!this->lexing(this->sourceManager.getLastSource(), vecsTemp))
         {
             if(!hasError) hasError = true;
             continue;
         }
 
-        for(auto& tokens : cTokensTemp) cTokens.push_back(std::move(tokens));
+        for(auto& tokens : vecsTemp) vecs.push_back(std::move(tokens));
     }
 
     mainTokens = {
         std::make_move_iterator(mainTokens.begin() + lastImportIndex), std::make_move_iterator(mainTokens.end())};
-    if(mainTokens.size() != 1 && mainTokens[0].type != TokenType::EOFF) cTokens.emplace_back(mainTokens);
+    if(mainTokens.size() != 1 && mainTokens[0].type != TokenType::EOFF) vecs.emplace_back(mainTokens);
 
     return !hasError;
 }
 
-bool Compiler::lexing(const char* filePath, Tokens& cTokens)
+bool Compiler::lexing(const char* filePath, Token::Vecs& vecs)
 {
     bool hasError = false;
 
@@ -84,102 +86,96 @@ bool Compiler::lexing(const char* filePath, Tokens& cTokens)
         else if(status == 2)
             continue;
 
-        Tokens cTokensTemp;
-        if(!this->lexing(this->sourceManager.getLastSource(), cTokensTemp))
+        Token::Vecs vecsTemp;
+        if(!this->lexing(this->sourceManager.getLastSource(), vecsTemp))
         {
             if(!hasError) hasError = true;
             continue;
         }
 
         // Lexing
-        for(auto& tokens : cTokensTemp) cTokens.push_back(std::move(tokens));
+        for(auto& tokens : vecsTemp) vecs.push_back(std::move(tokens));
     }
 
     return !hasError;
 }
 
-bool Compiler::parsing(const Tokens& cTokens, Asts& cAsts)
+bool Compiler::parsing(const Token::Vecs& vecs, AST::Groups& groups)
 {
     bool hasError = false;
 
-    for(const Lexer::Tokens& tokens : cTokens)
+    for(const Token::Vec& vec : vecs)
     {
-        AST::Asts asts;
-        if(!this->parser.parsing(tokens, asts))
+        AST::ChildrenWithSource childrenWithSource;
+        if(!this->parser.parsing(vec, childrenWithSource))
         {
             if(!hasError) hasError = true;
             continue;
         }
 
-        cAsts.push_back(std::move(asts));
+        groups.push_back(std::move(childrenWithSource));
     }
 
     return !hasError;
 }
 
-bool Compiler::analysis(const Asts& cAsts)
+bool Compiler::analysis(const AST::Groups& groups)
 {
     bool hasError = false;
 
-    for(const AST::Asts& asts : cAsts)
-        if(!this->semantic.analysis(asts))
+    for(const AST::ChildrenWithSource& childrenWithSource : groups)
+        if(!this->semantic.analysis(childrenWithSource))
             if(!hasError) hasError = true;
 
     return !hasError;
 }
 
-bool Compiler::generating(const Tokens& tokens, const Asts& cAsts, IR::Modules& modules)
-{
-    bool hasError = false;
+bool Compiler::generating(const AST::Groups& groups, IR::Unit& unit) { return this->ir.generating(groups, unit); }
 
-    size_t index = 0;
-    for(const AST::Asts& asts : cAsts)
+IR::Ptr Compiler::linking(IR::Vec& vec) { return this->ir.linking(vec); }
+
+bool Compiler::linking(IR::Unit& unit)
+{
+    auto ptr = this->linking(unit.vec);
+    if(ptr == nullptr) return false;
+    unit.vec.clear();
+    unit.vec.push_back(std::move(ptr));
+    return true;
+}
+
+void Compiler::optimize(IR::Ptr& ptr)
+{
+    this->ir.optimize(ptr);
+    if(ptr->empty()) ptr = nullptr;
+}
+
+void Compiler::optimize(IR::Vec& vec)
+{
+    IR::Vec optimizeVec;
+    for(IR::Ptr& ptr : vec)
     {
-        auto sourceFileName = tokens[index].front().source->getPath().c_str();
-        index++;
-        IR::Module module = nullptr;
-        if(!this->ir.generating(sourceFileName, asts, module))
-        {
-            if(!hasError) hasError = true;
-            continue;
-        }
-
-        modules.push_back(std::move(module));
+        this->optimize(ptr);
+        if(ptr == nullptr) continue;
+        optimizeVec.push_back(std::move(ptr));
     }
-
-    auto startModule = this->ir.getStartModule();
-    if(startModule == nullptr && !hasError) hasError = true;
-    if(!this->ir.linking(startModule, modules[std::max(0, ((int)modules.size()) - 1)]) && !hasError) hasError = true;
-
-    return !hasError;
+    vec = std::move(optimizeVec);
 }
 
-IR::Module Compiler::linking(IR::Modules& modules) { return this->ir.linking(modules); }
+void Compiler::optimize(IR::Unit& unit) { this->optimize(unit.vec); }
 
-void Compiler::optimize(IR::Modules& modules)
+std::optional<std::string> Compiler::compile(IR::Ptr& ptr)
 {
-    IR::Modules optimizeModules;
-    for(auto& module : modules)
-    {
-        this->optimize(module);
-        if(module == nullptr) continue;
-        optimizeModules.push_back(std::move(module));
-    }
-    modules = std::move(optimizeModules);
+    const auto& filePath = ptr->getSourceFileName();
+    if(!Aerell::CodeGen::obj(filePath.c_str(), ptr)) return std::nullopt;
+    return filePath;
 }
 
-void Compiler::optimize(IR::Module& module)
+bool Compiler::compile(IR::Vec& vec, std::vector<std::string>& outputs)
 {
-    this->ir.optimize(module);
-    if(module->empty()) module = nullptr;
-}
-
-bool Compiler::compile(IR::Modules& modules, std::vector<std::string>& outputs)
-{
-    if(modules.empty()) return false;
+    if(vec.empty()) return false;
 
     // Code Gen
-    return std::all_of(modules.begin(), modules.end(), [&](auto& module) {
+    return std::all_of(vec.begin(), vec.end(), [&](auto& module) {
         auto output = this->compile(module);
         if(!output.has_value()) return false;
         outputs.push_back(output.value());
@@ -187,31 +183,6 @@ bool Compiler::compile(IR::Modules& modules, std::vector<std::string>& outputs)
     });
 }
 
-std::optional<std::string> Compiler::compile(IR::Module& module)
-{
-    const auto& filePath = module->getSourceFileName();
-    if(!Aerell::CodeGen::obj(filePath.c_str(), module)) return std::nullopt;
-    return filePath;
-}
-
-void print(const Compiler::Tokens& cTokens)
-{
-    for(const Lexer::Tokens& tokens : cTokens) print(tokens);
-}
-
-void print(const Compiler::Asts& cAsts)
-{
-    for(const AST::Asts& asts : cAsts) print(asts);
-}
-
-void print(const IR::Modules& modules)
-{
-    for(const IR::Module& module : modules)
-    {
-        llvm::outs() << "\n```\n";
-        print(module);
-        llvm::outs() << "```\n";
-    }
-}
+bool Compiler::compile(IR::Unit& unit, std::vector<std::string>& outputs) { return this->compile(unit.vec, outputs); }
 
 } // namespace Aerell

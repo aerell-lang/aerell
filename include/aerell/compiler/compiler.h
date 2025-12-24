@@ -26,18 +26,15 @@ namespace Aerell
 class Compiler
 {
   public:
-    typedef std::vector<Lexer::Tokens> Tokens;
-    typedef std::vector<AST::Asts> Asts;
-
-    bool lexing(const char* filePath, Tokens& cTokens);
-    bool parsing(const Tokens& cTokens, Asts& cAsts);
-    bool analysis(const Asts& cAsts);
-    bool generating(const Tokens& tokens, const Asts& cAsts, IR::Modules& modules);
-    bool jit(IR::Modules& modules);
-    IR::Module linking(IR::Modules& modules);
-    void optimize(IR::Modules& modules);
-    void optimize(IR::Module& module);
-    bool compile(IR::Modules& modules, std::vector<std::string>& outputs);
+    const SymbolTable& getSymbolTable() const;
+    bool lexing(const char* filePath, Token::Vecs& vecs);
+    bool parsing(const Token::Vecs& vecs, AST::Groups& groups);
+    bool analysis(const AST::Groups& groups);
+    bool generating(const AST::Groups& groups, IR::Unit& unit);
+    bool linking(IR::Unit& unit);
+    bool jit(IR::Unit& unit);
+    void optimize(IR::Unit& unit);
+    bool compile(IR::Unit& unit, std::vector<std::string>& outputs);
 
   private:
     SourceManager sourceManager;
@@ -47,15 +44,12 @@ class Compiler
     Semantic semantic{symbolTable};
     IR ir;
 
-    bool lexing(Source* source, Tokens& cTokens);
-
-    std::optional<std::string> compile(IR::Module& module);
+    bool lexing(Source* source, Token::Vecs& vecs);
+    std::optional<std::string> compile(IR::Ptr& ptr);
+    IR::Ptr linking(IR::Vec& vec);
+    void optimize(IR::Ptr& ptr);
+    void optimize(IR::Vec& vec);
+    bool compile(IR::Vec& vec, std::vector<std::string>& outputs);
 };
-
-void print(const Compiler::Tokens& cTokens);
-
-void print(const Compiler::Asts& cAsts);
-
-void print(const IR::Modules& modules);
 
 } // namespace Aerell

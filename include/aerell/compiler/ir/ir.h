@@ -22,35 +22,45 @@ namespace Aerell
 class IR
 {
   public:
-    typedef std::unique_ptr<llvm::Module> Module;
-    typedef std::vector<std::unique_ptr<llvm::Module>> Modules;
-    typedef std::unique_ptr<llvm::LLVMContext> Context;
+    using Ptr = std::unique_ptr<llvm::Module>;
+    using Vec = std::vector<Ptr>;
+    using Ctx = std::unique_ptr<llvm::LLVMContext>;
 
-    Context& getContext();
-    bool generating(const char* sourceFileName, const AST::Asts& asts, Module& module);
-    Module getStartModule();
-    bool linking(Module& module, Module& moduleDest);
-    Module linking(Modules& modules);
-    void optimize(Module& module);
+    struct Unit
+    {
+        Ctx ctx = nullptr;
+        Vec vec;
+    };
+
+    bool generating(const AST::Groups& groups, Unit& unit);
+    void optimize(Ptr& ptr);
+    Ptr linking(Vec& vec);
 
   private:
     bool hasError = false;
-    Context llvmContext{std::make_unique<llvm::LLVMContext>()};
-    llvm::IRBuilder<> llvmBuilder{*llvmContext};
-    Module moduleTemp{nullptr};
-    Module moduleStart{nullptr};
-    llvm::BasicBlock* startFuncEntry{nullptr};
 
-    bool verify(Module& module);
+    Ctx* ctx = nullptr;
+    llvm::IRBuilder<>* builder = nullptr;
 
-    void stmt(const AST::Ast& ast, const Module& module);
-    llvm::Value* expr(const AST::Ast& ast, const Module& module);
-    llvm::Function* funcDecl(const Token& ident, SymbolFunc& ctx, const Module& module);
+    Ptr defaultModule = nullptr;
+    Ptr entryPointModule = nullptr;
+
+    Ptr* module = nullptr;
+
+    bool verify(Ptr& ptr);
+
+    void stmt(const AST::Ptr& ptr);
+    llvm::Value* expr(const AST::Ptr& ptr);
+    llvm::Function* funcDecl(const Token& ident, const SymbolFunc& ctx);
     void func(Func& ctx);
-    llvm::Value* funcCall(FuncCall& ctx, const Module& module);
+    llvm::Value* funcCall(FuncCall& ctx);
     llvm::Value* literal(Literal& ctx);
 };
 
-void print(const IR::Module& module);
+void print(const IR::Ptr& ptr);
+
+void print(const IR::Vec& vec);
+
+void print(const IR::Unit& unit);
 
 } // namespace Aerell

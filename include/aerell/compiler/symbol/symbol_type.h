@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <array>
+
 namespace Aerell
 {
 
@@ -16,5 +18,17 @@ enum class SymbolType
     VAR,
     FUNC
 };
+
+constexpr std::array<std::pair<SymbolType, const char*>, 2> SymbolTypeNames{{
+    {SymbolType::VAR, "VAR"},
+    {SymbolType::FUNC, "FUNC"},
+}};
+
+constexpr const char* to_string(SymbolType t)
+{
+    for(auto& [k, v] : SymbolTypeNames)
+        if(k == t) return v;
+    return "UNKNOWN";
+}
 
 } // namespace Aerell

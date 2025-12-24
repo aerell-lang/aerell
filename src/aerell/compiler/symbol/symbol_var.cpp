@@ -12,10 +12,10 @@
 namespace Aerell
 {
 
-SymbolVar::SymbolVar() : Symbol(SymbolType::VAR) {}
+SymbolVar::SymbolVar(SymbolTable* scope) : Symbol(scope, SymbolType::VAR) {}
 
 SymbolVar::~SymbolVar() {}
 
-void SymbolVar::setType(Type type) { this->type = type; }
+void SymbolVar::setDataType(DataType dataType) { this->dataType = dataType; }
 
 } // namespace Aerell

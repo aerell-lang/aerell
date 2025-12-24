@@ -10,8 +10,9 @@
 #include <llvm/Support/TargetSelect.h>
 
 #include "aerell/cli/cli.h"
-#include <aerell/linker/linker.h>
-#include <aerell/compiler/compiler.h>
+#include "aerell/linker/linker.h"
+#include "aerell/compiler/compiler.h"
+#include "aerell/compiler/symbol/symbol_print.h"
 
 namespace Aerell
 {
@@ -92,48 +93,43 @@ int main(int argc, char* argv[])
         const auto& filePath = argv[2];
 
         // Lexing
-        Aerell::Compiler::Tokens tokens;
-        if(!compiler.lexing(filePath, tokens)) return EXIT_FAILURE;
+        Aerell::Token::Vecs vecs;
+        if(!compiler.lexing(filePath, vecs)) return EXIT_FAILURE;
         if(isLex)
         {
-            print(tokens);
+            Aerell::print(vecs);
             llvm::outs() << "\nLexing finished.";
             return EXIT_SUCCESS;
         }
 
         // Parsing
-        Aerell::Compiler::Asts asts;
-        if(!compiler.parsing(tokens, asts)) return EXIT_FAILURE;
+        Aerell::AST::Groups groups;
+        if(!compiler.parsing(vecs, groups)) return EXIT_FAILURE;
         if(isParse)
         {
-            print(asts);
+            Aerell::print(groups);
             llvm::outs() << "\nParsing completed.";
             return EXIT_SUCCESS;
         }
 
         // Analysis
-        if(!compiler.analysis(asts)) return EXIT_FAILURE;
+        if(!compiler.analysis(groups)) return EXIT_FAILURE;
         if(isAnalyze)
         {
-            llvm::outs() << "Analysis completed.";
+            Aerell::print(compiler.getSymbolTable());
+            llvm::outs() << "\nAnalysis completed.";
             return EXIT_SUCCESS;
         }
 
         // IR Gen
-        Aerell::IR::Modules modules;
-        if(!compiler.generating(tokens, asts, modules)) return EXIT_FAILURE;
-
-        // IR Linking
-        auto moduleTemp = compiler.linking(modules);
-        if(moduleTemp == nullptr) return EXIT_FAILURE;
-        compiler.optimize(moduleTemp);
-
-        modules.clear();
-        modules.push_back(std::move(moduleTemp));
+        Aerell::IR::Unit unit;
+        if(!compiler.generating(groups, unit)) return EXIT_FAILURE;
+        if(!compiler.linking(unit)) return EXIT_FAILURE;
+        compiler.optimize(unit);
 
         if(isGenerate)
         {
-            Aerell::print(modules);
+            Aerell::print(unit);
             llvm::outs() << "\nGenerating completed.";
             return EXIT_SUCCESS;
         }
@@ -141,13 +137,13 @@ int main(int argc, char* argv[])
         // JIT
         if(isRun)
         {
-            if(!compiler.jit(modules)) return EXIT_FAILURE;
+            if(!compiler.jit(unit)) return EXIT_FAILURE;
             return EXIT_SUCCESS;
         }
 
         // Compile
         std::vector<std::string> outputs;
-        if(!compiler.compile(modules, outputs)) return EXIT_FAILURE;
+        if(!compiler.compile(unit, outputs)) return EXIT_FAILURE;
         if(isCompile)
         {
             llvm::outs() << "Compile completed.";

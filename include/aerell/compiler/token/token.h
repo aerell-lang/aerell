@@ -20,6 +20,9 @@ namespace Aerell
 class Token
 {
   public:
+    using Vec = std::vector<Token>;
+    using Vecs = std::vector<Vec>;
+
     TokenType type;
     Source* source = nullptr;
     size_t offset = 0;
@@ -30,6 +33,8 @@ class Token
   private:
 };
 
-void print(const std::vector<Token>& tokens);
+void print(const Token::Vec& vec);
+
+void print(const Token::Vecs& vecs);
 
 } // namespace Aerell

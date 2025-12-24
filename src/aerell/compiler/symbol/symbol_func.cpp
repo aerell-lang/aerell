@@ -12,7 +12,7 @@
 namespace Aerell
 {
 
-SymbolFunc::SymbolFunc(bool pub) : Symbol(SymbolType::FUNC), pub(pub) {}
+SymbolFunc::SymbolFunc(SymbolTable* scope, bool pub) : Symbol(scope, SymbolType::FUNC), pub(pub) {}
 
 SymbolFunc::~SymbolFunc() {}
 
@@ -22,14 +22,16 @@ void SymbolFunc::setVrdic(bool value) { this->vrdic = value; }
 
 bool SymbolFunc::getVrdic() const { return this->vrdic; }
 
-void SymbolFunc::setRet(Type type) { this->ret = type; }
+void SymbolFunc::setRet(DataType dataType) { this->ret = dataType; }
 
-Type SymbolFunc::getRet() const { return this->ret; }
+const std::optional<DataType>& SymbolFunc::getRet() const { return this->ret; }
 
-void SymbolFunc::setParams(std::vector<Type>&& types) { this->params = std::move(types); }
+void SymbolFunc::setParams(std::vector<DataType>&& dataTypes) { this->params = std::move(dataTypes); }
 
-const std::vector<Type>& SymbolFunc::getParams() const { return this->params; }
+const std::vector<DataType>& SymbolFunc::getParams() const { return this->params; }
 
-void SymbolFunc::setScope(SymbolTable* scope) { this->scope = scope; }
+void SymbolFunc::setBlockScope(SymbolTable* blockScope) { this->blockScope = blockScope; }
+
+const SymbolTable* SymbolFunc::getBlockScope() const { return this->blockScope; }
 
 } // namespace Aerell

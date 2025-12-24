@@ -13,10 +13,10 @@
 namespace Aerell
 {
 
-void print(const AST::Ast& ast, size_t indent)
+void print(const AST::Ptr& ptr, size_t indent)
 {
     // Func
-    if(auto* func = dynamic_cast<Func*>(ast.get()))
+    if(auto* func = dynamic_cast<Func*>(ptr.get()))
     {
         llvm::outs() << std::string(indent, ' ') << "Func\n";
         llvm::outs() << std::string(indent, ' ') << " ident: " << func->ident->getText() << "\n";
@@ -39,7 +39,7 @@ void print(const AST::Ast& ast, size_t indent)
     }
 
     // FuncCall
-    if(auto* funcCall = dynamic_cast<FuncCall*>(ast.get()))
+    if(auto* funcCall = dynamic_cast<FuncCall*>(ptr.get()))
     {
         llvm::outs() << std::string(indent, ' ') << "FuncCall\n";
         llvm::outs() << std::string(indent, ' ') << " name: " << funcCall->ident->getText() << "\n";
@@ -49,26 +49,27 @@ void print(const AST::Ast& ast, size_t indent)
     }
 
     // Literal
-    if(auto* literal = dynamic_cast<Literal*>(ast.get()))
+    if(auto* literal = dynamic_cast<Literal*>(ptr.get()))
     {
         llvm::outs() << std::string(indent, ' ') << "Literal\n";
         llvm::outs() << std::string(indent, ' ') << " value: " << literal->value->getText() << "\n";
     }
 }
 
-void print(const AST::Asts& asts)
+void print(const AST::Children& children)
 {
-    const char* path = nullptr;
-    for(const auto& ast : asts)
-    {
-        auto sourcePath = ast->path;
-        if(path != sourcePath)
-        {
-            path = sourcePath;
-            llvm::outs() << '\n' << path << ":\n";
-        }
-        print(ast);
-    }
+    for(const auto& child : children) print(child);
+}
+
+void print(const AST::ChildrenWithSource& childrenWithSource)
+{
+    llvm::outs() << '\n' << childrenWithSource.source << ":\n";
+    print(childrenWithSource.children);
+}
+
+void print(const AST::Groups& groups)
+{
+    for(const auto& group : groups) print(group);
 }
 
 } // namespace Aerell

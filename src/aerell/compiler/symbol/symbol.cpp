@@ -11,8 +11,12 @@
 namespace Aerell
 {
 
-Symbol::Symbol(SymbolType type) : type(type) {}
+Symbol::Symbol(SymbolTable* scope, SymbolType symbolType) : scope(scope), symbolType(symbolType) {}
 
 Symbol::~Symbol() {}
+
+const SymbolType& Symbol::getSymbolType() const { return this->symbolType; }
+
+const SymbolTable* Symbol::getScope() const { return this->scope; }
 
 } // namespace Aerell

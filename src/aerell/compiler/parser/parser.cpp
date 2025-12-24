@@ -32,19 +32,22 @@ Parser::Rules Parser::rules{
 
 Parser::Parser(SymbolTable& symbolTable) : symbolTable(&symbolTable) {}
 
-bool Parser::parsing(const Lexer::Tokens& tokens, AST::Asts& asts)
+bool Parser::parsing(const Token::Vec& vec, AST::ChildrenWithSource& childrenWithSource)
 {
     if(this->hasError) this->hasError = false;
-    this->tokensRef = &tokens;
+    this->tokensRef = &vec;
     this->pos = 0;
 
     while(this->pos < this->tokensRef->size() && (*this->tokensRef)[this->pos].type != TokenType::EOFF)
     {
+        if(childrenWithSource.source == nullptr)
+            childrenWithSource.source = (*this->tokensRef)[this->pos].source->getPath().c_str();
+
         if(is(Rule::STMT))
         {
             if(auto ast = stmt())
             {
-                asts.push_back(std::move(ast));
+                childrenWithSource.children.push_back(std::move(ast));
                 continue;
             }
         }
@@ -124,7 +127,7 @@ std::unique_ptr<AST> Parser::func()
     auto ident = &(*tokensRef)[pos];
     pos++;
 
-    auto symbolFunc = this->symbolTable->findFunc(ident->getText());
+    auto symbolFunc = this->symbolTable->findFunc(ident->getText(), false);
     if(symbolFunc != nullptr)
     {
         ident->source->printErrorMessage(ident->offset, ident->size, "[P] Duplicate function");
@@ -141,13 +144,13 @@ std::unique_ptr<AST> Parser::func()
 
     // Params
     std::vector<FuncParam> params;
-    std::vector<Type> types;
+    std::vector<DataType> dataTypes;
     if(is(Rule::FUNC_PARAM))
         if(auto param = funcParam())
         {
-            if(param.value().type->type == TokenType::I32) types.push_back(Type::I32);
+            if(param.value().type->type == TokenType::I32) dataTypes.push_back(DataType::I32);
             else if(param.value().type->type == TokenType::STR)
-                types.push_back(Type::STR);
+                dataTypes.push_back(DataType::STR);
 
             params.push_back(std::move(param.value()));
             while(is(TokenType::COMMA))
@@ -162,16 +165,16 @@ std::unique_ptr<AST> Parser::func()
                 }
                 else if(auto param = funcParam())
                 {
-                    if(param.value().type->type == TokenType::I32) types.push_back(Type::I32);
+                    if(param.value().type->type == TokenType::I32) dataTypes.push_back(DataType::I32);
                     else if(param.value().type->type == TokenType::STR)
-                        types.push_back(Type::STR);
+                        dataTypes.push_back(DataType::STR);
 
                     params.push_back(std::move(param.value()));
                 }
             }
         }
 
-    symbolFunc->setParams(std::move(types));
+    symbolFunc->setParams(std::move(dataTypes));
 
     this->symbolTable = this->symbolTable->exitScope();
 
@@ -182,11 +185,11 @@ std::unique_ptr<AST> Parser::func()
     // Ret
     const Token* ret = nullptr;
     if(is(Rule::DATA_TYPE)) ret = dataType();
-    if(ret == nullptr) symbolFunc->setRet(Type::VOID);
-    else if(ret->type == TokenType::I32)
-        symbolFunc->setRet(Type::I32);
-    else if(ret->type == TokenType::STR)
-        symbolFunc->setRet(Type::STR);
+    if(ret != nullptr)
+    {
+        if(ret->type == TokenType::I32) symbolFunc->setRet(DataType::I32);
+        if(ret->type == TokenType::STR) symbolFunc->setRet(DataType::STR);
+    }
 
     // Block
     std::optional<std::vector<std::unique_ptr<AST>>> stmts = std::nullopt;
@@ -195,7 +198,7 @@ std::unique_ptr<AST> Parser::func()
         this->symbolTable = funcSymbolTable;
         stmts = block();
         this->symbolTable = this->symbolTable->exitScope();
-        symbolFunc->setScope(funcSymbolTable);
+        symbolFunc->setBlockScope(funcSymbolTable);
     }
 
     // Gen AST
@@ -205,7 +208,6 @@ std::unique_ptr<AST> Parser::func()
     func->ret = ret;
     func->stmts = std::move(stmts);
     func->symbol = symbolFunc;
-    func->path = ident->source->getPath().c_str();
 
     return func;
 }
@@ -224,9 +226,9 @@ std::optional<FuncParam> Parser::funcParam()
     const Token* type{dataType()};
     if(type != nullptr)
     {
-        if(type->type == TokenType::I32) symbolVar->setType(Type::I32);
+        if(type->type == TokenType::I32) symbolVar->setDataType(DataType::I32);
         else if(type->type == TokenType::STR)
-            symbolVar->setType(Type::STR);
+            symbolVar->setDataType(DataType::STR);
     }
 
     // Gen AST
@@ -304,7 +306,6 @@ std::unique_ptr<AST> Parser::funcCall()
     auto funcCall = std::make_unique<FuncCall>();
     funcCall->ident = ident;
     funcCall->args = std::move(args);
-    funcCall->path = ident->source->getPath().c_str();
 
     return funcCall;
 }
@@ -319,7 +320,6 @@ std::unique_ptr<AST> Parser::literal()
     // Gen AST
     auto literal = std::make_unique<Literal>();
     literal->value = value;
-    literal->path = value->source->getPath().c_str();
 
     return literal;
 }

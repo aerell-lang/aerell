@@ -8,15 +8,11 @@
 
 #pragma once
 
-#include <aerell/compiler/ir/ir.h>
+#include <aerell/compiler/symbol/symbol_table.h>
 
 namespace Aerell
 {
 
-class CodeGen
-{
-  public:
-    static bool obj(const char* name, const IR::Ptr& ptr);
-};
+void print(const SymbolTable& symbolTable);
 
-} // namespace Aerell
+}

@@ -20,9 +20,9 @@
 namespace Aerell
 {
 
-bool Compiler::jit(IR::Modules& modules)
+bool Compiler::jit(IR::Unit& unit)
 {
-    if(modules.empty()) return false;
+    if(unit.vec.empty()) return false;
 
     // JIT
     auto jit = llvm::orc::LLJITBuilder().create();
@@ -38,10 +38,10 @@ bool Compiler::jit(IR::Modules& modules)
 #error "Only win supported"
 #endif
 
-    llvm::orc::ThreadSafeContext ctx{std::move(this->ir.getContext())};
+    llvm::orc::ThreadSafeContext ctx{std::move(unit.ctx)};
 
-    for(auto& module : modules)
-        if(auto error = (*jit)->addIRModule(llvm::orc::ThreadSafeModule(std::move(module), ctx)))
+    for(IR::Ptr& ptr : unit.vec)
+        if(auto error = (*jit)->addIRModule(llvm::orc::ThreadSafeModule(std::move(ptr), ctx)))
         {
             llvm::errs() << error << "\n";
             return false;

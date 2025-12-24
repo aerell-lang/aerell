@@ -13,8 +13,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include <aerell/compiler/symbol/symbol_var.h>
-#include <aerell/compiler/symbol/symbol_func.h>
+#include "aerell/compiler/symbol/symbol_var.h"
+#include "aerell/compiler/symbol/symbol_func.h"
 #include "aerell/compiler/symbol/symbol.h"
 
 namespace Aerell
@@ -23,18 +23,26 @@ namespace Aerell
 class SymbolTable
 {
   public:
+    typedef std::unordered_map<std::string_view, std::unique_ptr<Symbol>> Symbols;
+    typedef std::vector<SymbolTable> Scopes;
+
     SymbolTable(SymbolTable* parentScope);
+
+    const Symbols& getSymbols() const;
+    const std::vector<SymbolTable>& getScopes() const;
+    const SymbolTable* getParentScope() const;
+
     SymbolFunc* createFunc(bool pub, std::string_view ident);
     SymbolVar* createVar(std::string_view ident);
     SymbolTable* enterScope();
     SymbolTable* exitScope();
-    SymbolFunc* findFunc(std::string_view ident);
+    SymbolFunc* findFunc(std::string_view ident, bool recursive) const;
 
   private:
     SymbolTable* parentScope;
 
-    std::unordered_map<std::string_view, std::unique_ptr<Symbol>> symbols;
-    std::vector<SymbolTable> scopes;
+    Symbols symbols;
+    Scopes scopes;
 };
 
 } // namespace Aerell

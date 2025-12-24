@@ -9,7 +9,7 @@
 #pragma once
 
 #include "aerell/compiler/symbol/symbol.h"
-#include "aerell/compiler/symbol/type.h"
+#include "aerell/compiler/symbol/data_type.h"
 
 namespace Aerell
 {
@@ -17,13 +17,13 @@ namespace Aerell
 class SymbolVar : public Symbol
 {
   public:
-    SymbolVar();
+    SymbolVar(SymbolTable* scope);
     ~SymbolVar();
 
-    void setType(Type type);
+    void setDataType(DataType dataType);
 
   private:
-    Type type;
+    DataType dataType;
 };
 
 } // namespace Aerell
