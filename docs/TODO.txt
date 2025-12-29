@@ -1,4 +1,4 @@
 The Aerell Programming Language
 ISSUES & TODO LIST
 
-- IR: Make custom IR before LLVM IR
+- Make custom IR before LLVM IR
