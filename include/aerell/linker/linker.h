@@ -11,7 +11,7 @@
 
 #include <vector>
 
-namespace Aerell
+namespace aerell
 {
 
 class Linker
@@ -25,6 +25,6 @@ class Linker
     static bool findLibPathFlagsInit;
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

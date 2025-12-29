@@ -11,7 +11,7 @@
 #include "aerell/compiler/symbol/symbol_print.h"
 #include "aerell/compiler/symbol/symbol_type.h"
 
-namespace Aerell
+namespace aerell
 {
 
 void print(const SymbolTable& symbolTable)
@@ -28,4 +28,4 @@ void print(const SymbolTable& symbolTable)
     for(const auto& scope : symbolTable.getScopes()) print(scope);
 }
 
-} // namespace Aerell
+} // namespace aerell

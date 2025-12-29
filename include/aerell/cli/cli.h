@@ -9,7 +9,7 @@
 #ifndef AERELL_CLI_CLI_H
 #define AERELL_CLI_CLI_H
 
-namespace Aerell
+namespace aerell
 {
 
 class CLI
@@ -21,6 +21,6 @@ class CLI
   private:
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

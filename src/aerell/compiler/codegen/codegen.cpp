@@ -16,7 +16,7 @@
 
 #include "aerell/compiler/codegen/codegen.h"
 
-namespace Aerell
+namespace aerell
 {
 
 bool CodeGen::obj(const char* name, const IR::Ptr& ptr)
@@ -61,4 +61,4 @@ bool CodeGen::obj(const char* name, const IR::Ptr& ptr)
     return true;
 }
 
-} // namespace Aerell
+} // namespace aerell

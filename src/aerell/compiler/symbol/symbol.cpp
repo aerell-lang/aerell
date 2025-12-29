@@ -8,7 +8,7 @@
 
 #include "aerell/compiler/symbol/symbol.h"
 
-namespace Aerell
+namespace aerell
 {
 
 Symbol::Symbol(SymbolTable* scope, SymbolType symbolType) : scope(scope), symbolType(symbolType) {}
@@ -19,4 +19,4 @@ const SymbolType& Symbol::getSymbolType() const { return this->symbolType; }
 
 const SymbolTable* Symbol::getScope() const { return this->scope; }
 
-} // namespace Aerell
+} // namespace aerell

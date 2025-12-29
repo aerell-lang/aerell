@@ -13,7 +13,7 @@
 #include <aerell/compiler/ast/ast_func_param.h>
 #include <aerell/compiler/symbol/symbol_func.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class ASTFunc : public AST
@@ -29,6 +29,6 @@ class ASTFunc : public AST
     void print(llvm::raw_ostream& os, size_t indent = 0) const override;
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

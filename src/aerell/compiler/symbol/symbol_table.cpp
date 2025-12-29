@@ -10,7 +10,7 @@
 
 #include "aerell/compiler/symbol/symbol_table.h"
 
-namespace Aerell
+namespace aerell
 {
 
 const SymbolTable::Symbols& SymbolTable::getSymbols() const { return this->symbols; }
@@ -52,4 +52,4 @@ SymbolFunc* SymbolTable::findFunc(std::string_view ident, bool recursive) const
     return this->parentScope->findFunc(ident, recursive);
 }
 
-} // namespace Aerell
+} // namespace aerell

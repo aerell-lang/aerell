@@ -10,7 +10,7 @@
 
 #include "aerell/cli/cli.h"
 
-namespace Aerell
+namespace aerell
 {
 
 void CLI::printVersion() { llvm::outs() << "Aerell version: 0.0.0"; }
@@ -35,4 +35,4 @@ void CLI::printHelp()
     llvm::outs() << " compile <file>      Compile the source file into an object file.\n";
 }
 
-} // namespace Aerell
+} // namespace aerell

@@ -11,7 +11,7 @@
 
 #include <array>
 
-namespace Aerell
+namespace aerell
 {
 
 enum class SymbolType
@@ -32,6 +32,6 @@ constexpr const char* to_string(SymbolType t)
     return "UNKNOWN";
 }
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

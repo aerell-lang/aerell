@@ -11,7 +11,7 @@
 
 #include "symbol_type.h"
 
-namespace Aerell
+namespace aerell
 {
 
 class SymbolTable;
@@ -29,6 +29,6 @@ class Symbol
     SymbolType symbolType;
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

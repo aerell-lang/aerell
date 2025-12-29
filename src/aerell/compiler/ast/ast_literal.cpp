@@ -8,7 +8,7 @@
 
 #include "aerell/compiler/ast/ast_literal.h"
 
-namespace Aerell
+namespace aerell
 {
 
 void ASTLiteral::print(llvm::raw_ostream& os, size_t indent) const
@@ -17,4 +17,4 @@ void ASTLiteral::print(llvm::raw_ostream& os, size_t indent) const
     os << std::string(indent, ' ') << " value: " << this->value->getText() << '\n';
 }
 
-} // namespace Aerell
+} // namespace aerell

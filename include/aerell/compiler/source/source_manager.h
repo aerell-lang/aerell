@@ -16,7 +16,7 @@
 #include <aerell/support/utils.h>
 #include <aerell/compiler/source/source.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class SourceManager
@@ -33,6 +33,6 @@ class SourceManager
     std::optional<std::filesystem::path> find(const char* value);
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

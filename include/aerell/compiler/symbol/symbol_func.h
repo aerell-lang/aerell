@@ -15,7 +15,7 @@
 #include "aerell/compiler/symbol/symbol.h"
 #include "aerell/compiler/symbol/data_type.h"
 
-namespace Aerell
+namespace aerell
 {
 
 class SymbolTable;
@@ -44,6 +44,6 @@ class SymbolFunc : public Symbol
     SymbolTable* blockScope;
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

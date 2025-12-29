@@ -11,7 +11,7 @@
 
 #include <aerell/compiler/ir/ir.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class CodeGen
@@ -20,6 +20,6 @@ class CodeGen
     static bool obj(const char* name, const IR::Ptr& ptr);
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

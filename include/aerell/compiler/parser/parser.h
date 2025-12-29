@@ -19,7 +19,7 @@
 #include "aerell/compiler/ast/ast_func_param.h"
 #include "aerell/compiler/token/token.h"
 
-namespace Aerell
+namespace aerell
 {
 
 class Parser
@@ -69,6 +69,6 @@ class Parser
     std::unique_ptr<AST> literal();
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

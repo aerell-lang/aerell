@@ -20,9 +20,9 @@ int main(int argc, char* argv[])
     llvm::InitializeNativeTargetAsmPrinter();
     llvm::InitializeNativeTargetDisassembler();
 
-    Aerell::CLI cli;
-    Aerell::Compiler compiler;
-    Aerell::Linker linker;
+    aerell::CLI cli;
+    aerell::Compiler compiler;
+    aerell::Linker linker;
 
     if(argc == 1)
     {
@@ -65,17 +65,17 @@ int main(int argc, char* argv[])
         const auto& filePath = argv[2];
 
         // Lexing
-        Aerell::Token::Vecs vecs;
+        aerell::Token::Vecs vecs;
         if(!compiler.lexing(filePath, vecs)) return EXIT_FAILURE;
         if(isLex)
         {
-            Aerell::print(vecs);
+            aerell::print(vecs);
             llvm::outs() << "\nLexing finished.";
             return EXIT_SUCCESS;
         }
 
         // Parsing
-        Aerell::AST::Groups groups;
+        aerell::AST::Groups groups;
         if(!compiler.parsing(vecs, groups)) return EXIT_FAILURE;
         if(isParse)
         {
@@ -87,20 +87,20 @@ int main(int argc, char* argv[])
         if(!compiler.analysis(groups)) return EXIT_FAILURE;
         if(isAnalyze)
         {
-            Aerell::print(compiler.getSymbolTable());
+            aerell::print(compiler.getSymbolTable());
             llvm::outs() << "\nAnalysis completed.";
             return EXIT_SUCCESS;
         }
 
         // IR Gen
-        Aerell::IR::Unit unit;
+        aerell::IR::Unit unit;
         if(!compiler.generating(groups, unit)) return EXIT_FAILURE;
         if(!compiler.linking(unit)) return EXIT_FAILURE;
         compiler.optimize(unit);
 
         if(isGenerate)
         {
-            Aerell::print(unit);
+            aerell::print(unit);
             llvm::outs() << "\nGenerating completed.";
             return EXIT_SUCCESS;
         }

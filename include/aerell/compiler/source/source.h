@@ -13,7 +13,7 @@
 
 #include <llvm/Support/raw_ostream.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class Source
@@ -36,6 +36,6 @@ class Source
     std::vector<size_t> lineStarts;
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

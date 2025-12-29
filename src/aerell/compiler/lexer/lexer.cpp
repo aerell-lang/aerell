@@ -13,7 +13,7 @@
 
 #include "aerell/compiler/lexer/lexer.h"
 
-namespace Aerell
+namespace aerell
 {
 
 const std::pair<std::string, TokenType> Lexer::symbols[] = {{"(", TokenType::LPAREN}, {")", TokenType::RPAREN},
@@ -162,4 +162,4 @@ bool Lexer::isIdent()
     return true;
 }
 
-} // namespace Aerell
+} // namespace aerell

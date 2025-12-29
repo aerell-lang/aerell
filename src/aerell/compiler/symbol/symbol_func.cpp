@@ -9,7 +9,7 @@
 #include "aerell/compiler/symbol/symbol_func.h"
 #include <aerell/compiler/symbol/symbol_type.h>
 
-namespace Aerell
+namespace aerell
 {
 
 SymbolFunc::SymbolFunc(SymbolTable* scope, bool pub) : Symbol(scope, SymbolType::FUNC), pub(pub) {}
@@ -34,4 +34,4 @@ void SymbolFunc::setBlockScope(SymbolTable* blockScope) { this->blockScope = blo
 
 const SymbolTable* SymbolFunc::getBlockScope() const { return this->blockScope; }
 
-} // namespace Aerell
+} // namespace aerell

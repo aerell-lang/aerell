@@ -15,7 +15,7 @@
 
 #include "aerell/compiler/token/token_type.h"
 
-namespace Aerell
+namespace aerell
 {
 
 class Token
@@ -38,6 +38,6 @@ void print(const Token::Vec& vec);
 
 void print(const Token::Vecs& vecs);
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

@@ -12,7 +12,7 @@
 #include <aerell/compiler/ast/ast.h>
 #include <aerell/compiler/token/token.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class ASTLiteral : public AST
@@ -25,6 +25,6 @@ class ASTLiteral : public AST
     void print(llvm::raw_ostream& os, size_t indent = 0) const override;
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

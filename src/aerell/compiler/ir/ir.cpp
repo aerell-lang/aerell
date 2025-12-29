@@ -16,7 +16,7 @@
 
 #include "aerell/compiler/ir/ir.h"
 
-namespace Aerell
+namespace aerell
 {
 
 bool IR::generating(const AST::Groups& groups, Unit& unit)
@@ -304,4 +304,4 @@ void print(const IR::Vec& vec)
 
 void print(const IR::Unit& unit) { print(unit.vec); }
 
-} // namespace Aerell
+} // namespace aerell

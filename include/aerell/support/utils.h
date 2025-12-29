@@ -11,11 +11,11 @@
 
 #include <filesystem>
 
-namespace Aerell
+namespace aerell
 {
 
 std::filesystem::path getExeDir();
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

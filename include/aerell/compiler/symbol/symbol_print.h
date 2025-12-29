@@ -11,7 +11,7 @@
 
 #include <aerell/compiler/symbol/symbol_table.h>
 
-namespace Aerell
+namespace aerell
 {
 
 void print(const SymbolTable& symbolTable);

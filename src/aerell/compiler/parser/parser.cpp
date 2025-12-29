@@ -18,7 +18,7 @@
 #include "aerell/compiler/parser/parser.h"
 #include <aerell/compiler/symbol/symbol_func.h>
 
-namespace Aerell
+namespace aerell
 {
 
 Parser::Rules Parser::rules{
@@ -326,4 +326,4 @@ std::unique_ptr<AST> Parser::literal()
     return literal;
 }
 
-} // namespace Aerell
+} // namespace aerell

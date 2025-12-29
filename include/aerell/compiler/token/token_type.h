@@ -11,7 +11,7 @@
 
 #include <array>
 
-namespace Aerell
+namespace aerell
 {
 
 enum class TokenType
@@ -63,6 +63,6 @@ constexpr const char* to_string(TokenType t)
     return "UNKNOWN";
 }
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

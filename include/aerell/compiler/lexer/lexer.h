@@ -14,7 +14,7 @@
 #include "aerell/compiler/token/token.h"
 #include <aerell/compiler/source/source.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class Lexer
@@ -39,6 +39,6 @@ class Lexer
     bool isIdent();
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

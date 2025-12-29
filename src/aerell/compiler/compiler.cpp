@@ -16,7 +16,7 @@
 #include <aerell/compiler/ir/ir.h>
 #include <aerell/compiler/codegen/codegen.h>
 
-namespace Aerell
+namespace aerell
 {
 
 const SymbolTable& Compiler::getSymbolTable() const { return this->symbolTable; }
@@ -166,7 +166,7 @@ void Compiler::optimize(IR::Unit& unit) { this->optimize(unit.vec); }
 std::optional<std::string> Compiler::compile(IR::Ptr& ptr)
 {
     const auto& filePath = ptr->getSourceFileName();
-    if(!Aerell::CodeGen::obj(filePath.c_str(), ptr)) return std::nullopt;
+    if(!aerell::CodeGen::obj(filePath.c_str(), ptr)) return std::nullopt;
     return filePath;
 }
 
@@ -185,4 +185,4 @@ bool Compiler::compile(IR::Vec& vec, std::vector<std::string>& outputs)
 
 bool Compiler::compile(IR::Unit& unit, std::vector<std::string>& outputs) { return this->compile(unit.vec, outputs); }
 
-} // namespace Aerell
+} // namespace aerell

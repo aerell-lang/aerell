@@ -14,7 +14,7 @@
 
 #include <llvm/Support/raw_ostream.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class AST
@@ -60,6 +60,6 @@ inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST::Groups& g
     return os;
 }
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

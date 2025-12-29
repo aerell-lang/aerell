@@ -10,7 +10,7 @@
 
 #include "aerell/compiler/token/token.h"
 
-namespace Aerell
+namespace aerell
 {
 
 std::string_view Token::getText() const { return {this->source->getContentData() + this->offset, this->size}; }
@@ -53,4 +53,4 @@ void print(const Token::Vecs& vecs)
     for(const auto& vec : vecs) print(vec);
 }
 
-} // namespace Aerell
+} // namespace aerell

@@ -16,7 +16,7 @@
 #include <aerell/compiler/ast/ast_func_call.h>
 #include <aerell/compiler/ast/ast_literal.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class Semantic
@@ -37,6 +37,6 @@ class Semantic
     std::optional<DataType> literal(ASTLiteral& ctx);
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

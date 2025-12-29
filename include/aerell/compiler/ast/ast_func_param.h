@@ -11,7 +11,7 @@
 
 #include <aerell/compiler/token/token.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class ASTFuncParam
@@ -21,6 +21,6 @@ class ASTFuncParam
     const Token* type = nullptr;
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

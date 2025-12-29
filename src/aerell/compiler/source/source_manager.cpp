@@ -12,7 +12,7 @@
 
 #include "aerell/compiler/source/source_manager.h"
 
-namespace Aerell
+namespace aerell
 {
 
 int SourceManager::import(const char* value, llvm::raw_ostream& errs, bool makeAsPrefix)
@@ -61,4 +61,4 @@ std::optional<std::filesystem::path> SourceManager::find(const char* value)
     return path;
 }
 
-} // namespace Aerell
+} // namespace aerell

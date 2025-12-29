@@ -10,7 +10,7 @@
 #include <aerell/compiler/symbol/symbol_print.h>
 #include <aerell/support/utils.h>
 
-namespace Aerell
+namespace aerell
 {
 
 Semantic::Semantic(SymbolTable& symbolTable) : symbolTable(&symbolTable) {}
@@ -90,4 +90,4 @@ std::optional<DataType> Semantic::literal(ASTLiteral& ctx)
         return std::nullopt;
 }
 
-} // namespace Aerell
+} // namespace aerell

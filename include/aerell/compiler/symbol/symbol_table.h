@@ -18,7 +18,7 @@
 #include "aerell/compiler/symbol/symbol_func.h"
 #include "aerell/compiler/symbol/symbol.h"
 
-namespace Aerell
+namespace aerell
 {
 
 class SymbolTable
@@ -46,6 +46,6 @@ class SymbolTable
     Scopes scopes;
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

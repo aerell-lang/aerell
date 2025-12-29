@@ -12,7 +12,7 @@
 #include "aerell/compiler/symbol/symbol.h"
 #include "aerell/compiler/symbol/data_type.h"
 
-namespace Aerell
+namespace aerell
 {
 
 class SymbolVar : public Symbol
@@ -27,6 +27,6 @@ class SymbolVar : public Symbol
     DataType dataType;
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

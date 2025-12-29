@@ -11,7 +11,7 @@
 
 #include "aerell/compiler/source/source.h"
 
-namespace Aerell
+namespace aerell
 {
 
 Source::Source(std::filesystem::path&& path) : path(std::move(path)), pathStr(this->path.generic_string()) {}
@@ -71,4 +71,4 @@ void Source::printErrorMessage(size_t offset, size_t size, const char* msg)
     llvm::errs() << ' ' << msg << '\n';
 }
 
-} // namespace Aerell
+} // namespace aerell

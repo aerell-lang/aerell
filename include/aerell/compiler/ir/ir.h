@@ -19,7 +19,7 @@
 #include <aerell/compiler/ast/ast_literal.h>
 #include <aerell/compiler/symbol/symbol_func.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class IR
@@ -66,6 +66,6 @@ void print(const IR::Vec& vec);
 
 void print(const IR::Unit& unit);
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

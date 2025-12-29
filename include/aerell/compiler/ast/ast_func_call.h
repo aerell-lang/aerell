@@ -13,7 +13,7 @@
 #include <aerell/compiler/symbol/symbol_func.h>
 #include <aerell/compiler/token/token.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class ASTFuncCall : public AST
@@ -28,6 +28,6 @@ class ASTFuncCall : public AST
     void print(llvm::raw_ostream& os, size_t indent = 0) const override;
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif

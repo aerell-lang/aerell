@@ -8,7 +8,7 @@
 
 #include <aerell/compiler/ast/ast_func.h>
 
-namespace Aerell
+namespace aerell
 {
 
 void ASTFunc::print(llvm::raw_ostream& os, size_t indent) const
@@ -33,4 +33,4 @@ void ASTFunc::print(llvm::raw_ostream& os, size_t indent) const
     }
 }
 
-} // namespace Aerell
+} // namespace aerell

@@ -9,7 +9,7 @@
 #include "aerell/compiler/symbol/symbol_var.h"
 #include <aerell/compiler/symbol/symbol_type.h>
 
-namespace Aerell
+namespace aerell
 {
 
 SymbolVar::SymbolVar(SymbolTable* scope) : Symbol(scope, SymbolType::VAR) {}
@@ -18,4 +18,4 @@ SymbolVar::~SymbolVar() {}
 
 void SymbolVar::setDataType(DataType dataType) { this->dataType = dataType; }
 
-} // namespace Aerell
+} // namespace aerell

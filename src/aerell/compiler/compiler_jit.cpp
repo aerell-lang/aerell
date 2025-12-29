@@ -17,7 +17,7 @@
 #include <windows.h>
 #endif
 
-namespace Aerell
+namespace aerell
 {
 
 bool Compiler::jit(IR::Unit& unit)
@@ -60,4 +60,4 @@ bool Compiler::jit(IR::Unit& unit)
     return true;
 }
 
-} // namespace Aerell
+} // namespace aerell

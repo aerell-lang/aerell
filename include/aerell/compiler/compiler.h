@@ -21,7 +21,7 @@
 
 #include <llvm/IR/Module.h>
 
-namespace Aerell
+namespace aerell
 {
 
 class Compiler
@@ -53,6 +53,6 @@ class Compiler
     bool compile(IR::Vec& vec, std::vector<std::string>& outputs);
 };
 
-} // namespace Aerell
+} // namespace aerell
 
 #endif
