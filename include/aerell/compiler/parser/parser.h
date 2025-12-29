@@ -16,6 +16,7 @@
 #include <aerell/compiler/symbol/symbol_table.h>
 #include <aerell/compiler/lexer/lexer.h>
 #include "aerell/compiler/ast/ast.h"
+#include "aerell/compiler/ast/ast_func_param.h"
 #include "aerell/compiler/token/token.h"
 
 namespace Aerell
@@ -60,7 +61,7 @@ class Parser
 
     std::unique_ptr<AST> stmt();
     std::unique_ptr<AST> func();
-    std::optional<FuncParam> funcParam();
+    std::optional<ASTFuncParam> funcParam();
     const Token* dataType();
     std::optional<std::vector<std::unique_ptr<AST>>> block();
     std::unique_ptr<AST> expr();

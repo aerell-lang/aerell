@@ -14,7 +14,9 @@
 #include <llvm/IR/IRBuilder.h>
 #include "llvm/IR/Module.h"
 
-#include <aerell/compiler/ast/ast.h>
+#include <aerell/compiler/ast/ast_func.h>
+#include <aerell/compiler/ast/ast_func_call.h>
+#include <aerell/compiler/ast/ast_literal.h>
 #include <aerell/compiler/symbol/symbol_func.h>
 
 namespace Aerell
@@ -53,9 +55,9 @@ class IR
     void stmt(const AST::Ptr& ptr);
     llvm::Value* expr(const AST::Ptr& ptr);
     llvm::Function* funcDecl(const Token& ident, const SymbolFunc& ctx);
-    void func(Func& ctx);
-    llvm::Value* funcCall(FuncCall& ctx);
-    llvm::Value* literal(Literal& ctx);
+    void func(ASTFunc& ctx);
+    llvm::Value* funcCall(ASTFuncCall& ctx);
+    llvm::Value* literal(ASTLiteral& ctx);
 };
 
 void print(const IR::Ptr& ptr);

@@ -23,18 +23,18 @@ bool Semantic::analysis(const AST::ChildrenWithSource& childrenWithSource)
 
 void Semantic::stmt(const std::unique_ptr<AST>& ast)
 {
-    if(auto* funcCtx = dynamic_cast<Func*>(ast.get())) return func(*funcCtx);
+    if(auto* funcCtx = dynamic_cast<ASTFunc*>(ast.get())) return func(*funcCtx);
     if(expr(ast).has_value()) return;
 }
 
 std::optional<DataType> Semantic::expr(const std::unique_ptr<AST>& ast)
 {
-    if(auto* funcCallCtx = dynamic_cast<FuncCall*>(ast.get())) return funcCall(*funcCallCtx);
-    if(auto* literalCtx = dynamic_cast<Literal*>(ast.get())) return literal(*literalCtx);
+    if(auto* funcCallCtx = dynamic_cast<ASTFuncCall*>(ast.get())) return funcCall(*funcCallCtx);
+    if(auto* literalCtx = dynamic_cast<ASTLiteral*>(ast.get())) return literal(*literalCtx);
     return std::nullopt;
 }
 
-void Semantic::func(Func& ctx)
+void Semantic::func(ASTFunc& ctx)
 {
     if(ctx.stmts == std::nullopt) return;
     const auto& blockScope = ctx.symbol->getBlockScope();
@@ -43,7 +43,7 @@ void Semantic::func(Func& ctx)
     this->symbolTable = blockScope->getParentScope();
 }
 
-std::optional<DataType> Semantic::funcCall(FuncCall& ctx)
+std::optional<DataType> Semantic::funcCall(ASTFuncCall& ctx)
 {
     const auto& indent = ctx.ident;
 
@@ -82,7 +82,7 @@ std::optional<DataType> Semantic::funcCall(FuncCall& ctx)
     return ctx.symbolCalled->getRet();
 }
 
-std::optional<DataType> Semantic::literal(Literal& ctx)
+std::optional<DataType> Semantic::literal(ASTLiteral& ctx)
 {
     if(ctx.value->type == TokenType::INTL) return DataType::I32;
     if(ctx.value->type == TokenType::STRL) return DataType::STR;

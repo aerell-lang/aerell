@@ -12,7 +12,9 @@
 
 #include <llvm/Support/raw_ostream.h>
 
-#include <aerell/compiler/ast/ast.h>
+#include <aerell/compiler/ast/ast_func.h>
+#include <aerell/compiler/ast/ast_func_call.h>
+#include <aerell/compiler/ast/ast_literal.h>
 #include "aerell/compiler/parser/parser.h"
 #include <aerell/compiler/symbol/symbol_func.h>
 
@@ -143,7 +145,7 @@ std::unique_ptr<AST> Parser::func()
     this->symbolTable = funcSymbolTable;
 
     // Params
-    std::vector<FuncParam> params;
+    std::vector<ASTFuncParam> params;
     std::vector<DataType> dataTypes;
     if(is(Rule::FUNC_PARAM))
         if(auto param = funcParam())
@@ -202,7 +204,7 @@ std::unique_ptr<AST> Parser::func()
     }
 
     // Gen AST
-    auto func = std::make_unique<Func>();
+    auto func = std::make_unique<ASTFunc>();
     func->ident = ident;
     func->params = std::move(params);
     func->ret = ret;
@@ -212,7 +214,7 @@ std::unique_ptr<AST> Parser::func()
     return func;
 }
 
-std::optional<FuncParam> Parser::funcParam()
+std::optional<ASTFuncParam> Parser::funcParam()
 {
     // IDENT
     if(!expect(Rule::FUNC_PARAM)) return std::nullopt;
@@ -232,7 +234,7 @@ std::optional<FuncParam> Parser::funcParam()
     }
 
     // Gen AST
-    FuncParam param;
+    ASTFuncParam param;
     param.ident = ident;
     param.type = type;
 
@@ -303,7 +305,7 @@ std::unique_ptr<AST> Parser::funcCall()
     pos++;
 
     // Gen AST
-    auto funcCall = std::make_unique<FuncCall>();
+    auto funcCall = std::make_unique<ASTFuncCall>();
     funcCall->ident = ident;
     funcCall->args = std::move(args);
 
@@ -318,7 +320,7 @@ std::unique_ptr<AST> Parser::literal()
     pos++;
 
     // Gen AST
-    auto literal = std::make_unique<Literal>();
+    auto literal = std::make_unique<ASTLiteral>();
     literal->value = value;
 
     return literal;

@@ -131,7 +131,7 @@ IR::Ptr IR::linking(Vec& vec)
 
 void IR::stmt(const AST::Ptr& ptr)
 {
-    if(auto* funcCtx = dynamic_cast<Func*>(ptr.get())) return func(*funcCtx);
+    if(auto* funcCtx = dynamic_cast<ASTFunc*>(ptr.get())) return func(*funcCtx);
     if(expr(ptr) != nullptr) return;
     this->hasError = true;
     llvm::errs() << "[IR] Invalid statement\n";
@@ -139,8 +139,8 @@ void IR::stmt(const AST::Ptr& ptr)
 
 llvm::Value* IR::expr(const AST::Ptr& ptr)
 {
-    if(auto* funcCallCtx = dynamic_cast<FuncCall*>(ptr.get())) return funcCall(*funcCallCtx);
-    if(auto* literalCtx = dynamic_cast<Literal*>(ptr.get())) return literal(*literalCtx);
+    if(auto* funcCallCtx = dynamic_cast<ASTFuncCall*>(ptr.get())) return funcCall(*funcCallCtx);
+    if(auto* literalCtx = dynamic_cast<ASTLiteral*>(ptr.get())) return literal(*literalCtx);
     return nullptr;
 }
 
@@ -173,7 +173,7 @@ llvm::Function* IR::funcDecl(const Token& ident, const SymbolFunc& ctx)
     return llvm::Function::Create(fType, pubLlvm, ident.getText(), this->module->get());
 }
 
-void IR::func(Func& ctx)
+void IR::func(ASTFunc& ctx)
 {
     const auto& ident = *ctx.ident;
 
@@ -197,7 +197,7 @@ void IR::func(Func& ctx)
     if(ctx.ret == nullptr) this->builder->CreateRetVoid();
 }
 
-llvm::Value* IR::funcCall(FuncCall& ctx)
+llvm::Value* IR::funcCall(ASTFuncCall& ctx)
 {
     std::string_view ident = ctx.ident->getText();
 
@@ -240,7 +240,7 @@ llvm::Value* IR::funcCall(FuncCall& ctx)
     return this->builder->CreateCall(func, args);
 }
 
-llvm::Value* IR::literal(Literal& ctx)
+llvm::Value* IR::literal(ASTLiteral& ctx)
 {
     auto value = ctx.value;
     if(value->type == TokenType::INTL)

@@ -79,8 +79,7 @@ int main(int argc, char* argv[])
         if(!compiler.parsing(vecs, groups)) return EXIT_FAILURE;
         if(isParse)
         {
-            Aerell::print(groups);
-            llvm::outs() << "\nParsing completed.";
+            llvm::outs() << groups << "\nParsing completed.";
             return EXIT_SUCCESS;
         }
 

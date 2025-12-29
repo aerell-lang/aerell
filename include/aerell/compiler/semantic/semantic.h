@@ -12,7 +12,9 @@
 #include <memory>
 
 #include <aerell/compiler/symbol/symbol_table.h>
-#include <aerell/compiler/ast/ast.h>
+#include <aerell/compiler/ast/ast_func.h>
+#include <aerell/compiler/ast/ast_func_call.h>
+#include <aerell/compiler/ast/ast_literal.h>
 
 namespace Aerell
 {
@@ -30,9 +32,9 @@ class Semantic
     void stmt(const std::unique_ptr<AST>& ast);
     std::optional<DataType> expr(const std::unique_ptr<AST>& ast);
 
-    void func(Func& ctx);
-    std::optional<DataType> funcCall(FuncCall& ctx);
-    std::optional<DataType> literal(Literal& ctx);
+    void func(ASTFunc& ctx);
+    std::optional<DataType> funcCall(ASTFuncCall& ctx);
+    std::optional<DataType> literal(ASTLiteral& ctx);
 };
 
 } // namespace Aerell

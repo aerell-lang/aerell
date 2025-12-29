@@ -12,9 +12,7 @@
 #include <memory>
 #include <vector>
 
-#include <aerell/compiler/symbol/symbol_func.h>
-#include <aerell/compiler/symbol/symbol_var.h>
-#include <aerell/compiler/token/token.h>
+#include <llvm/Support/raw_ostream.h>
 
 namespace Aerell
 {
@@ -34,51 +32,33 @@ class AST
     using Groups = std::vector<ChildrenWithSource>;
 
     virtual ~AST() {};
+
+    virtual void print(llvm::raw_ostream& os, size_t indent = 0) const = 0;
 };
 
-class FuncParam
+inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST::Ptr& obj)
 {
-  public:
-    const Token* ident = nullptr;
-    const Token* type = nullptr;
-};
+    obj->print(os);
+    return os;
+}
 
-class Func : public AST
+inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST::Children& children)
 {
-  public:
-    ~Func() {};
-    const Token* ident = nullptr;
-    std::vector<FuncParam> params;
-    const Token* ret = nullptr;
-    std::optional<Children> stmts = std::nullopt;
-    SymbolFunc* symbol = nullptr;
-};
+    for(const auto& child : children) os << child;
+    return os;
+}
 
-class FuncCall : public AST
+inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST::ChildrenWithSource& childrenWithSource)
 {
-  public:
-    ~FuncCall() {};
+    os << '\n' << childrenWithSource.source << ":\n" << childrenWithSource.children;
+    return os;
+}
 
-    const Token* ident = nullptr;
-    const SymbolFunc* symbolCalled = nullptr;
-    Children args;
-};
-
-class Literal : public AST
+inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST::Groups& groups)
 {
-  public:
-    ~Literal() {};
-
-    const Token* value = nullptr;
-};
-
-void print(const AST::Ptr& ptr, size_t indent = 0);
-
-void print(const AST::Children& children);
-
-void print(const AST::ChildrenWithSource& childrenWithSource);
-
-void print(const AST::Groups& groups);
+    for(const auto& group : groups) os << group;
+    return os;
+}
 
 } // namespace Aerell
 
