@@ -128,6 +128,7 @@ file(
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/linker/*.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/support/*.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/cli/*.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/app/*.cpp"
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
