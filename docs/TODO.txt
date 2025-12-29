@@ -1,8 +1,4 @@
 The Aerell Programming Language
 ISSUES & TODO LIST
 
-- CMake: Create a CMakePresets.json file
-
-- Scripts: Replace scripts with VSCode tasks.json
-
 - IR: Make custom IR before LLVM IR

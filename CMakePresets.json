@@ -1,0 +1,126 @@
+{
+    "version": 10,
+    "cmakeMinimumRequired": {
+        "major": 4,
+        "minor": 0,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "base-essential",
+            "displayName": "Base Essential Configuration",
+            "description": "Common configuration inherited by all presets",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build",
+            "installDir": "C:/apps/portables/aerell",
+            "cacheVariables": {
+                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": true,
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true
+            }
+        },
+        {
+            "name": "toolchain-clang-ninja",
+            "displayName": "Clang with Ninja Generator",
+            "hidden": true,
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_C_STANDARD": "23",
+                "CMAKE_C_STANDARD_REQUIRED": true,
+                "CMAKE_CXX_STANDARD": "23",
+                "CMAKE_CXX_STANDARD_REQUIRED": true
+            }
+        },
+        {
+            "name": "flags-release",
+            "displayName": "Release Optimization Flags",
+            "hidden": true,
+            "environment": {
+                "RELEASE_FLAGS": "-static -O3 -march=native -mtune=native -flto -funroll-loops -fomit-frame-pointer -ffast-math -finline-functions -fdata-sections -ffunction-sections -Os -DNDEBUG -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -g0"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_C_FLAGS": "$env{RELEASE_FLAGS}",
+                "CMAKE_CXX_FLAGS": "$env{RELEASE_FLAGS}",
+                "CMAKE_EXE_LINKER_FLAGS": "-s -Wl,--gc-sections -Wl,--strip-all -Wl,--as-needed"
+            }
+        },
+        {
+            "name": "flags-debug",
+            "displayName": "Debug Development Flags",
+            "hidden": true,
+            "environment": {
+                "SANITIZER_FLAGS": "-fsanitize=address -fsanitize=undefined -fsanitize-address-use-after-scope",
+                "DEBUG_FLAGS": "-g -O0 -Wall -Werror -Wextra -fno-omit-frame-pointer $env{SANITIZER_FLAGS}"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_FLAGS": "$env{DEBUG_FLAGS}",
+                "CMAKE_CXX_FLAGS": "$env{DEBUG_FLAGS}"
+            }
+        },
+        {
+            "name": "config-release",
+            "displayName": "Release",
+            "description": "Production build with maximum optimization",
+            "inherits": [
+                "base-essential",
+                "toolchain-clang-ninja",
+                "flags-release"
+            ]
+        },
+        {
+            "name": "config-debug",
+            "displayName": "Debug",
+            "description": "Development build with symbols and no optimization",
+            "inherits": [
+                "base-essential",
+                "toolchain-clang-ninja",
+                "flags-debug"
+            ]
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "build-release",
+            "displayName": "Build: Release",
+            "configurePreset": "config-release"
+        },
+        {
+            "name": "build-debug",
+            "displayName": "Build: Debug",
+            "configurePreset": "config-debug"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "workflow-release",
+            "displayName": "Full Release Workflow",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "config-release"
+                },
+                {
+                    "type": "build",
+                    "name": "build-release"
+                }
+            ]
+        },
+        {
+            "name": "workflow-debug",
+            "displayName": "Full Debug Workflow",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "config-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "build-debug"
+                }
+            ]
+        }
+    ]
+}

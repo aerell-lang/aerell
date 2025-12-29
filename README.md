@@ -20,32 +20,44 @@ To build Aerell, you need the following dependencies:
 
 This project currently uses **LLVM version 21.1.7**, built manually from the official LLVM GitHub repository.
 
-## Build Preparation
+## Build Instructions
 
-Before building the project:
+This project uses **CMake Presets** to streamline the build process.
 
-1. Copy the environment configuration file:
+### Using the Command Line
 
-   ```bash
-   .env.build.example -> .env.build
-   ```
+You can run the entire configuration and build sequence using the CMake workflow presets:
 
-2. Edit `.env.build` and configure:
+* **Debug Build:**
+    ```bash
+    cmake --workflow --preset workflow-debug
+    ```
+* **Release Build:**
+    ```bash
+    cmake --workflow --preset workflow-release
+    ```
 
-   * `CMAKE_BUILD_TYPE` (Debug or Release)
-   * `CMAKE_INSTALL_PREFIX` (installation directory)
+### Using Visual Studio Code
 
-The environment file is used by the build scripts located in the `scripts/` directory.
+The project includes a `.vscode/tasks.json` file, allowing you to run build steps directly from the editor:
 
-## Build Scripts
+1.  Press `Ctrl+Shift+B` (or `Cmd+Shift+B` on macOS) to open the Build Task menu.
+2.  Select one of the following:
+    * **CMake Workflow Debug**: Configures and builds the project in Debug mode.
+    * **CMake Workflow Release**: Configures and builds the project in Release mode.
+3.  To install the artifacts, go to `Terminal` > `Run Task...` and select **CMake Install**.
 
-The `scripts/` directory contains several helper scripts:
+---
 
-* `build.sh` — build the project
-* `install.sh` — install the built artifacts
-* `build_and_install.sh` — build and install in one step
+### Defined Tasks
 
-Each script behaves according to its name and relies on the configuration from `.env.build`.
+The following tasks are configured for convenience:
+
+| Label | Command | Description |
+| :--- | :--- | :--- |
+| **CMake Workflow Debug** | `cmake --workflow --preset workflow-debug` | Runs the full debug workflow. |
+| **CMake Workflow Release** | `cmake --workflow --preset workflow-release` | Runs the full release workflow. |
+| **CMake Install** | `cmake --install build` | Installs the built files. |
 
 ## Usage
 
