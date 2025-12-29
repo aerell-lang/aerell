@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_AST_AST_H
+#define AERELL_COMPILER_AST_AST_H
 
 #include <memory>
 #include <vector>
@@ -80,3 +81,5 @@ void print(const AST::ChildrenWithSource& childrenWithSource);
 void print(const AST::Groups& groups);
 
 } // namespace Aerell
+
+#endif

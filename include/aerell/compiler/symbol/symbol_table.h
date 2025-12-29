@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_SYMBOL_SYMBOL_TABLE_H
+#define AERELL_COMPILER_SYMBOL_SYMBOL_TABLE_H
 
 #include <memory>
 #include <string_view>
@@ -46,3 +47,5 @@ class SymbolTable
 };
 
 } // namespace Aerell
+
+#endif

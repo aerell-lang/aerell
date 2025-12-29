@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_CODEGEN_CODEGEN_H
+#define AERELL_COMPILER_CODEGEN_CODEGEN_H
 
 #include <aerell/compiler/ir/ir.h>
 
@@ -20,3 +21,5 @@ class CodeGen
 };
 
 } // namespace Aerell
+
+#endif

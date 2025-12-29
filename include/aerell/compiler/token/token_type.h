@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_TOKEN_TOKEN_TYPE_H
+#define AERELL_COMPILER_TOKEN_TOKEN_TYPE_H
 
 #include <array>
 
@@ -63,3 +64,5 @@ constexpr const char* to_string(TokenType t)
 }
 
 } // namespace Aerell
+
+#endif

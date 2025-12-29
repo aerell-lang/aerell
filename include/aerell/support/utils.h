@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_SUPPORT_UTILS_H
+#define AERELL_SUPPORT_UTILS_H
 
 #include <filesystem>
 
@@ -16,3 +17,5 @@ namespace Aerell
 std::filesystem::path getExeDir();
 
 } // namespace Aerell
+
+#endif

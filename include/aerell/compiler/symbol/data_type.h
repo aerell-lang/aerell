@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_SYMBOL_DATA_TYPE_H
+#define AERELL_COMPILER_SYMBOL_DATA_TYPE_H
 
 #include <array>
 
@@ -32,3 +33,5 @@ constexpr const char* to_string(DataType t)
 }
 
 } // namespace Aerell
+
+#endif

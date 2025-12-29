@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_LINKER_LINKER_H
+#define AERELL_LINKER_LINKER_H
 
 #include <vector>
 
@@ -25,3 +26,5 @@ class Linker
 };
 
 } // namespace Aerell
+
+#endif

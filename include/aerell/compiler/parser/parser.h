@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_PARSER_PARSER_H
+#define AERELL_COMPILER_PARSER_PARSER_H
 
 #include <map>
 #include <memory>
@@ -68,3 +69,5 @@ class Parser
 };
 
 } // namespace Aerell
+
+#endif

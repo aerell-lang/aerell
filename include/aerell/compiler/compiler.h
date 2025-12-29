@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_COMPILER_H
+#define AERELL_COMPILER_COMPILER_H
 
 #include <vector>
 
@@ -53,3 +54,5 @@ class Compiler
 };
 
 } // namespace Aerell
+
+#endif

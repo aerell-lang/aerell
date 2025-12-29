@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_SOURCE_SOURCE_MANAGER_H
+#define AERELL_COMPILER_SOURCE_SOURCE_MANAGER_H
 
 #include <memory>
 
@@ -33,3 +34,5 @@ class SourceManager
 };
 
 } // namespace Aerell
+
+#endif

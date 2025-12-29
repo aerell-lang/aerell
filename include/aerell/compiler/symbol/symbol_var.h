@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_SYMBOL_SYMBOL_VAR_H
+#define AERELL_COMPILER_SYMBOL_SYMBOL_VAR_H
 
 #include "aerell/compiler/symbol/symbol.h"
 #include "aerell/compiler/symbol/data_type.h"
@@ -27,3 +28,5 @@ class SymbolVar : public Symbol
 };
 
 } // namespace Aerell
+
+#endif

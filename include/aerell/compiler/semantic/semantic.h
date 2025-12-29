@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_SEMANTIC_SEMANTIC_H
+#define AERELL_COMPILER_SEMANTIC_SEMANTIC_H
 
 #include <memory>
 
@@ -35,3 +36,5 @@ class Semantic
 };
 
 } // namespace Aerell
+
+#endif

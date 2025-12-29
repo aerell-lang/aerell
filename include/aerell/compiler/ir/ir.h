@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_IR_IR_H
+#define AERELL_COMPILER_IR_IR_H
 
 #include <memory>
 
@@ -64,3 +65,5 @@ void print(const IR::Vec& vec);
 void print(const IR::Unit& unit);
 
 } // namespace Aerell
+
+#endif

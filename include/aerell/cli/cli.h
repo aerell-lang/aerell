@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_CLI_CLI_H
+#define AERELL_CLI_CLI_H
 
 namespace Aerell
 {
@@ -21,3 +22,5 @@ class CLI
 };
 
 } // namespace Aerell
+
+#endif

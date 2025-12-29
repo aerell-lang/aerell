@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_TOKEN_TOKEN_H
+#define AERELL_COMPILER_TOKEN_TOKEN_H
 
 #include <aerell/compiler/source/source.h>
 #include <string_view>
@@ -38,3 +39,5 @@ void print(const Token::Vec& vec);
 void print(const Token::Vecs& vecs);
 
 } // namespace Aerell
+
+#endif

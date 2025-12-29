@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_LEXER_LEXER_H
+#define AERELL_COMPILER_LEXER_LEXER_H
 
 #include <utility>
 
@@ -39,3 +40,5 @@ class Lexer
 };
 
 } // namespace Aerell
+
+#endif

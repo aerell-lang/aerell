@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_SYMBOL_SYMBOL_H
+#define AERELL_COMPILER_SYMBOL_SYMBOL_H
 
 #include "symbol_type.h"
 
@@ -29,3 +30,5 @@ class Symbol
 };
 
 } // namespace Aerell
+
+#endif

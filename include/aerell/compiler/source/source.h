@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_SOURCE_SOURCE_H
+#define AERELL_COMPILER_SOURCE_SOURCE_H
 
 #include <filesystem>
 
@@ -36,3 +37,5 @@ class Source
 };
 
 } // namespace Aerell
+
+#endif

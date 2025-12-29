@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_SYMBOL_SYMBOL_PRINT_H
+#define AERELL_COMPILER_SYMBOL_SYMBOL_PRINT_H
 
 #include <aerell/compiler/symbol/symbol_table.h>
 
@@ -16,3 +17,5 @@ namespace Aerell
 void print(const SymbolTable& symbolTable);
 
 }
+
+#endif

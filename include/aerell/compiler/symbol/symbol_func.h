@@ -6,7 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#pragma once
+#ifndef AERELL_COMPILER_SYMBOL_SYMBOL_FUNC_H
+#define AERELL_COMPILER_SYMBOL_SYMBOL_FUNC_H
 
 #include <optional>
 #include <vector>
@@ -44,3 +45,5 @@ class SymbolFunc : public Symbol
 };
 
 } // namespace Aerell
+
+#endif
