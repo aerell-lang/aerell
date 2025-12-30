@@ -34,7 +34,6 @@ class IR
 
     void stmt(const AST::Ptr& ptr);
     IRVal::Ptr expr(const AST::Ptr& ptr);
-    IRFunc* funcDecl(const std::string& ident, const SymbolFunc& ctx);
     void func(ASTFunc& ctx);
     IRVal::Ptr funcCall(ASTFuncCall& ctx);
     IRVal::Ptr literal(ASTLiteral& ctx);

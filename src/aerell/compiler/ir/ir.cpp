@@ -7,6 +7,7 @@
  */
 
 #include <format>
+#include <variant>
 
 #include "aerell/compiler/ir/ir.h"
 #include "aerell/compiler/ir/ir_val.h"
@@ -131,36 +132,40 @@ IRVal::Ptr IR::expr(const AST::Ptr& ptr)
     return nullptr;
 }
 
-IRFunc* IR::funcDecl(const std::string& ident, const SymbolFunc& ctx)
-{
-    return this->mod->addFunc(ident, IRFunc(ctx.getPub(), ctx.getParams(), ctx.getVrdic(), ctx.getRet()));
-}
-
 void IR::func(ASTFunc& ctx)
 {
     const auto& ident = (std::string)(*ctx.ident).getText();
 
-    auto* func = this->mod->getFunc(ident);
-    if(func == nullptr) func = this->funcDecl(ident, *ctx.symbol);
-
-    if(!ctx.stmts.has_value()) return;
-
-    // Block
-    auto blockLabel = "entry";
-    IRBlock* block = func->addBlock(blockLabel, IRBlock());
-    if(block == nullptr)
+    std::variant<IRFunc*, IRFunc> funcVariant = this->mod->getFunc(ident);
+    IRFunc* funcTemp = nullptr;
+    if(std::holds_alternative<IRFunc*>(funcVariant) && std::get<IRFunc*>(funcVariant) == nullptr)
     {
-        this->hasError = true;
-        llvm::errs() << "Failed to create " << blockLabel << " label for " << ident << " function.\n";
-        return;
+        const auto& symbol = ctx.symbol;
+        funcVariant = IRFunc(symbol->getPub(), symbol->getParams(), symbol->getVrdic(), symbol->getRet());
+        funcTemp = &std::get<IRFunc>(funcVariant);
     }
 
-    // Statements
-    for(const auto& stmtCtx : ctx.stmts.value())
+    if(ctx.stmts.has_value())
     {
-        this->block = block;
-        stmt(stmtCtx);
+        IRBlock block;
+
+        // Statements
+        for(const auto& stmtCtx : ctx.stmts.value())
+        {
+            this->block = &block;
+            stmt(stmtCtx);
+        }
+
+        auto blockLabel = "entry";
+        if(funcTemp->addBlock(blockLabel, std::move(block)) == nullptr)
+        {
+            this->hasError = true;
+            llvm::errs() << "Failed to create " << blockLabel << " label for " << ident << " function.\n";
+            return;
+        }
     }
+
+    if(std::holds_alternative<IRFunc>(funcVariant)) this->mod->addFunc(ident, std::move(*funcTemp));
 }
 
 IRVal::Ptr IR::funcCall(ASTFuncCall& ctx)
@@ -178,7 +183,9 @@ IRVal::Ptr IR::funcCall(ASTFuncCall& ctx)
             return nullptr;
         }
 
-        if(this->funcDecl(ident, *ctx.symbolCalled) == nullptr)
+        const auto& symbol = ctx.symbolCalled;
+        if(this->mod->addFunc(
+               ident, IRFunc(symbol->getPub(), symbol->getParams(), symbol->getVrdic(), symbol->getRet())) == nullptr)
         {
             ctx.ident->source->printErrorMessage(ctx.ident->offset, ctx.ident->size, "[IR] Failed to declare function");
             this->hasError = true;
