@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "aerell/compiler/symbol/symbol.h"
-#include "aerell/compiler/symbol/data_type.h"
+#include "aerell/compiler/ir/ir_type.h"
 
 namespace aerell
 {
@@ -26,21 +26,21 @@ class SymbolFunc : public Symbol
     SymbolFunc(SymbolTable* scope, bool pub);
     ~SymbolFunc();
 
-    bool getPub() const;
+    const bool& getPub() const;
     void setVrdic(bool value);
-    bool getVrdic() const;
-    void setRet(DataType dataType);
-    const std::optional<DataType>& getRet() const;
-    void setParams(std::vector<DataType>&& dataTypes);
-    const std::vector<DataType>& getParams() const;
+    const bool& getVrdic() const;
+    void setRet(IRType type);
+    const std::optional<IRType>& getRet() const;
+    void setParams(std::vector<IRType>&& types);
+    const std::vector<IRType>& getParams() const;
     void setBlockScope(SymbolTable* blockScope);
     const SymbolTable* getBlockScope() const;
 
   private:
     bool pub;
-    std::vector<DataType> params;
+    std::vector<IRType> params;
     bool vrdic = false;
-    std::optional<DataType> ret;
+    std::optional<IRType> ret = std::nullopt;
     SymbolTable* blockScope;
 };
 

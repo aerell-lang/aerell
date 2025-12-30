@@ -85,7 +85,8 @@ Linker::Linker()
     while(std::getline(ss, token, delimiter))
     {
         std::filesystem::path path(token);
-        if(std::filesystem::exists(path) && std::filesystem::equivalent(path, exeBinPath))
+        if(std::filesystem::exists(path) && std::filesystem::exists(exeBinPath) &&
+           std::filesystem::equivalent(path, exeBinPath))
         {
             found = true;
             break;

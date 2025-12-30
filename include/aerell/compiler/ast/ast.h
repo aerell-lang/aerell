@@ -36,9 +36,15 @@ class AST
     virtual void print(llvm::raw_ostream& os, size_t indent = 0) const = 0;
 };
 
+inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST& obj)
+{
+    obj.print(os);
+    return os;
+}
+
 inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST::Ptr& obj)
 {
-    obj->print(os);
+    os << (*obj);
     return os;
 }
 

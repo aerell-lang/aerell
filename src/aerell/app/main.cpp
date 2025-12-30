@@ -11,6 +11,7 @@
 #include "aerell/cli/cli.h"
 #include "aerell/linker/linker.h"
 #include "aerell/compiler/compiler.h"
+#include <aerell/compiler/ir/ir_mod.h>
 #include "aerell/compiler/symbol/symbol_print.h"
 
 int main(int argc, char* argv[])
@@ -92,16 +93,25 @@ int main(int argc, char* argv[])
             return EXIT_SUCCESS;
         }
 
-        // IR Gen
-        aerell::IR::Unit unit;
-        if(!compiler.generating(groups, unit)) return EXIT_FAILURE;
-        if(!compiler.linking(unit)) return EXIT_FAILURE;
-        compiler.optimize(unit);
+        // Aerell IR Gen
+        aerell::IRMod::Vec vec;
+        if(!compiler.generating(groups, vec)) return EXIT_FAILURE;
+        if(isGenerate) llvm::outs() << vec << "Aerell IR Generating completed.\n";
 
+        // LLVM IR Gen
+        aerell::IRllvm::Unit unit;
+        if(!compiler.generating(vec, unit)) return EXIT_FAILURE;
+        if(isGenerate) llvm::outs() << unit << "\nLLVM IR Generating completed.\n";
+
+        // LLVM IR Link
+        if(!compiler.linking(unit)) return EXIT_FAILURE;
+        if(isGenerate) llvm::outs() << unit << "\nLLVM IR Linking completed.\n";
+
+        // LLVM IR Optimize
+        compiler.optimize(unit);
         if(isGenerate)
         {
-            aerell::print(unit);
-            llvm::outs() << "\nGenerating completed.";
+            llvm::outs() << unit << "\nLLVM IR Optimizing completed.";
             return EXIT_SUCCESS;
         }
 

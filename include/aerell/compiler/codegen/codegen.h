@@ -17,7 +17,7 @@ namespace aerell
 class CodeGen
 {
   public:
-    static bool obj(const char* name, const IR::Ptr& ptr);
+    static bool obj(const char* name, const IRllvm::Ptr& ptr);
 };
 
 } // namespace aerell

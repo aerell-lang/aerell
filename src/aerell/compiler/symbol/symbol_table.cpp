@@ -37,7 +37,7 @@ SymbolVar* SymbolTable::createVar(std::string_view ident)
     return symbolRaw;
 }
 
-SymbolTable* SymbolTable::enterScope() { return &this->scopes.emplace_back(this); }
+SymbolTable* SymbolTable::enterScope() { return this->scopes.emplace_back(std::make_unique<SymbolTable>(this)).get(); }
 
 SymbolTable* SymbolTable::exitScope() { return this->parentScope; }
 

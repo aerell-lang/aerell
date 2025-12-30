@@ -10,7 +10,7 @@
 #define AERELL_COMPILER_SYMBOL_SYMBOL_VAR_H
 
 #include "aerell/compiler/symbol/symbol.h"
-#include "aerell/compiler/symbol/data_type.h"
+#include <aerell/compiler/ir/ir_type.h>
 
 namespace aerell
 {
@@ -21,10 +21,10 @@ class SymbolVar : public Symbol
     SymbolVar(SymbolTable* scope);
     ~SymbolVar();
 
-    void setDataType(DataType dataType);
+    void setType(IRType type);
 
   private:
-    DataType dataType;
+    IRType type;
 };
 
 } // namespace aerell

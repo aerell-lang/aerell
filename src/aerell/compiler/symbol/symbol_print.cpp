@@ -25,7 +25,7 @@ void print(const SymbolTable& symbolTable)
         for(const auto& symbol : symbols)
             llvm::outs() << symbol.first << ", " << to_string(symbol.second->getSymbolType()) << '\n';
     }
-    for(const auto& scope : symbolTable.getScopes()) print(scope);
+    for(const auto& scope : symbolTable.getScopes()) print(*scope);
 }
 
 } // namespace aerell

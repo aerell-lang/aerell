@@ -16,19 +16,19 @@ SymbolFunc::SymbolFunc(SymbolTable* scope, bool pub) : Symbol(scope, SymbolType:
 
 SymbolFunc::~SymbolFunc() {}
 
-bool SymbolFunc::getPub() const { return this->pub; }
+const bool& SymbolFunc::getPub() const { return this->pub; }
 
 void SymbolFunc::setVrdic(bool value) { this->vrdic = value; }
 
-bool SymbolFunc::getVrdic() const { return this->vrdic; }
+const bool& SymbolFunc::getVrdic() const { return this->vrdic; }
 
-void SymbolFunc::setRet(DataType dataType) { this->ret = dataType; }
+void SymbolFunc::setRet(IRType type) { this->ret = type; }
 
-const std::optional<DataType>& SymbolFunc::getRet() const { return this->ret; }
+const std::optional<IRType>& SymbolFunc::getRet() const { return this->ret; }
 
-void SymbolFunc::setParams(std::vector<DataType>&& dataTypes) { this->params = std::move(dataTypes); }
+void SymbolFunc::setParams(std::vector<IRType>&& types) { this->params = std::move(types); }
 
-const std::vector<DataType>& SymbolFunc::getParams() const { return this->params; }
+const std::vector<IRType>& SymbolFunc::getParams() const { return this->params; }
 
 void SymbolFunc::setBlockScope(SymbolTable* blockScope) { this->blockScope = blockScope; }
 

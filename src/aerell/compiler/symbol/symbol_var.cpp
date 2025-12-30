@@ -16,6 +16,6 @@ SymbolVar::SymbolVar(SymbolTable* scope) : Symbol(scope, SymbolType::VAR) {}
 
 SymbolVar::~SymbolVar() {}
 
-void SymbolVar::setDataType(DataType dataType) { this->dataType = dataType; }
+void SymbolVar::setType(IRType type) { this->type = type; }
 
 } // namespace aerell

@@ -30,11 +30,11 @@ class Semantic
     const SymbolTable* symbolTable;
 
     void stmt(const std::unique_ptr<AST>& ast);
-    std::optional<DataType> expr(const std::unique_ptr<AST>& ast);
+    std::optional<IRType> expr(const std::unique_ptr<AST>& ast);
 
     void func(ASTFunc& ctx);
-    std::optional<DataType> funcCall(ASTFuncCall& ctx);
-    std::optional<DataType> literal(ASTLiteral& ctx);
+    std::optional<IRType> funcCall(ASTFuncCall& ctx);
+    std::optional<IRType> literal(ASTLiteral& ctx);
 };
 
 } // namespace aerell

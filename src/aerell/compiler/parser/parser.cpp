@@ -146,13 +146,13 @@ std::unique_ptr<AST> Parser::func()
 
     // Params
     std::vector<ASTFuncParam> params;
-    std::vector<DataType> dataTypes;
+    std::vector<IRType> dataTypes;
     if(is(Rule::FUNC_PARAM))
         if(auto param = funcParam())
         {
-            if(param.value().type->type == TokenType::I32) dataTypes.push_back(DataType::I32);
+            if(param.value().type->type == TokenType::I32) dataTypes.push_back(IRType::I32);
             else if(param.value().type->type == TokenType::STR)
-                dataTypes.push_back(DataType::STR);
+                dataTypes.push_back(IRType::STR);
 
             params.push_back(std::move(param.value()));
             while(is(TokenType::COMMA))
@@ -167,9 +167,9 @@ std::unique_ptr<AST> Parser::func()
                 }
                 else if(auto param = funcParam())
                 {
-                    if(param.value().type->type == TokenType::I32) dataTypes.push_back(DataType::I32);
+                    if(param.value().type->type == TokenType::I32) dataTypes.push_back(IRType::I32);
                     else if(param.value().type->type == TokenType::STR)
-                        dataTypes.push_back(DataType::STR);
+                        dataTypes.push_back(IRType::STR);
 
                     params.push_back(std::move(param.value()));
                 }
@@ -189,8 +189,8 @@ std::unique_ptr<AST> Parser::func()
     if(is(Rule::DATA_TYPE)) ret = dataType();
     if(ret != nullptr)
     {
-        if(ret->type == TokenType::I32) symbolFunc->setRet(DataType::I32);
-        if(ret->type == TokenType::STR) symbolFunc->setRet(DataType::STR);
+        if(ret->type == TokenType::I32) symbolFunc->setRet(IRType::I32);
+        if(ret->type == TokenType::STR) symbolFunc->setRet(IRType::STR);
     }
 
     // Block
@@ -228,9 +228,9 @@ std::optional<ASTFuncParam> Parser::funcParam()
     const Token* type{dataType()};
     if(type != nullptr)
     {
-        if(type->type == TokenType::I32) symbolVar->setDataType(DataType::I32);
+        if(type->type == TokenType::I32) symbolVar->setType(IRType::I32);
         else if(type->type == TokenType::STR)
-            symbolVar->setDataType(DataType::STR);
+            symbolVar->setType(IRType::STR);
     }
 
     // Gen AST

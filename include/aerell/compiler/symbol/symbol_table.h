@@ -25,12 +25,12 @@ class SymbolTable
 {
   public:
     typedef std::unordered_map<std::string_view, std::unique_ptr<Symbol>> Symbols;
-    typedef std::vector<SymbolTable> Scopes;
+    typedef std::vector<std::unique_ptr<SymbolTable>> Scopes;
 
     SymbolTable(SymbolTable* parentScope);
 
     const Symbols& getSymbols() const;
-    const std::vector<SymbolTable>& getScopes() const;
+    const Scopes& getScopes() const;
     const SymbolTable* getParentScope() const;
 
     SymbolFunc* createFunc(bool pub, std::string_view ident);

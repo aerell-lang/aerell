@@ -130,11 +130,13 @@ bool Compiler::analysis(const AST::Groups& groups)
     return !hasError;
 }
 
-bool Compiler::generating(const AST::Groups& groups, IR::Unit& unit) { return this->ir.generating(groups, unit); }
+bool Compiler::generating(const AST::Groups& groups, IRMod::Vec& vec) { return this->ir.generating(groups, vec); }
 
-IR::Ptr Compiler::linking(IR::Vec& vec) { return this->ir.linking(vec); }
+bool Compiler::generating(const IRMod::Vec& vec, IRllvm::Unit& unit) { return this->ir.generating(vec, unit); }
 
-bool Compiler::linking(IR::Unit& unit)
+IRllvm::Ptr Compiler::linking(IRllvm::Vec& vec) { return IRllvm::linking(vec); }
+
+bool Compiler::linking(IRllvm::Unit& unit)
 {
     auto ptr = this->linking(unit.vec);
     if(ptr == nullptr) return false;
@@ -143,16 +145,16 @@ bool Compiler::linking(IR::Unit& unit)
     return true;
 }
 
-void Compiler::optimize(IR::Ptr& ptr)
+void Compiler::optimize(IRllvm::Ptr& ptr)
 {
-    this->ir.optimize(ptr);
+    IRllvm::optimize(ptr);
     if(ptr->empty()) ptr = nullptr;
 }
 
-void Compiler::optimize(IR::Vec& vec)
+void Compiler::optimize(IRllvm::Vec& vec)
 {
-    IR::Vec optimizeVec;
-    for(IR::Ptr& ptr : vec)
+    IRllvm::Vec optimizeVec;
+    for(IRllvm::Ptr& ptr : vec)
     {
         this->optimize(ptr);
         if(ptr == nullptr) continue;
@@ -161,16 +163,16 @@ void Compiler::optimize(IR::Vec& vec)
     vec = std::move(optimizeVec);
 }
 
-void Compiler::optimize(IR::Unit& unit) { this->optimize(unit.vec); }
+void Compiler::optimize(IRllvm::Unit& unit) { this->optimize(unit.vec); }
 
-std::optional<std::string> Compiler::compile(IR::Ptr& ptr)
+std::optional<std::string> Compiler::compile(IRllvm::Ptr& ptr)
 {
     const auto& filePath = ptr->getSourceFileName();
     if(!aerell::CodeGen::obj(filePath.c_str(), ptr)) return std::nullopt;
     return filePath;
 }
 
-bool Compiler::compile(IR::Vec& vec, std::vector<std::string>& outputs)
+bool Compiler::compile(IRllvm::Vec& vec, std::vector<std::string>& outputs)
 {
     if(vec.empty()) return false;
 
@@ -183,6 +185,9 @@ bool Compiler::compile(IR::Vec& vec, std::vector<std::string>& outputs)
     });
 }
 
-bool Compiler::compile(IR::Unit& unit, std::vector<std::string>& outputs) { return this->compile(unit.vec, outputs); }
+bool Compiler::compile(IRllvm::Unit& unit, std::vector<std::string>& outputs)
+{
+    return this->compile(unit.vec, outputs);
+}
 
 } // namespace aerell

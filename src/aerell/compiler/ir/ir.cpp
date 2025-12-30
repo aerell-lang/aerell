@@ -6,209 +6,168 @@
  * See the LICENSE file for details.
  */
 
-#include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/Verifier.h"
-#include "llvm/Passes/PassBuilder.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Linker/Linker.h"
+#include <format>
 
 #include "aerell/compiler/ir/ir.h"
+#include "aerell/compiler/ir/ir_val.h"
+#include "aerell/compiler/ir/ir_instruct.h"
+#include "aerell/compiler/ir/ir_i32.h"
+#include "aerell/compiler/ir/ir_str.h"
+#include "aerell/compiler/ir/ir_func_call.h"
 
 namespace aerell
 {
 
-bool IR::generating(const AST::Groups& groups, Unit& unit)
+bool IR::generating(const AST::Groups& groups, IRMod::Vec& vec)
 {
     this->hasError = false;
 
-    // Ctx
-    unit.ctx = std::make_unique<llvm::LLVMContext>();
-    this->ctx = &unit.ctx;
+    auto startMod = std::make_unique<IRMod>("start");
 
-    // Builder
-    llvm::IRBuilder<> builder(*this->ctx->get());
-    this->builder = &builder;
+    IRBlock startFuncBlock;
 
-    // Entry point
-    this->entryPointModule = std::make_unique<llvm::Module>("entry_point", *unit.ctx);
-    auto entryPointFuncType = llvm::FunctionType::get(this->builder->getVoidTy(), {}, false);
-    auto entryPointFunc = llvm::Function::Create(
-        entryPointFuncType, llvm::Function::ExternalLinkage, "_start", this->entryPointModule.get());
-    auto entryPointBlock = llvm::BasicBlock::Create(*unit.ctx, "entry", entryPointFunc);
-
-    auto end = groups.end();
-    for(auto it = groups.begin(); it != groups.end(); ++it)
+    size_t i = 0;
+    for(const AST::ChildrenWithSource& childrenWithSource : groups)
     {
-        const AST::ChildrenWithSource& childrenWithSource = *it;
-        bool isLast = (std::next(it) == end);
+        this->mod = std::make_unique<IRMod>(childrenWithSource.source);
 
-        if(isLast)
-        {
-            this->module = &this->entryPointModule;
-            (*this->module)->setSourceFileName(childrenWithSource.source);
-            (*this->module)->setModuleIdentifier(childrenWithSource.source);
-        }
-        else
-        {
-            this->defaultModule = std::make_unique<llvm::Module>(childrenWithSource.source, *unit.ctx);
-            this->module = &this->defaultModule;
-        }
+        IRBlock initFuncBlock;
 
         for(const AST::Ptr& ptr : childrenWithSource.children)
         {
-            this->builder->SetInsertPoint(entryPointBlock);
+            this->block = &initFuncBlock;
             this->stmt(ptr);
         }
 
-        if(isLast)
+        i++;
+        if(this->hasError) continue;
+
+        IRFunc initFunc(true, IRTypes{}, false, std::nullopt);
+
+        IRFunc initFuncDeclInStartMod(true, IRTypes{}, false, std::nullopt);
+
+        auto initFuncIdent = std::format("init{}", i);
+        if(startMod->addFunc(initFuncIdent, std::move(initFuncDeclInStartMod)) == nullptr)
         {
-            // Close entry point
-            this->builder->SetInsertPoint(entryPointBlock);
-            auto exitFuncType =
-                llvm::FunctionType::get(this->builder->getVoidTy(), {this->builder->getInt32Ty()}, false);
-            auto exitFunc = llvm::Function::Create(
-                exitFuncType, llvm::Function::ExternalLinkage, "exit", this->entryPointModule.get());
-            this->builder->CreateCall(exitFunc, {this->builder->getInt32(0)});
-            this->builder->CreateRetVoid();
+            this->hasError = true;
+            llvm::errs() << "Failed to create declaration function of " << initFuncIdent << " in start module.\n";
+            continue;
         }
 
-        if(this->verify(*this->module)) unit.vec.push_back(std::move(*this->module));
-        else if(!this->hasError)
+        auto initFuncBlockLabel = "entry";
+        if(initFunc.addBlock(initFuncBlockLabel, std::move(initFuncBlock)) == nullptr)
+        {
             this->hasError = true;
+            llvm::errs() << "Failed to create " << initFuncBlockLabel << " label for " << initFuncIdent
+                         << " function.\n";
+            continue;
+        }
+
+        if(this->mod->addFunc(initFuncIdent, std::move(initFunc)) == nullptr)
+        {
+            this->hasError = true;
+            llvm::errs() << "Failed to create declaration function of " << initFuncIdent << " in a module of "
+                         << childrenWithSource.source << ".\n";
+            continue;
+        }
+
+        startFuncBlock.addInstruct(std::make_unique<IRFuncCall>(std::move(initFuncIdent), IRVal::Vec{}));
+
+        vec.emplace_back(std::move(this->mod));
     }
+
+    IRFunc exitFunc(true, IRTypes{IRType::I32}, false, std::nullopt);
+
+    auto exitFuncIdent = "exit";
+    if(startMod->addFunc(exitFuncIdent, std::move(exitFunc)) == nullptr)
+    {
+        llvm::errs() << "Failed to create declaration function of " << exitFuncIdent << " in start module.\n";
+        return false;
+    }
+
+    IRVal::Vec extFuncArgs;
+    extFuncArgs.emplace_back(std::make_unique<IRI32>(0));
+    startFuncBlock.addInstruct(std::make_unique<IRFuncCall>(exitFuncIdent, std::move(extFuncArgs)));
+
+    IRFunc startFunc(true, IRTypes{}, false, std::nullopt);
+
+    auto startFuncIdent = "_start";
+    auto startFuncBlockLabel = "entry";
+
+    if(startFunc.addBlock(startFuncBlockLabel, std::move(startFuncBlock)) == nullptr)
+    {
+        llvm::errs() << "Failed to create " << startFuncBlockLabel << " label for " << startFuncIdent << " function.\n";
+        return false;
+    }
+
+    if(startMod->addFunc(startFuncIdent, std::move(startFunc)) == nullptr)
+    {
+        llvm::errs() << "Failed to create declaration function of " << startFuncIdent << " in start module.\n";
+        return false;
+    }
+
+    vec.emplace_back(std::move(startMod));
 
     return !this->hasError;
 }
 
-bool IR::verify(Ptr& ptr)
-{
-    // llvm return true if found error
-    return !llvm::verifyModule(*ptr, &llvm::errs());
-}
-
-void IR::optimize(Ptr& ptr)
-{
-    llvm::PassBuilder pb;
-
-    llvm::LoopAnalysisManager lam;
-    llvm::FunctionAnalysisManager fam;
-    llvm::CGSCCAnalysisManager cgsccam;
-    llvm::ModuleAnalysisManager mam;
-
-    pb.registerModuleAnalyses(mam);
-    pb.registerCGSCCAnalyses(cgsccam);
-    pb.registerFunctionAnalyses(fam);
-    pb.registerLoopAnalyses(lam);
-    pb.crossRegisterProxies(lam, fam, cgsccam, mam);
-
-    llvm::ModulePassManager mpm = pb.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O3);
-
-    mpm.run(*ptr, mam);
-}
-
-IR::Ptr IR::linking(Vec& vec)
-{
-    if(vec.empty()) return nullptr;
-
-    auto mainModule = std::move(vec[std::max(0, ((int)vec.size()) - 1)]);
-
-    llvm::Linker linker(*mainModule);
-
-    for(auto& module : vec)
-    {
-        if(module == nullptr) continue;
-
-        auto sourceFileName = module->getSourceFileName();
-        if(linker.linkInModule(std::move(module)))
-            llvm::errs() << "Failed to link module '" << sourceFileName << "' to '" << mainModule->getSourceFileName()
-                         << "'\n";
-    }
-
-    return mainModule;
-}
-
 void IR::stmt(const AST::Ptr& ptr)
 {
-    if(auto* funcCtx = dynamic_cast<ASTFunc*>(ptr.get())) return func(*funcCtx);
-    if(expr(ptr) != nullptr) return;
+    if(auto* funcCtx = dynamic_cast<ASTFunc*>(ptr.get())) return this->func(*funcCtx);
+    if(IRVal::Ptr exprCtx = expr(ptr); exprCtx != nullptr)
+        if(dynamic_cast<IRInstruct*>(exprCtx.get()))
+        {
+            this->block->addInstruct(IRInstruct::Ptr(static_cast<IRInstruct*>(exprCtx.release())));
+            return;
+        }
     this->hasError = true;
-    llvm::errs() << "[IR] Invalid statement\n";
+    llvm::errs() << "[IR] a Invalid statement\n";
 }
 
-llvm::Value* IR::expr(const AST::Ptr& ptr)
+IRVal::Ptr IR::expr(const AST::Ptr& ptr)
 {
-    if(auto* funcCallCtx = dynamic_cast<ASTFuncCall*>(ptr.get())) return funcCall(*funcCallCtx);
-    if(auto* literalCtx = dynamic_cast<ASTLiteral*>(ptr.get())) return literal(*literalCtx);
+    if(auto* funcCallCtx = dynamic_cast<ASTFuncCall*>(ptr.get())) return this->funcCall(*funcCallCtx);
+    if(auto* literalCtx = dynamic_cast<ASTLiteral*>(ptr.get())) return this->literal(*literalCtx);
     return nullptr;
 }
 
-llvm::Function* IR::funcDecl(const Token& ident, const SymbolFunc& ctx)
+IRFunc* IR::funcDecl(const std::string& ident, const SymbolFunc& ctx)
 {
-    // Return
-    llvm::Type* retLlvm = this->builder->getVoidTy();
-    const auto& ret = ctx.getRet();
-    if(ret.has_value())
-    {
-        if(ret.value() == DataType::I32) retLlvm = this->builder->getInt32Ty();
-        else if(ret.value() == DataType::STR)
-            retLlvm = this->builder->getPtrTy();
-    }
-
-    // Params
-    std::vector<llvm::Type*> paramsLlvm;
-    for(auto param : ctx.getParams()) switch(param)
-        {
-        case STR: paramsLlvm.emplace_back(this->builder->getPtrTy()); break;
-        case I32: paramsLlvm.emplace_back(this->builder->getInt32Ty()); break;
-        }
-
-    // Public
-    auto pubLlvm = llvm::Function::InternalLinkage;
-    if(ctx.getPub()) pubLlvm = llvm::Function::ExternalLinkage;
-
-    // Declare function
-    auto fType = llvm::FunctionType::get(retLlvm, paramsLlvm, ctx.getVrdic());
-    return llvm::Function::Create(fType, pubLlvm, ident.getText(), this->module->get());
+    return this->mod->addFunc(ident, IRFunc(ctx.getPub(), ctx.getParams(), ctx.getVrdic(), ctx.getRet()));
 }
 
 void IR::func(ASTFunc& ctx)
 {
-    const auto& ident = *ctx.ident;
+    const auto& ident = (std::string)(*ctx.ident).getText();
 
-    auto* funcDecl = this->module->get()->getFunction(ident.getText());
-    if(funcDecl == nullptr) funcDecl = this->funcDecl(ident, *ctx.symbol);
+    auto* func = this->mod->getFunc(ident);
+    if(func == nullptr) func = this->funcDecl(ident, *ctx.symbol);
 
     if(!ctx.stmts.has_value()) return;
 
     // Block
-    auto* entry = llvm::BasicBlock::Create(*this->ctx->get(), "entry", funcDecl);
-    this->builder->SetInsertPoint(entry);
+    auto blockLabel = "entry";
+    IRBlock* block = func->addBlock(blockLabel, IRBlock());
+    if(block == nullptr)
+    {
+        this->hasError = true;
+        llvm::errs() << "Failed to create " << blockLabel << " label for " << ident << " function.\n";
+        return;
+    }
 
     // Statements
     for(const auto& stmtCtx : ctx.stmts.value())
     {
-        this->builder->SetInsertPoint(entry);
+        this->block = block;
         stmt(stmtCtx);
     }
-
-    // Return void if ret is null
-    if(ctx.ret == nullptr) this->builder->CreateRetVoid();
 }
 
-llvm::Value* IR::funcCall(ASTFuncCall& ctx)
+IRVal::Ptr IR::funcCall(ASTFuncCall& ctx)
 {
-    std::string_view ident = ctx.ident->getText();
+    const auto& ident = (std::string)ctx.ident->getText();
 
-    Ptr* previousModule = nullptr;
-    if((*this->module) != this->entryPointModule)
-    {
-        previousModule = this->module;
-        this->module = &this->entryPointModule;
-    }
-
-    llvm::Function* func = this->module->get()->getFunction(ident);
+    IRFunc* func = this->mod->getFunc(ident);
 
     if(func == nullptr)
     {
@@ -216,37 +175,33 @@ llvm::Value* IR::funcCall(ASTFuncCall& ctx)
         {
             ctx.ident->source->printErrorMessage(ctx.ident->offset, ctx.ident->size, "[IR] Undefined function");
             this->hasError = true;
-            if(previousModule != nullptr) this->module = previousModule;
             return nullptr;
         }
 
-        if(this->funcDecl(*ctx.ident, *ctx.symbolCalled) == nullptr)
+        if(this->funcDecl(ident, *ctx.symbolCalled) == nullptr)
         {
             ctx.ident->source->printErrorMessage(ctx.ident->offset, ctx.ident->size, "[IR] Failed to declare function");
             this->hasError = true;
-            if(previousModule != nullptr) this->module = previousModule;
             return nullptr;
         }
 
-        func = this->module->get()->getFunction(ident);
+        func = this->mod->getFunc(ident);
     }
 
-    std::vector<llvm::Value*> args;
+    IRVal::Vec args;
     for(const auto& arg : ctx.args)
-        if(auto value = expr(arg)) args.push_back(value);
+        if(auto value = expr(arg)) args.push_back(std::move(value));
 
-    if(previousModule != nullptr) this->module = previousModule;
-
-    return this->builder->CreateCall(func, args);
+    return std::make_unique<IRFuncCall>(ident, std::move(args));
 }
 
-llvm::Value* IR::literal(ASTLiteral& ctx)
+IRVal::Ptr IR::literal(ASTLiteral& ctx)
 {
     auto value = ctx.value;
     if(value->type == TokenType::INTL)
     {
         std::string_view intl{value->source->getContent().data() + value->offset, value->size};
-        return this->builder->getInt32(std::stoi(std::string(intl)));
+        return std::make_unique<IRI32>(std::stoi(std::string(intl)));
     }
 
     if(value->type == TokenType::STRL)
@@ -284,24 +239,26 @@ llvm::Value* IR::literal(ASTLiteral& ctx)
                 result += strl[i];
             }
         }
-        return this->builder->CreateGlobalString(result);
+        return std::make_unique<IRStr>(std::move(result));
     }
 
     return nullptr;
 }
 
-void print(const IR::Ptr& ptr) { ptr->print(llvm::outs(), nullptr); }
-
-void print(const IR::Vec& vec)
+bool IR::generating(const IRMod::Vec& vec, IRllvm::Unit& unit)
 {
-    for(const auto& ptr : vec)
-    {
-        llvm::outs() << "\n```\n";
-        print(ptr);
-        llvm::outs() << "```\n";
-    }
-}
+    this->hasError = false;
 
-void print(const IR::Unit& unit) { print(unit.vec); }
+    unit.ctx = std::make_unique<llvm::LLVMContext>();
+
+    llvm::IRBuilder<> builder(*unit.ctx);
+
+    for(const IRMod::Ptr& ptr : vec)
+        if(IRllvm::Ptr llvmPtr = ptr->toLlvm(unit.ctx, builder)) unit.vec.emplace_back(std::move(llvmPtr));
+        else
+            this->hasError = true;
+
+    return !this->hasError;
+}
 
 } // namespace aerell

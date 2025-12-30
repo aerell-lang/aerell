@@ -19,7 +19,7 @@
 namespace aerell
 {
 
-bool CodeGen::obj(const char* name, const IR::Ptr& ptr)
+bool CodeGen::obj(const char* name, const IRllvm::Ptr& ptr)
 {
     auto targetTriple = llvm::Triple(llvm::sys::getDefaultTargetTriple());
     ptr->setTargetTriple(targetTriple);

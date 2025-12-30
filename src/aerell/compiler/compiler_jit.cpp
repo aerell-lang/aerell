@@ -11,7 +11,6 @@
 #include "llvm/ExecutionEngine/Orc/LLJIT.h"
 
 #include "aerell/compiler/compiler.h"
-#include "aerell/compiler/ir/ir.h"
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -20,7 +19,7 @@
 namespace aerell
 {
 
-bool Compiler::jit(IR::Unit& unit)
+bool Compiler::jit(IRllvm::Unit& unit)
 {
     if(unit.vec.empty()) return false;
 
@@ -40,7 +39,7 @@ bool Compiler::jit(IR::Unit& unit)
 
     llvm::orc::ThreadSafeContext ctx{std::move(unit.ctx)};
 
-    for(IR::Ptr& ptr : unit.vec)
+    for(IRllvm::Ptr& ptr : unit.vec)
         if(auto error = (*jit)->addIRModule(llvm::orc::ThreadSafeModule(std::move(ptr), ctx)))
         {
             llvm::errs() << error << "\n";

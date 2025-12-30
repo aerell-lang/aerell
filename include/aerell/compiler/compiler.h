@@ -31,11 +31,12 @@ class Compiler
     bool lexing(const char* filePath, Token::Vecs& vecs);
     bool parsing(const Token::Vecs& vecs, AST::Groups& groups);
     bool analysis(const AST::Groups& groups);
-    bool generating(const AST::Groups& groups, IR::Unit& unit);
-    bool linking(IR::Unit& unit);
-    bool jit(IR::Unit& unit);
-    void optimize(IR::Unit& unit);
-    bool compile(IR::Unit& unit, std::vector<std::string>& outputs);
+    bool generating(const AST::Groups& groups, IRMod::Vec& vec);
+    bool generating(const IRMod::Vec& vec, IRllvm::Unit& unit);
+    bool linking(IRllvm::Unit& unit);
+    bool jit(IRllvm::Unit& unit);
+    void optimize(IRllvm::Unit& unit);
+    bool compile(IRllvm::Unit& unit, std::vector<std::string>& outputs);
 
   private:
     SourceManager sourceManager;
@@ -46,11 +47,11 @@ class Compiler
     IR ir;
 
     bool lexing(Source* source, Token::Vecs& vecs);
-    std::optional<std::string> compile(IR::Ptr& ptr);
-    IR::Ptr linking(IR::Vec& vec);
-    void optimize(IR::Ptr& ptr);
-    void optimize(IR::Vec& vec);
-    bool compile(IR::Vec& vec, std::vector<std::string>& outputs);
+    std::optional<std::string> compile(IRllvm::Ptr& ptr);
+    IRllvm::Ptr linking(IRllvm::Vec& vec);
+    void optimize(IRllvm::Ptr& ptr);
+    void optimize(IRllvm::Vec& vec);
+    bool compile(IRllvm::Vec& vec, std::vector<std::string>& outputs);
 };
 
 } // namespace aerell
