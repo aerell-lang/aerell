@@ -1,4 +1,4 @@
 The Aerell Programming Language
 ISSUES & TODO LIST
 
-- Make custom IR before LLVM IR
+- Update README.md with new task in task.json
