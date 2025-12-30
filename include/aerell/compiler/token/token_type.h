@@ -19,8 +19,8 @@ enum class TokenType
     EOFF,
     ILLEGAL,
     // Keywords
-    F,  // f
-    PF, // pf
+    F, // function
+    P, // public
     // Data Types
     STR, // str
     I32, // i32
@@ -42,7 +42,7 @@ constexpr std::array<std::pair<TokenType, const char*>, 15> TokenTypeNames{{
     {TokenType::EOFF, "EOF"},
     {TokenType::ILLEGAL, "ILLEGAL"},
     {TokenType::F, "F"},
-    {TokenType::PF, "PF"},
+    {TokenType::P, "P"},
     {TokenType::STR, "STR"},
     {TokenType::I32, "I32"},
     {TokenType::LPAREN, "LPAREN"},

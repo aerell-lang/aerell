@@ -22,7 +22,7 @@ const std::pair<std::string, TokenType> Lexer::symbols[] = {{"(", TokenType::LPA
 
 const std::pair<std::string, TokenType> Lexer::keywords[] = {
     {"f", TokenType::F},
-    {"pf", TokenType::PF},
+    {"p", TokenType::P},
     {"str", TokenType::STR},
     {"i32", TokenType::I32},
 };

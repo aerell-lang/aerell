@@ -22,8 +22,8 @@ namespace aerell
 {
 
 Parser::Rules Parser::rules{
-    {Rule::STMT, {TokenType::F, TokenType::PF, TokenType::IDENT, TokenType::INTL, TokenType::STRL}},
-    {Rule::FUNC, {TokenType::F, TokenType::PF}},
+    {Rule::STMT, {TokenType::P, TokenType::F, TokenType::IDENT, TokenType::INTL, TokenType::STRL}},
+    {Rule::FUNC, {TokenType::P, TokenType::F}},
     {Rule::FUNC_PARAM, {TokenType::IDENT}},
     {Rule::DATA_TYPE, {TokenType::I32, TokenType::STR}},
     {Rule::BLOCK, {TokenType::LBRACE}},
@@ -119,10 +119,17 @@ std::unique_ptr<AST> Parser::stmt()
 
 std::unique_ptr<AST> Parser::func()
 {
-    // P / PF
+    // P / F
     if(!expect(Rule::FUNC)) return nullptr;
-    bool pub = is(TokenType::PF);
+    bool pub = is(TokenType::P);
     pos++;
+
+    // F if before is P
+    if(pub)
+    {
+        if(!expect(TokenType::F)) return nullptr;
+        pos++;
+    }
 
     // IDENT
     if(!expect(TokenType::IDENT)) return nullptr;

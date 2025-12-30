@@ -5,4 +5,4 @@
 # See the LICENSE file for details.
 
 # Print string to the console
-pf print(value str)
+p f print(v str)
