@@ -2,6 +2,7 @@
     "recommendations": [
         "usernamehw.errorlens",
         "llvm-vs-code-extensions.vscode-clangd",
-        "ms-vscode.cmake-tools"
+        "ms-vscode.cmake-tools",
+        "llvm-vs-code-extensions.lldb-dap"
     ]
 }
