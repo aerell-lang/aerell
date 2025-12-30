@@ -19,7 +19,29 @@
             "label": "CMake Install",
             "type": "shell",
             "command": "cmake --install build",
-            "group": "none"
+            "group": "none",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build & Install Debug",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "CMake Workflow Debug",
+                "CMake Install"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build & Install Release",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "CMake Workflow Release",
+                "CMake Install"
+            ],
+            "group": "build"
         }
     ]
 }
