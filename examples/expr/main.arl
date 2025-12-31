@@ -1,2 +1,4 @@
 20 # Integer literal
+20.05 # Float literal
+'A' # Char literal
 "Fern Aerell" # String literal
