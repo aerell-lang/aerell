@@ -35,6 +35,8 @@ class Lexer
     bool isSymbols();
     bool isKeywords();
     bool isInt();
+    bool isFlt();
+    bool isChr();
     bool isStr();
     bool isIdent();
 };

@@ -21,10 +21,8 @@ const std::pair<std::string, TokenType> Lexer::symbols[] = {{"(", TokenType::LPA
                                                             {",", TokenType::COMMA},  {"...", TokenType::VRDIC}};
 
 const std::pair<std::string, TokenType> Lexer::keywords[] = {
-    {"f", TokenType::F},
-    {"p", TokenType::P},
-    {"str", TokenType::STR},
-    {"i32", TokenType::I32},
+    {"f", TokenType::F},     {"p", TokenType::P},     {"i32", TokenType::I32},
+    {"f32", TokenType::F32}, {"chr", TokenType::CHR}, {"str", TokenType::STR},
 };
 
 Token::Vec Lexer::lexing(Source* source)
@@ -38,7 +36,9 @@ Token::Vec Lexer::lexing(Source* source)
         if(isComment()) continue;
         if(isSymbols()) continue;
         if(isKeywords()) continue;
+        if(isFlt()) continue;
         if(isInt()) continue;
+        if(isChr()) continue;
         if(isStr()) continue;
         if(isIdent()) continue;
         tokens.push_back({.type = TokenType::ILLEGAL, .source = source, .offset = pos, .size = 1});
@@ -121,6 +121,77 @@ bool Lexer::isInt()
     size_t size = pos - offset;
 
     tokens.push_back({.type = TokenType::INTL, .source = sourceRef, .offset = offset, .size = size});
+
+    return true;
+}
+
+bool Lexer::isFlt()
+{
+    // [0-9]
+    if(!std::iswdigit(sourceRef->getContent()[pos])) return false;
+
+    size_t offset = pos;
+    pos++;
+
+    // [0-9]*
+    while(pos < sourceRef->getContent().size() && std::iswdigit(sourceRef->getContent()[pos])) pos++;
+
+    // .
+    if(sourceRef->getContent()[pos] != '.')
+    {
+        pos = offset;
+        return false;
+    }
+    pos++;
+
+    // [0-9]
+    if(!std::iswdigit(sourceRef->getContent()[pos]))
+    {
+        pos = offset;
+        return false;
+    }
+    pos++;
+
+    // [0-9]*
+    while(pos < sourceRef->getContent().size() && std::iswdigit(sourceRef->getContent()[pos])) pos++;
+
+    // Calc size
+    size_t size = pos - offset;
+
+    // Create token
+    tokens.push_back({.type = TokenType::FLTL, .source = sourceRef, .offset = offset, .size = size});
+
+    return true;
+}
+
+bool Lexer::isChr()
+{
+    // '
+    if(sourceRef->getContent()[pos] != '\'') return false;
+    size_t offset = pos;
+    pos++;
+
+    // .
+    if(sourceRef->getContent()[pos] == '\'' || sourceRef->getContent()[pos] == '\n')
+    {
+        pos = offset;
+        return false;
+    }
+    pos++;
+
+    // '
+    if(sourceRef->getContent()[pos] != '\'')
+    {
+        pos = offset;
+        return false;
+    }
+    pos++;
+
+    // Calc size
+    size_t size = pos - offset;
+
+    // Create token
+    tokens.push_back({.type = TokenType::CHRL, .source = sourceRef, .offset = offset, .size = size});
 
     return true;
 }
