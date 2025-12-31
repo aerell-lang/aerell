@@ -2,3 +2,7 @@ The Aerell Programming Language
 ISSUES & TODO LIST
 
 - Update README.md with new task in task.json
+- Make parser can handle token f32, chr, fltl and chrl
+- Make semantic can handle ast literal type fltl as f32 and chrl as chr
+- Make aerell ir gen can handle ast literal fltl, chrl and type f32 and chr
+- Make aerell ir can handle llvm ir gen with literal fltl, chrl and type f32 and chr
