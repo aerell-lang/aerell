@@ -13,7 +13,7 @@ namespace aerell
 
 IRStr::IRStr(std::string&& value) : value(std::move(value)) {}
 
-void IRStr::print(llvm::raw_ostream& os) const { os << '"' << this->value << '"'; }
+void IRStr::print(OStream& os) const { os << '"' << this->value << '"'; }
 
 llvm::Value* IRStr::toLlvm(
     [[maybe_unused]] IRllvm::Ptr& ptr, [[maybe_unused]] IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const

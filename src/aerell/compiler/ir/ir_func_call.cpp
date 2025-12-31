@@ -11,7 +11,7 @@
 namespace aerell
 {
 
-void IRFuncCall::print(llvm::raw_ostream& os) const { os << " call " << this->ident << ' ' << this->args; }
+void IRFuncCall::print(OStream& os) const { os << " call " << this->ident << ' ' << this->args; }
 
 llvm::Value* IRFuncCall::toLlvm(IRllvm::Ptr& ptr, IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const
 {

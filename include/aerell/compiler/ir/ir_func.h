@@ -14,7 +14,6 @@
 #include <unordered_map>
 
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/Support/raw_ostream.h>
 
 #include "aerell/compiler/ir/ir_type.h"
 #include "aerell/compiler/ir/ir_block.h"
@@ -41,7 +40,7 @@ class IRFunc
         return &b.first->second;
     }
 
-    void print(llvm::raw_ostream& os) const;
+    void print(OStream& os) const;
 
     void toLlvm(std::string_view ident, IRllvm::Ptr& ptr, IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const;
 
@@ -54,7 +53,7 @@ class IRFunc
     std::unordered_map<std::string, IRBlock> blocks;
 };
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRFunc& obj)
+inline OStream& operator<<(OStream& os, const IRFunc& obj)
 {
     obj.print(os);
     return os;

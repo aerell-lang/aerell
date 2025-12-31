@@ -13,6 +13,7 @@
 #include "aerell/compiler/compiler.h"
 #include <aerell/compiler/ir/ir_mod.h>
 #include "aerell/compiler/symbol/symbol_print.h"
+#include <aerell/support/ostream.h>
 
 int main(int argc, char* argv[])
 {
@@ -71,7 +72,7 @@ int main(int argc, char* argv[])
         if(isLex)
         {
             aerell::print(vecs);
-            llvm::outs() << "\nLexing finished.";
+            aerell::outs() << "\nLexing finished.";
             return EXIT_SUCCESS;
         }
 
@@ -80,7 +81,7 @@ int main(int argc, char* argv[])
         if(!compiler.parsing(vecs, groups)) return EXIT_FAILURE;
         if(isParse)
         {
-            llvm::outs() << groups << "\nParsing completed.";
+            aerell::outs() << groups << "\nParsing completed.";
             return EXIT_SUCCESS;
         }
 
@@ -89,29 +90,29 @@ int main(int argc, char* argv[])
         if(isAnalyze)
         {
             aerell::print(compiler.getSymbolTable());
-            llvm::outs() << "\nAnalysis completed.";
+            aerell::outs() << "\nAnalysis completed.";
             return EXIT_SUCCESS;
         }
 
         // Aerell IR Gen
         aerell::IRMod::Vec vec;
         if(!compiler.generating(groups, vec)) return EXIT_FAILURE;
-        if(isGenerate) llvm::outs() << vec << "Aerell IR Generating completed.\n";
+        if(isGenerate) aerell::outs() << vec << "Aerell IR Generating completed.\n";
 
         // LLVM IR Gen
         aerell::IRllvm::Unit unit;
         if(!compiler.generating(vec, unit)) return EXIT_FAILURE;
-        if(isGenerate) llvm::outs() << unit << "\nLLVM IR Generating completed.\n";
+        if(isGenerate) aerell::outs() << unit << "\nLLVM IR Generating completed.\n";
 
         // LLVM IR Link
         if(!compiler.linking(unit)) return EXIT_FAILURE;
-        if(isGenerate) llvm::outs() << unit << "\nLLVM IR Linking completed.\n";
+        if(isGenerate) aerell::outs() << unit << "\nLLVM IR Linking completed.\n";
 
         // LLVM IR Optimize
         compiler.optimize(unit);
         if(isGenerate)
         {
-            llvm::outs() << unit << "\nLLVM IR Optimizing completed.";
+            aerell::outs() << unit << "\nLLVM IR Optimizing completed.";
             return EXIT_SUCCESS;
         }
 
@@ -127,18 +128,18 @@ int main(int argc, char* argv[])
         if(!compiler.compile(unit, outputs)) return EXIT_FAILURE;
         if(isCompile)
         {
-            llvm::outs() << "Compile completed.";
+            aerell::outs() << "Compile completed.";
             return EXIT_SUCCESS;
         }
 
         // Linker
         if(!linker.linking(outputs)) return EXIT_FAILURE;
-        llvm::outs() << "Build completed.";
+        aerell::outs() << "Build completed.";
 
         return EXIT_SUCCESS;
     }
 
-    llvm::outs() << "Invalid arguments or too few or too many.\n";
+    aerell::outs() << "Invalid arguments or too few or too many.\n";
     cli.printHelp();
 
     return EXIT_FAILURE;

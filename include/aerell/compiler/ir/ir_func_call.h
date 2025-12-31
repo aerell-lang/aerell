@@ -9,6 +9,7 @@
 #ifndef AERELL_COMPILER_IR_IR_FUNC_CALL_H
 #define AERELL_COMPILER_IR_IR_FUNC_CALL_H
 
+#include <aerell/support/ostream.h>
 #include <aerell/compiler/ir/ir_instruct.h>
 #include <aerell/compiler/ir/ir_val.h>
 
@@ -23,7 +24,7 @@ class IRFuncCall : public IRInstruct
     {
     }
 
-    void print(llvm::raw_ostream& os) const override;
+    void print(OStream& os) const override;
 
     llvm::Value* toLlvm(IRllvm::Ptr& ptr, IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const override;
 

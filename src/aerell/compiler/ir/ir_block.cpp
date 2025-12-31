@@ -13,7 +13,7 @@ namespace aerell
 
 void IRBlock::addInstruct(IRInstruct::Ptr ptr) { this->vec.emplace_back(std::move(ptr)); }
 
-void IRBlock::print(llvm::raw_ostream& os) const
+void IRBlock::print(OStream& os) const
 {
     for(const IRInstruct::Ptr& ptr : this->vec) os << ' ' << ptr << '\n';
 }

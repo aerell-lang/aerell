@@ -28,7 +28,7 @@ bool CodeGen::obj(const char* name, const IRllvm::Ptr& ptr)
     auto target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
     if(target == nullptr)
     {
-        llvm::errs() << error << "\n";
+        errs() << error << "\n";
         return false;
     }
 
@@ -44,14 +44,14 @@ bool CodeGen::obj(const char* name, const IRllvm::Ptr& ptr)
 
     if(errorCode)
     {
-        llvm::errs() << "Could not open file: " << errorCode.message() << "\n";
+        errs() << "Could not open file: " << errorCode.message() << "\n";
         return false;
     }
 
     llvm::legacy::PassManager pass;
     if(targetMachine->addPassesToEmitFile(pass, dest, nullptr, llvm::CodeGenFileType::ObjectFile))
     {
-        llvm::errs() << "TargetMachine can't emit a file of this type\n";
+        errs() << "TargetMachine can't emit a file of this type\n";
         return false;
     }
 

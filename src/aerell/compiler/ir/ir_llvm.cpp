@@ -15,7 +15,7 @@
 namespace aerell
 {
 
-bool IRllvm::verify(Ptr& ptr) { return !llvm::verifyModule(*ptr, &llvm::errs()); }
+bool IRllvm::verify(Ptr& ptr) { return !llvm::verifyModule(*ptr, &errs()); }
 
 void IRllvm::optimize(Ptr& ptr)
 {
@@ -54,8 +54,8 @@ IRllvm::Ptr IRllvm::linking(Vec& vec)
         auto sourceFileName = module->getSourceFileName();
         if(linker.linkInModule(std::move(module)))
         {
-            llvm::errs() << "Failed to link module '" << sourceFileName << "' to '" << mainModule->getSourceFileName()
-                         << "'\n";
+            errs() << "Failed to link module '" << sourceFileName << "' to '" << mainModule->getSourceFileName()
+                   << "'\n";
             hasError = true;
         }
     }

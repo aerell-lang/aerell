@@ -11,7 +11,7 @@
 namespace aerell
 {
 
-void ASTFuncCall::print(llvm::raw_ostream& os, size_t indent) const
+void ASTFuncCall::print(OStream& os, size_t indent) const
 {
     os << std::string(indent, ' ') << "FuncCall\n";
     os << std::string(indent, ' ') << " name: " << this->ident->getText() << "\n";

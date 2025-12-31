@@ -6,33 +6,33 @@
  * See the LICENSE file for details.
  */
 
-#include <llvm/Support/raw_ostream.h>
+#include <aerell/support/ostream.h>
 
 #include "aerell/cli/cli.h"
 
 namespace aerell
 {
 
-void CLI::printVersion() { llvm::outs() << "Aerell version: 0.0.0"; }
+void CLI::printVersion() { outs() << "Aerell version: 0.0.0"; }
 
 void CLI::printHelp()
 {
-    llvm::outs() << "A command-line utility for Aerell development.\n";
-    llvm::outs() << "\n";
-    llvm::outs() << "Usage: aerell <command>\n";
-    llvm::outs() << "\n";
-    llvm::outs() << "Available commands:\n";
-    llvm::outs() << " help                Print this usage information.\n";
-    llvm::outs() << " version             Print the Aerell compiler version.\n";
-    llvm::outs() << " run <file>          Execute the source file using JIT compilation.\n";
-    llvm::outs() << " build <file>        Build the source file into a standalone executable.\n";
-    llvm::outs() << "\n";
-    llvm::outs() << "Available internal commands:\n";
-    llvm::outs() << " lex <file>          Tokenize the source file and print the lexer output.\n";
-    llvm::outs() << " parse <file>        Parse the source file and print the AST structure.\n";
-    llvm::outs() << " analyze <file>      Perform semantic analysis on the source file.\n";
-    llvm::outs() << " generate <file>     Generate LLVM IR from source and print the IR output.\n";
-    llvm::outs() << " compile <file>      Compile the source file into an object file.\n";
+    outs() << "A command-line utility for Aerell development.\n";
+    outs() << "\n";
+    outs() << "Usage: aerell <command>\n";
+    outs() << "\n";
+    outs() << "Available commands:\n";
+    outs() << " help                Print this usage information.\n";
+    outs() << " version             Print the Aerell compiler version.\n";
+    outs() << " run <file>          Execute the source file using JIT compilation.\n";
+    outs() << " build <file>        Build the source file into a standalone executable.\n";
+    outs() << "\n";
+    outs() << "Available internal commands:\n";
+    outs() << " lex <file>          Tokenize the source file and print the lexer output.\n";
+    outs() << " parse <file>        Parse the source file and print the AST structure.\n";
+    outs() << " analyze <file>      Perform semantic analysis on the source file.\n";
+    outs() << " generate <file>     Generate LLVM IR from source and print the IR output.\n";
+    outs() << " compile <file>      Compile the source file into an object file.\n";
 }
 
 } // namespace aerell

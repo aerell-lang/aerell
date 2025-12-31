@@ -22,7 +22,7 @@ IRFunc* IRMod::getFunc(const std::string& ident)
     return nullptr;
 }
 
-void IRMod::print(llvm::raw_ostream& os) const
+void IRMod::print(OStream& os) const
 {
     os << "module_name: " << this->name << '\n';
     for(const auto& ident : this->funcIdents) os << ident << ":\n" << this->funcs.at(ident) << '\n';

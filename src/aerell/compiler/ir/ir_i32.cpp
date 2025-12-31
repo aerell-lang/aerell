@@ -13,7 +13,7 @@ namespace aerell
 
 IRI32::IRI32(const int& value) : value(value) {}
 
-void IRI32::print(llvm::raw_ostream& os) const { os << this->value; }
+void IRI32::print(OStream& os) const { os << this->value; }
 
 llvm::Value* IRI32::toLlvm(
     [[maybe_unused]] IRllvm::Ptr& ptr, [[maybe_unused]] IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const

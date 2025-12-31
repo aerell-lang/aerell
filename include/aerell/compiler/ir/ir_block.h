@@ -11,8 +11,8 @@
 
 #include <llvm/IR/Function.h>
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/Support/raw_ostream.h>
 
+#include <aerell/support/ostream.h>
 #include "aerell/compiler/ir/ir_instruct.h"
 #include <aerell/compiler/ir/ir_llvm.h>
 
@@ -24,7 +24,7 @@ class IRBlock
   public:
     void addInstruct(IRInstruct::Ptr ptr);
 
-    void print(llvm::raw_ostream& os) const;
+    void print(OStream& os) const;
 
     void toLlvm(
         llvm::Function* func, std::string_view label, IRllvm::Ptr& ptr, IRllvm::Ctx& ctx,
@@ -34,7 +34,7 @@ class IRBlock
     IRInstruct::Vec vec;
 };
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRBlock& obj)
+inline OStream& operator<<(OStream& os, const IRBlock& obj)
 {
     obj.print(os);
     return os;

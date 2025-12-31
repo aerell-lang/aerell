@@ -10,8 +10,9 @@
 #include <format>
 #include <sstream>
 
-#include "aerell/linker/linker.h"
+#include <aerell/support/ostream.h>
 #include <aerell/support/utils.h>
+#include "aerell/linker/linker.h"
 
 #include "lld/Common/Driver.h"
 
@@ -136,7 +137,7 @@ bool Linker::linking(const std::vector<std::string>& filePaths)
     args.push_back("-o");
     args.push_back(exeName.c_str());
 
-    lld::Result result = lld::lldMain(args, llvm::outs(), llvm::errs(), LLD_MINGW_DRIVER);
+    lld::Result result = lld::lldMain(args, outs(), errs(), LLD_MINGW_DRIVER);
 
     for(const auto& objName : objNames) std::filesystem::remove(objName);
 

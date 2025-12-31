@@ -11,7 +11,7 @@
 namespace aerell
 {
 
-void IRFunc::print(llvm::raw_ostream& os) const
+void IRFunc::print(OStream& os) const
 {
     os << " pub " << this->pub << '\n';
     os << " params " << this->params << '\n';

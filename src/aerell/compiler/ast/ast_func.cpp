@@ -11,7 +11,7 @@
 namespace aerell
 {
 
-void ASTFunc::print(llvm::raw_ostream& os, size_t indent) const
+void ASTFunc::print(OStream& os, size_t indent) const
 {
     os << std::string(indent, ' ') << "Func\n";
     os << std::string(indent, ' ') << " ident: " << this->ident->getText() << "\n";

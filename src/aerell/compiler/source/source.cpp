@@ -6,6 +6,7 @@
  * See the LICENSE file for details.
  */
 
+#include <algorithm>
 #include <format>
 #include <fstream>
 
@@ -16,7 +17,7 @@ namespace aerell
 
 Source::Source(std::filesystem::path&& path) : path(std::move(path)), pathStr(this->path.generic_string()) {}
 
-bool Source::read(llvm::raw_ostream& errs)
+bool Source::read(OStream& errs)
 {
     if(!this->content.empty()) this->content.clear();
     if(!this->lineStarts.empty()) this->lineStarts.clear();
@@ -64,11 +65,11 @@ void Source::printErrorMessage(size_t offset, size_t size, const char* msg)
     if(!view.empty() && view.back() == '\n') view.remove_suffix(1);
 
     // Print Message
-    llvm::errs() << std::string(path.size(), '-') << '\n';
-    llvm::errs() << path << "\n\n";
-    llvm::errs() << prefix << view << "\n";
-    llvm::errs() << std::string(prefix.size() + (column - 1), ' ') << std::string(size, '^') << '\n';
-    llvm::errs() << ' ' << msg << '\n';
+    errs() << std::string(path.size(), '-') << '\n';
+    errs() << path << "\n\n";
+    errs() << prefix << view << "\n";
+    errs() << std::string(prefix.size() + (column - 1), ' ') << std::string(size, '^') << '\n';
+    errs() << ' ' << msg << '\n';
 }
 
 } // namespace aerell

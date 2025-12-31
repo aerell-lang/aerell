@@ -9,10 +9,10 @@
 #ifndef AERELL_COMPILER_TOKEN_TOKEN_H
 #define AERELL_COMPILER_TOKEN_TOKEN_H
 
-#include <aerell/compiler/source/source.h>
 #include <string_view>
 #include <vector>
 
+#include <aerell/compiler/source/source.h>
 #include "aerell/compiler/token/token_type.h"
 
 namespace aerell

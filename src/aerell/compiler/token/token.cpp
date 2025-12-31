@@ -6,9 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#include <llvm/Support/raw_ostream.h>
-
 #include "aerell/compiler/token/token.h"
+#include <aerell/support/ostream.h>
 
 namespace aerell
 {
@@ -33,7 +32,7 @@ void print(const Token::Vec& vec)
         if(path != sourcePath)
         {
             path = sourcePath;
-            llvm::outs() << '\n' << path << ":\n";
+            outs() << '\n' << path << ":\n";
         }
 
         const char* t = to_string(token.type);
@@ -41,10 +40,10 @@ void print(const Token::Vec& vec)
 
         if(width < maxWidth)
         {
-            llvm::outs() << std::string(maxWidth - width, ' ');
+            outs() << std::string(maxWidth - width, ' ');
         }
 
-        llvm::outs() << t << " " << token.getText() << '\n';
+        outs() << t << " " << token.getText() << '\n';
     }
 }
 

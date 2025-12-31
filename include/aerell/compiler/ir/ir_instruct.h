@@ -12,8 +12,7 @@
 #include <memory>
 #include <vector>
 
-#include <llvm/Support/raw_ostream.h>
-
+#include <aerell/support/ostream.h>
 #include <aerell/compiler/ir/ir_val.h>
 
 namespace aerell
@@ -27,22 +26,22 @@ class IRInstruct : public IRVal
 
     virtual ~IRInstruct() {}
 
-    virtual void print(llvm::raw_ostream& os) const = 0;
+    virtual void print(OStream& os) const = 0;
 };
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRInstruct& obj)
+inline OStream& operator<<(OStream& os, const IRInstruct& obj)
 {
     obj.print(os);
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRInstruct::Ptr& obj)
+inline OStream& operator<<(OStream& os, const IRInstruct::Ptr& obj)
 {
     os << (*obj);
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRInstruct::Vec& obj)
+inline OStream& operator<<(OStream& os, const IRInstruct::Vec& obj)
 {
     for(const auto& ptr : obj) os << ptr;
     return os;

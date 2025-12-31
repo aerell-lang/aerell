@@ -11,6 +11,7 @@
 
 #include <aerell/compiler/ast/ast.h>
 #include <aerell/compiler/token/token.h>
+#include <aerell/support/ostream.h>
 
 namespace aerell
 {
@@ -22,7 +23,7 @@ class ASTLiteral : public AST
 
     const Token* value = nullptr;
 
-    void print(llvm::raw_ostream& os, size_t indent = 0) const override;
+    void print(OStream& os, size_t indent = 0) const override;
 };
 
 } // namespace aerell

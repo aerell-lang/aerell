@@ -10,10 +10,10 @@
 #define AERELL_COMPILER_SOURCE_SOURCE_MANAGER_H
 
 #include <memory>
-
-#include <llvm/Support/raw_ostream.h>
+#include <optional>
 
 #include <aerell/support/utils.h>
+#include <aerell/support/ostream.h>
 #include <aerell/compiler/source/source.h>
 
 namespace aerell
@@ -22,7 +22,7 @@ namespace aerell
 class SourceManager
 {
   public:
-    int import(const char* value, llvm::raw_ostream& errs, bool makeAsPrefix = false);
+    int import(const char* value, OStream& errs, bool makeAsPrefix = false);
     Source* getLastSource();
     bool hasSource();
 

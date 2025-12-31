@@ -21,7 +21,7 @@ class IRStr : public IRVal
   public:
     IRStr(std::string&& value);
 
-    void print(llvm::raw_ostream& os) const override;
+    void print(OStream& os) const override;
 
     llvm::Value* toLlvm(IRllvm::Ptr& ptr, IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const override;
 

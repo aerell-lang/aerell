@@ -12,6 +12,7 @@
 #include <aerell/compiler/ast/ast.h>
 #include <aerell/compiler/ast/ast_func_param.h>
 #include <aerell/compiler/symbol/symbol_func.h>
+#include <aerell/support/ostream.h>
 
 namespace aerell
 {
@@ -26,7 +27,7 @@ class ASTFunc : public AST
     std::optional<Children> stmts = std::nullopt;
     SymbolFunc* symbol = nullptr;
 
-    void print(llvm::raw_ostream& os, size_t indent = 0) const override;
+    void print(OStream& os, size_t indent = 0) const override;
 };
 
 } // namespace aerell

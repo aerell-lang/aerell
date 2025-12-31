@@ -8,8 +8,6 @@
 
 #include <memory>
 
-#include <llvm/Support/raw_ostream.h>
-
 #include <aerell/support/utils.h>
 #include <aerell/compiler/compiler.h>
 #include <aerell/compiler/semantic/semantic.h>
@@ -35,7 +33,7 @@ bool Compiler::lexing(Source* source, Token::Vecs& vecs)
         lastImportIndex++;
 
         std::string errorMessage;
-        llvm::raw_string_ostream os(errorMessage);
+        OSStream os(errorMessage);
         int status = sourceManager.import(std::string(token.getText().substr(1, token.size - 2)).c_str(), os);
         if(status == 0)
         {
@@ -76,10 +74,10 @@ bool Compiler::lexing(const char* filePath, Token::Vecs& vecs)
     for(const auto& autoImportSource : autoImportSources)
     {
         // Import file
-        int status = this->sourceManager.import(autoImportSource.first, llvm::errs(), autoImportSource.second);
+        int status = this->sourceManager.import(autoImportSource.first, errs(), autoImportSource.second);
         if(status == 0)
         {
-            llvm::errs() << '\n';
+            errs() << '\n';
             if(!hasError) hasError = true;
             continue;
         }

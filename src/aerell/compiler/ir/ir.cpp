@@ -51,7 +51,7 @@ bool IR::generating(const AST::Groups& groups, IRMod::Vec& vec)
         if(startMod->addFunc(initFuncIdent, std::move(initFuncDeclInStartMod)) == nullptr)
         {
             this->hasError = true;
-            llvm::errs() << "Failed to create declaration function of " << initFuncIdent << " in start module.\n";
+            errs() << "Failed to create declaration function of " << initFuncIdent << " in start module.\n";
             continue;
         }
 
@@ -59,16 +59,15 @@ bool IR::generating(const AST::Groups& groups, IRMod::Vec& vec)
         if(initFunc.addBlock(initFuncBlockLabel, std::move(initFuncBlock)) == nullptr)
         {
             this->hasError = true;
-            llvm::errs() << "Failed to create " << initFuncBlockLabel << " label for " << initFuncIdent
-                         << " function.\n";
+            errs() << "Failed to create " << initFuncBlockLabel << " label for " << initFuncIdent << " function.\n";
             continue;
         }
 
         if(this->mod->addFunc(initFuncIdent, std::move(initFunc)) == nullptr)
         {
             this->hasError = true;
-            llvm::errs() << "Failed to create declaration function of " << initFuncIdent << " in a module of "
-                         << childrenWithSource.source << ".\n";
+            errs() << "Failed to create declaration function of " << initFuncIdent << " in a module of "
+                   << childrenWithSource.source << ".\n";
             continue;
         }
 
@@ -82,7 +81,7 @@ bool IR::generating(const AST::Groups& groups, IRMod::Vec& vec)
     auto exitFuncIdent = "exit";
     if(startMod->addFunc(exitFuncIdent, std::move(exitFunc)) == nullptr)
     {
-        llvm::errs() << "Failed to create declaration function of " << exitFuncIdent << " in start module.\n";
+        errs() << "Failed to create declaration function of " << exitFuncIdent << " in start module.\n";
         return false;
     }
 
@@ -97,13 +96,13 @@ bool IR::generating(const AST::Groups& groups, IRMod::Vec& vec)
 
     if(startFunc.addBlock(startFuncBlockLabel, std::move(startFuncBlock)) == nullptr)
     {
-        llvm::errs() << "Failed to create " << startFuncBlockLabel << " label for " << startFuncIdent << " function.\n";
+        errs() << "Failed to create " << startFuncBlockLabel << " label for " << startFuncIdent << " function.\n";
         return false;
     }
 
     if(startMod->addFunc(startFuncIdent, std::move(startFunc)) == nullptr)
     {
-        llvm::errs() << "Failed to create declaration function of " << startFuncIdent << " in start module.\n";
+        errs() << "Failed to create declaration function of " << startFuncIdent << " in start module.\n";
         return false;
     }
 
@@ -122,7 +121,7 @@ void IR::stmt(const AST::Ptr& ptr)
             return;
         }
     this->hasError = true;
-    llvm::errs() << "[IR] a Invalid statement\n";
+    errs() << "[IR] a Invalid statement\n";
 }
 
 IRVal::Ptr IR::expr(const AST::Ptr& ptr)
@@ -160,7 +159,7 @@ void IR::func(ASTFunc& ctx)
         if(funcTemp->addBlock(blockLabel, std::move(block)) == nullptr)
         {
             this->hasError = true;
-            llvm::errs() << "Failed to create " << blockLabel << " label for " << ident << " function.\n";
+            errs() << "Failed to create " << blockLabel << " label for " << ident << " function.\n";
             return;
         }
     }

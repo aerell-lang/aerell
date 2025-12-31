@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 
-#include <llvm/Support/raw_ostream.h>
+#include <aerell/support/ostream.h>
 
 namespace aerell
 {
@@ -33,34 +33,34 @@ class AST
 
     virtual ~AST() {};
 
-    virtual void print(llvm::raw_ostream& os, size_t indent = 0) const = 0;
+    virtual void print(OStream& os, size_t indent = 0) const = 0;
 };
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST& obj)
+inline OStream& operator<<(OStream& os, const AST& obj)
 {
     obj.print(os);
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST::Ptr& obj)
+inline OStream& operator<<(OStream& os, const AST::Ptr& obj)
 {
     os << (*obj);
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST::Children& children)
+inline OStream& operator<<(OStream& os, const AST::Children& children)
 {
     for(const auto& child : children) os << child;
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST::ChildrenWithSource& childrenWithSource)
+inline OStream& operator<<(OStream& os, const AST::ChildrenWithSource& childrenWithSource)
 {
     os << '\n' << childrenWithSource.source << ":\n" << childrenWithSource.children;
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const AST::Groups& groups)
+inline OStream& operator<<(OStream& os, const AST::Groups& groups)
 {
     for(const auto& group : groups) os << group;
     return os;

@@ -9,8 +9,9 @@
 #ifndef AERELL_COMPILER_IR_IR_LLVM_H
 #define AERELL_COMPILER_IR_IR_LLVM_H
 
-#include <llvm/Support/raw_ostream.h>
 #include <llvm/IR/Module.h>
+
+#include <aerell/support/ostream.h>
 
 namespace aerell
 {
@@ -36,19 +37,19 @@ class IRllvm
     IRllvm() {}
 };
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRllvm::Ptr& obj)
+inline OStream& operator<<(OStream& os, const IRllvm::Ptr& obj)
 {
-    obj->print(os, nullptr);
+    obj->print(outs(), nullptr);
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRllvm::Vec& obj)
+inline OStream& operator<<(OStream& os, const IRllvm::Vec& obj)
 {
     for(const auto& ptr : obj) os << "\n```\n" << ptr << "\n```\n";
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRllvm::Unit& obj)
+inline OStream& operator<<(OStream& os, const IRllvm::Unit& obj)
 {
     os << obj.vec;
     return os;

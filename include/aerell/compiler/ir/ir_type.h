@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include <llvm/Support/raw_ostream.h>
+#include <aerell/support/ostream.h>
 
 namespace aerell
 {
@@ -38,13 +38,13 @@ constexpr const char* to_string(IRType t)
     return "UNKNOWN";
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRType& obj)
+inline OStream& operator<<(OStream& os, const IRType& obj)
 {
     os << to_string(obj);
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRTypes& obj)
+inline OStream& operator<<(OStream& os, const IRTypes& obj)
 {
     os << "[ ";
     bool init = true;

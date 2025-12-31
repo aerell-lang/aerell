@@ -15,7 +15,7 @@
 namespace aerell
 {
 
-int SourceManager::import(const char* value, llvm::raw_ostream& errs, bool makeAsPrefix)
+int SourceManager::import(const char* value, OStream& errs, bool makeAsPrefix)
 {
     auto path = this->find(value);
     if(!path.has_value())

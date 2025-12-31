@@ -10,8 +10,9 @@
 #define AERELL_COMPILER_SOURCE_SOURCE_H
 
 #include <filesystem>
+#include <vector>
 
-#include <llvm/Support/raw_ostream.h>
+#include <aerell/support/ostream.h>
 
 namespace aerell
 {
@@ -21,7 +22,7 @@ class Source
   public:
     Source(std::filesystem::path&& path);
 
-    bool read(llvm::raw_ostream& errs);
+    bool read(OStream& errs);
 
     const std::string& getContent() const;
     const char* getContentData() const;

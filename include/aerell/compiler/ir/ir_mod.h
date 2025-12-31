@@ -12,7 +12,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <llvm/Support/raw_ostream.h>
 #include <llvm/IR/IRBuilder.h>
 
 #include "aerell/compiler/ir/ir_func.h"
@@ -41,7 +40,7 @@ class IRMod
 
     IRFunc* getFunc(const std::string& ident);
 
-    void print(llvm::raw_ostream& os) const;
+    void print(OStream& os) const;
 
     IRllvm::Ptr toLlvm(IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const;
 
@@ -51,19 +50,19 @@ class IRMod
     std::unordered_map<std::string, IRFunc> funcs;
 };
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRMod& obj)
+inline OStream& operator<<(OStream& os, const IRMod& obj)
 {
     obj.print(os);
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRMod::Ptr& obj)
+inline OStream& operator<<(OStream& os, const IRMod::Ptr& obj)
 {
     os << (*obj);
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRMod::Vec& obj)
+inline OStream& operator<<(OStream& os, const IRMod::Vec& obj)
 {
 
     for(const IRMod::Ptr& ptr : obj) os << ptr;

@@ -7,9 +7,9 @@
  */
 
 #include <llvm/IR/LLVMContext.h>
-#include <llvm/Support/raw_ostream.h>
 #include "llvm/ExecutionEngine/Orc/LLJIT.h"
 
+#include <aerell/support/ostream.h>
 #include "aerell/compiler/compiler.h"
 
 #if defined(_WIN32)
@@ -27,7 +27,7 @@ bool Compiler::jit(IRllvm::Unit& unit)
     auto jit = llvm::orc::LLJITBuilder().create();
     if(!jit)
     {
-        llvm::errs() << jit.takeError() << "\n";
+        errs() << jit.takeError() << "\n";
         return false;
     }
 
@@ -42,14 +42,14 @@ bool Compiler::jit(IRllvm::Unit& unit)
     for(IRllvm::Ptr& ptr : unit.vec)
         if(auto error = (*jit)->addIRModule(llvm::orc::ThreadSafeModule(std::move(ptr), ctx)))
         {
-            llvm::errs() << error << "\n";
+            errs() << error << "\n";
             return false;
         }
 
     auto entrySym = (*jit)->lookup("_start");
     if(!entrySym)
     {
-        llvm::errs() << entrySym.takeError() << "\n";
+        errs() << entrySym.takeError() << "\n";
         return false;
     }
 

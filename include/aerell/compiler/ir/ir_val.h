@@ -12,7 +12,6 @@
 #include <memory>
 #include <vector>
 
-#include <llvm/Support/raw_ostream.h>
 #include <llvm/IR/IRBuilder.h>
 
 #include <aerell/compiler/ir/ir_llvm.h>
@@ -28,24 +27,24 @@ class IRVal
 
     virtual ~IRVal() {}
 
-    virtual void print(llvm::raw_ostream& os) const = 0;
+    virtual void print(OStream& os) const = 0;
 
     virtual llvm::Value* toLlvm(IRllvm::Ptr& ptr, IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const = 0;
 };
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRVal& obj)
+inline OStream& operator<<(OStream& os, const IRVal& obj)
 {
     obj.print(os);
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRVal::Ptr& obj)
+inline OStream& operator<<(OStream& os, const IRVal::Ptr& obj)
 {
     os << (*obj);
     return os;
 }
 
-inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os, const IRVal::Vec& obj)
+inline OStream& operator<<(OStream& os, const IRVal::Vec& obj)
 {
     os << "[ ";
     bool init = true;
