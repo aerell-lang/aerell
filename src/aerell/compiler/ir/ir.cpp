@@ -115,11 +115,11 @@ void IR::stmt(const AST::Ptr& ptr)
 {
     if(auto* funcCtx = dynamic_cast<ASTFunc*>(ptr.get())) return this->func(*funcCtx);
     if(IRVal::Ptr exprCtx = expr(ptr); exprCtx != nullptr)
+    {
         if(dynamic_cast<IRInstruct*>(exprCtx.get()))
-        {
             this->block->addInstruct(IRInstruct::Ptr(static_cast<IRInstruct*>(exprCtx.release())));
-            return;
-        }
+        return;
+    }
     this->hasError = true;
     errs() << "[IR] a Invalid statement\n";
 }
