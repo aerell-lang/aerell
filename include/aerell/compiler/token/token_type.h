@@ -22,8 +22,10 @@ enum class TokenType
     F, // function
     P, // public
     // Data Types
-    STR, // str
     I32, // i32
+    F32, // f32
+    CHR, // chr
+    STR, // str
     // Symbols
     LPAREN, // (
     RPAREN, // )
@@ -32,27 +34,21 @@ enum class TokenType
     COMMA,  // ,
     VRDIC,  // ...
     // Literals
-    STRL, // " .* exclude("\n) "
+    FLTL, // [0-9]+.[0-9]+
     INTL, // [0-9]+
+    CHRL, // ' . '
+    STRL, // " .* exclude("\n) "
     // Identifier
     IDENT // [a-zA-Z_] [a-zA-Z0-9_]*
 };
 
-constexpr std::array<std::pair<TokenType, const char*>, 15> TokenTypeNames{{
-    {TokenType::EOFF, "EOF"},
-    {TokenType::ILLEGAL, "ILLEGAL"},
-    {TokenType::F, "F"},
-    {TokenType::P, "P"},
-    {TokenType::STR, "STR"},
-    {TokenType::I32, "I32"},
-    {TokenType::LPAREN, "LPAREN"},
-    {TokenType::RPAREN, "RPAREN"},
-    {TokenType::LBRACE, "LBRACE"},
-    {TokenType::RBRACE, "RBRACE"},
-    {TokenType::COMMA, "COMMA"},
-    {TokenType::VRDIC, "VRDIC"},
-    {TokenType::STRL, "STRL"},
-    {TokenType::INTL, "INTL"},
+constexpr std::array<std::pair<TokenType, const char*>, 19> TokenTypeNames{{
+    {TokenType::EOFF, "EOF"},      {TokenType::ILLEGAL, "ILLEGAL"}, {TokenType::F, "F"},
+    {TokenType::P, "P"},           {TokenType::I32, "I32"},         {TokenType::F32, "F32"},
+    {TokenType::CHR, "CHR"},       {TokenType::STR, "STR"},         {TokenType::LPAREN, "LPAREN"},
+    {TokenType::RPAREN, "RPAREN"}, {TokenType::LBRACE, "LBRACE"},   {TokenType::RBRACE, "RBRACE"},
+    {TokenType::COMMA, "COMMA"},   {TokenType::VRDIC, "VRDIC"},     {TokenType::FLTL, "FLTL"},
+    {TokenType::INTL, "INTL"},     {TokenType::CHRL, "CHRL"},       {TokenType::STRL, "STRL"},
     {TokenType::IDENT, "IDENT"},
 }};
 
