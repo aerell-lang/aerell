@@ -85,6 +85,8 @@ std::optional<IRType> Semantic::funcCall(ASTFuncCall& ctx)
 std::optional<IRType> Semantic::literal(ASTLiteral& ctx)
 {
     if(ctx.value->type == TokenType::INTL) return IRType::I32;
+    if(ctx.value->type == TokenType::FLTL) return IRType::F32;
+    if(ctx.value->type == TokenType::CHRL) return IRType::CHR;
     if(ctx.value->type == TokenType::STRL) return IRType::STR;
     else
         return std::nullopt;

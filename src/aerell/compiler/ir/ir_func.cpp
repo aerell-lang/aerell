@@ -32,6 +32,8 @@ void IRFunc::toLlvm(std::string_view ident, IRllvm::Ptr& ptr, IRllvm::Ctx& ctx, 
     {
         const auto& type = this->ret.value();
         if(type == IRType::I32) retLlvm = builder.getInt32Ty();
+        if(type == IRType::F32) retLlvm = builder.getFloatTy();
+        if(type == IRType::CHR) retLlvm = builder.getInt8Ty();
         else if(type == IRType::STR)
             retLlvm = builder.getPtrTy();
     }
@@ -40,8 +42,10 @@ void IRFunc::toLlvm(std::string_view ident, IRllvm::Ptr& ptr, IRllvm::Ctx& ctx, 
     std::vector<llvm::Type*> paramsLlvm;
     for(auto param : this->params) switch(param)
         {
-        case IRType::STR: paramsLlvm.emplace_back(builder.getPtrTy()); break;
         case IRType::I32: paramsLlvm.emplace_back(builder.getInt32Ty()); break;
+        case IRType::F32: paramsLlvm.emplace_back(builder.getFloatTy()); break;
+        case IRType::CHR: paramsLlvm.emplace_back(builder.getInt8Ty()); break;
+        case IRType::STR: paramsLlvm.emplace_back(builder.getPtrTy()); break;
         }
 
     // Declare function

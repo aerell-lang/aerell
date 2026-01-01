@@ -1,0 +1,9 @@
+f add_i32(a i32, b i32) {}
+f add_f32(a f32, b f32) {}
+f add_chr(a chr, b chr) {}
+f add_str(a str, b str) {}
+
+add_i32(11, 20)
+add_f32(11.20, 20.05)
+add_chr('F', 'A')
+add_str("Fern", "Aerell")

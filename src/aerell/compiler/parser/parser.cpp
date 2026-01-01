@@ -22,14 +22,16 @@ namespace aerell
 {
 
 Parser::Rules Parser::rules{
-    {Rule::STMT, {TokenType::P, TokenType::F, TokenType::IDENT, TokenType::INTL, TokenType::STRL}},
+    {Rule::STMT,
+     {TokenType::P, TokenType::F, TokenType::IDENT, TokenType::INTL, TokenType::FLTL, TokenType::CHRL,
+      TokenType::STRL}},
     {Rule::FUNC, {TokenType::P, TokenType::F}},
     {Rule::FUNC_PARAM, {TokenType::IDENT}},
-    {Rule::DATA_TYPE, {TokenType::I32, TokenType::STR}},
+    {Rule::DATA_TYPE, {TokenType::I32, TokenType::F32, TokenType::CHR, TokenType::STR}},
     {Rule::BLOCK, {TokenType::LBRACE}},
-    {Rule::EXPR, {TokenType::IDENT, TokenType::INTL, TokenType::STRL}},
+    {Rule::EXPR, {TokenType::IDENT, TokenType::INTL, TokenType::FLTL, TokenType::CHRL, TokenType::STRL}},
     {Rule::FUNC_CALL, {TokenType::IDENT}},
-    {Rule::LITERAL, {TokenType::INTL, TokenType::STRL}},
+    {Rule::LITERAL, {TokenType::INTL, TokenType::FLTL, TokenType::CHRL, TokenType::STRL}},
 };
 
 Parser::Parser(SymbolTable& symbolTable) : symbolTable(&symbolTable) {}
@@ -158,6 +160,10 @@ std::unique_ptr<AST> Parser::func()
         if(auto param = funcParam())
         {
             if(param.value().type->type == TokenType::I32) dataTypes.push_back(IRType::I32);
+            else if(param.value().type->type == TokenType::F32)
+                dataTypes.push_back(IRType::F32);
+            else if(param.value().type->type == TokenType::CHR)
+                dataTypes.push_back(IRType::CHR);
             else if(param.value().type->type == TokenType::STR)
                 dataTypes.push_back(IRType::STR);
 
@@ -175,6 +181,10 @@ std::unique_ptr<AST> Parser::func()
                 else if(auto param = funcParam())
                 {
                     if(param.value().type->type == TokenType::I32) dataTypes.push_back(IRType::I32);
+                    else if(param.value().type->type == TokenType::F32)
+                        dataTypes.push_back(IRType::F32);
+                    else if(param.value().type->type == TokenType::CHR)
+                        dataTypes.push_back(IRType::CHR);
                     else if(param.value().type->type == TokenType::STR)
                         dataTypes.push_back(IRType::STR);
 
@@ -197,6 +207,8 @@ std::unique_ptr<AST> Parser::func()
     if(ret != nullptr)
     {
         if(ret->type == TokenType::I32) symbolFunc->setRet(IRType::I32);
+        if(ret->type == TokenType::F32) symbolFunc->setRet(IRType::F32);
+        if(ret->type == TokenType::CHR) symbolFunc->setRet(IRType::CHR);
         if(ret->type == TokenType::STR) symbolFunc->setRet(IRType::STR);
     }
 
@@ -236,8 +248,14 @@ std::optional<ASTFuncParam> Parser::funcParam()
     if(type != nullptr)
     {
         if(type->type == TokenType::I32) symbolVar->setType(IRType::I32);
+        else if(type->type == TokenType::F32)
+            symbolVar->setType(IRType::F32);
+        else if(type->type == TokenType::CHR)
+            symbolVar->setType(IRType::CHR);
         else if(type->type == TokenType::STR)
             symbolVar->setType(IRType::STR);
+        else
+            return std::nullopt;
     }
 
     // Gen AST

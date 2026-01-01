@@ -6,25 +6,25 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_IR_IR_I32_H
-#define AERELL_COMPILER_IR_IR_I32_H
+#ifndef AERELL_COMPILER_IR_IR_CHR_H
+#define AERELL_COMPILER_IR_IR_CHR_H
 
 #include <aerell/compiler/ir/ir_val.h>
 
 namespace aerell
 {
 
-class IRI32 : public IRVal
+class IRChr : public IRVal
 {
   public:
-    IRI32(int value);
+    IRChr(char value);
 
     void print(OStream& os) const override;
 
     llvm::Value* toLlvm(IRllvm::Ptr& ptr, IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const override;
 
   private:
-    int value;
+    char value;
 };
 
 } // namespace aerell

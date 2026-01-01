@@ -20,15 +20,19 @@ namespace aerell
 
 enum class IRType
 {
-    STR,
-    I32
+    I32,
+    F32,
+    CHR,
+    STR
 };
 
 using IRTypes = std::vector<IRType>;
 
-constexpr std::array<std::pair<IRType, const char*>, 2> IrTypeNames{{
-    {IRType::STR, "STR"},
+constexpr std::array<std::pair<IRType, const char*>, 4> IrTypeNames{{
     {IRType::I32, "I32"},
+    {IRType::F32, "F32"},
+    {IRType::CHR, "CHR"},
+    {IRType::STR, "STR"},
 }};
 
 constexpr const char* to_string(IRType t)

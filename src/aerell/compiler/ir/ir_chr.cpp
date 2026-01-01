@@ -6,19 +6,19 @@
  * See the LICENSE file for details.
  */
 
-#include <aerell/compiler/ir/ir_i32.h>
+#include <aerell/compiler/ir/ir_chr.h>
 
 namespace aerell
 {
 
-IRI32::IRI32(int value) : value(value) {}
+IRChr::IRChr(char value) : value(value) {}
 
-void IRI32::print(OStream& os) const { os << this->value; }
+void IRChr::print(OStream& os) const { os << '"' << this->value << '"'; }
 
-llvm::Value* IRI32::toLlvm(
+llvm::Value* IRChr::toLlvm(
     [[maybe_unused]] IRllvm::Ptr& ptr, [[maybe_unused]] IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const
 {
-    return builder.getInt32(this->value);
+    return builder.getInt8(this->value);
 }
 
 } // namespace aerell

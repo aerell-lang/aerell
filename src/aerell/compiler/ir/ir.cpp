@@ -13,6 +13,8 @@
 #include "aerell/compiler/ir/ir_val.h"
 #include "aerell/compiler/ir/ir_instruct.h"
 #include "aerell/compiler/ir/ir_i32.h"
+#include <aerell/compiler/ir/ir_f32.h>
+#include <aerell/compiler/ir/ir_chr.h>
 #include "aerell/compiler/ir/ir_str.h"
 #include "aerell/compiler/ir/ir_func_call.h"
 
@@ -204,15 +206,51 @@ IRVal::Ptr IR::funcCall(ASTFuncCall& ctx)
 IRVal::Ptr IR::literal(ASTLiteral& ctx)
 {
     auto value = ctx.value;
-    if(value->type == TokenType::INTL)
+    if(value->type == TokenType::INTL) return std::make_unique<IRI32>(std::stoi(std::string(value->getText())));
+
+    if(value->type == TokenType::FLTL) return std::make_unique<IRF32>(std::stof(std::string(value->getText())));
+
+    if(value->type == TokenType::CHRL)
     {
-        std::string_view intl{value->source->getContent().data() + value->offset, value->size};
-        return std::make_unique<IRI32>(std::stoi(std::string(intl)));
+        std::string_view chrl{value->getText()};
+        chrl = chrl.substr(1, chrl.size() - 2);
+        std::string result;
+        for(size_t i = 0; i < chrl.size(); ++i)
+        {
+            if(chrl[i] == '\\' && i + 1 < chrl.size())
+            {
+                switch(chrl[i + 1])
+                {
+                case 'n':
+                    result += '\n';
+                    i++;
+                    break;
+                case 't':
+                    result += '\t';
+                    i++;
+                    break;
+                case '\\':
+                    result += '\\';
+                    i++;
+                    break;
+                case '"':
+                    result += '"';
+                    i++;
+                    break;
+                default: result += chrl[i]; break;
+                }
+            }
+            else
+            {
+                result += chrl[i];
+            }
+        }
+        return std::make_unique<IRChr>(result[0]);
     }
 
     if(value->type == TokenType::STRL)
     {
-        std::string_view strl{value->source->getContent().data() + value->offset, value->size};
+        std::string_view strl{value->getText()};
         strl = strl.substr(1, strl.size() - 2);
         std::string result;
         for(size_t i = 0; i < strl.size(); ++i)
