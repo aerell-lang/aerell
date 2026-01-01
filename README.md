@@ -41,11 +41,12 @@ You can run the entire configuration and build sequence using the CMake workflow
 
 The project includes a `.vscode/tasks.json` file, allowing you to run build steps directly from the editor:
 
-1.  Press `Ctrl+Shift+B` (or `Cmd+Shift+B` on macOS) to open the Build Task menu.
-2.  Select one of the following:
-    * **CMake Workflow Debug**: Configures and builds the project in Debug mode.
-    * **CMake Workflow Release**: Configures and builds the project in Release mode.
-3.  To install the artifacts, go to `Terminal` > `Run Task...` and select **CMake Install**.
+1.  **Quick Build**: Press `Ctrl+Shift+B` (or `Cmd+Shift+B` on macOS). 
+    * This runs the **Build & Install Debug** task by default.
+2.  **Specific Tasks**: Go to `Terminal` > `Run Task...` to select a specific workflow:
+    * **Build & Install Debug**: Full workflow (Configure, Build, and Install) in Debug mode.
+    * **Build & Install Release**: Full workflow (Configure, Build, and Install) in Release mode.
+    * **CMake Install**: Only runs the installation step for existing builds.
 
 ---
 
@@ -53,10 +54,12 @@ The project includes a `.vscode/tasks.json` file, allowing you to run build step
 
 The following tasks are configured for convenience:
 
-| Label | Command | Description |
+| Label | Command / Sequence | Description |
 | :--- | :--- | :--- |
-| **CMake Workflow Debug** | `cmake --workflow --preset workflow-debug` | Runs the full debug workflow. |
-| **CMake Workflow Release** | `cmake --workflow --preset workflow-release` | Runs the full release workflow. |
+| **Build & Install Debug** | Workflow + Install | **(Default)** Sequences debug build and installation. |
+| **Build & Install Release** | Workflow + Install | Sequences release build and installation. |
+| **CMake Workflow Debug** | `cmake --workflow --preset workflow-debug` | Runs the full debug workflow only. |
+| **CMake Workflow Release** | `cmake --workflow --preset workflow-release` | Runs the full release workflow only. |
 | **CMake Install** | `cmake --install build` | Installs the built files. |
 
 ## Usage

@@ -1,4 +1,2 @@
 The Aerell Programming Language
 ISSUES & TODO LIST
-
-- Update README.md with new task in task.json
