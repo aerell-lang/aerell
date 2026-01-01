@@ -13,7 +13,7 @@
 namespace aerell
 {
 
-OWStream::OWStream(WriteFunc writer) : writer(writer) {}
+OWStream::OWStream(WriteFunc writer) : writer(writer) { this->SetUnbuffered(); }
 
 void OWStream::write(std::string_view str) { this->write_impl(str.data(), str.size()); }
 
@@ -25,7 +25,7 @@ void OWStream::write_impl(const char* ptr, size_t size)
 
 uint64_t OWStream::current_pos() const { return this->totalBytes; }
 
-OSStream::OSStream(std::string& str) : str(str) {}
+OSStream::OSStream(std::string& str) : str(str) { this->SetUnbuffered(); }
 
 void OSStream::write(std::string_view str) { this->write_impl(str.data(), str.size()); }
 
