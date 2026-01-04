@@ -124,11 +124,9 @@ set("AERELL_PROJECT_NAME" "aerell")
 file(
     GLOB_RECURSE
     "AERELL_SRC_FILES"
-    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/compiler/*.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/linker/*.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/support/*.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/cli/*.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/app/*.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/app/main.cpp"
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

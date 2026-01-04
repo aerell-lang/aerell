@@ -13,6 +13,26 @@
 namespace aerell
 {
 
+int CLI::main(int argc, const char* argv[])
+{
+    if(argc == 1 || (argc == 2 && (std::strcmp(argv[1], "h") == 0 || std::strcmp(argv[1], "help") == 0)))
+    {
+        this->printHelp();
+        return 0;
+    }
+
+    if(argc == 2 && (std::strcmp(argv[1], "v") == 0 || std::strcmp(argv[1], "version") == 0))
+    {
+        this->printVersion();
+        return 0;
+    }
+
+    aerell::outs() << "Invalid arguments or too few or too many.\n";
+    this->printHelp();
+
+    return 1;
+}
+
 void CLI::printVersion() { outs() << "Aerell version: 0.0.0"; }
 
 void CLI::printHelp()
@@ -22,17 +42,8 @@ void CLI::printHelp()
     outs() << "Usage: aerell <command>\n";
     outs() << "\n";
     outs() << "Available commands:\n";
-    outs() << " help                Print this usage information.\n";
-    outs() << " version             Print the Aerell compiler version.\n";
-    outs() << " run <file>          Execute the source file using JIT compilation.\n";
-    outs() << " build <file>        Build the source file into a standalone executable.\n";
-    outs() << "\n";
-    outs() << "Available internal commands:\n";
-    outs() << " lex <file>          Tokenize the source file and print the lexer output.\n";
-    outs() << " parse <file>        Parse the source file and print the AST structure.\n";
-    outs() << " analyze <file>      Perform semantic analysis on the source file.\n";
-    outs() << " generate <file>     Generate LLVM IR from source and print the IR output.\n";
-    outs() << " compile <file>      Compile the source file into an object file.\n";
+    outs() << " h, help             Print this usage information.\n";
+    outs() << " v, version          Print the Aerell compiler version.\n";
 }
 
 } // namespace aerell

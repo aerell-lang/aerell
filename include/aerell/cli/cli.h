@@ -15,10 +15,11 @@ namespace aerell
 class CLI
 {
   public:
-    void printVersion();
-    void printHelp();
+    int main(int argc, const char* argv[]);
 
   private:
+    void printVersion();
+    void printHelp();
 };
 
 } // namespace aerell
