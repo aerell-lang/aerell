@@ -6,19 +6,19 @@
  * See the LICENSE file for details.
  */
 
-#include <aerell/compiler/ir/ir_str.h>
+#include "aerell/ir/ir_chr.h"
 
 namespace aerell
 {
 
-IRStr::IRStr(std::string&& value) : value(std::move(value)) {}
+IRChr::IRChr(char value) : value(value) {}
 
-void IRStr::print(OStream& os) const { os << '"' << this->value << '"'; }
+void IRChr::print(OStream& os) const { os << '"' << this->value << '"'; }
 
-llvm::Value* IRStr::toLlvm(
+llvm::Value* IRChr::toLlvm(
     [[maybe_unused]] IRllvm::Ptr& ptr, [[maybe_unused]] IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const
 {
-    return builder.CreateGlobalString(this->value);
+    return builder.getInt8(this->value);
 }
 
 } // namespace aerell

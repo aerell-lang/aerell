@@ -6,12 +6,12 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_IR_IR_LLVM_H
-#define AERELL_COMPILER_IR_IR_LLVM_H
+#ifndef AERELL_IR_IR_LLVM_H
+#define AERELL_IR_IR_LLVM_H
 
 #include <llvm/IR/Module.h>
 
-#include <aerell/support/ostream.h>
+#include "aerell/support/ostream.h"
 
 namespace aerell
 {

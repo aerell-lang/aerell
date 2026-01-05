@@ -6,19 +6,19 @@
  * See the LICENSE file for details.
  */
 
-#include <aerell/compiler/ir/ir_f32.h>
+#include "aerell/ir/ir_str.h"
 
 namespace aerell
 {
 
-IRF32::IRF32(float value) : value(value) {}
+IRStr::IRStr(std::string&& value) : value(std::move(value)) {}
 
-void IRF32::print(OStream& os) const { os << this->value; }
+void IRStr::print(OStream& os) const { os << '"' << this->value << '"'; }
 
-llvm::Value* IRF32::toLlvm(
+llvm::Value* IRStr::toLlvm(
     [[maybe_unused]] IRllvm::Ptr& ptr, [[maybe_unused]] IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const
 {
-    return llvm::ConstantFP::get(builder.getFloatTy(), this->value);
+    return builder.CreateGlobalString(this->value);
 }
 
 } // namespace aerell

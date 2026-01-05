@@ -6,15 +6,15 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_IR_IR_VAL_H
-#define AERELL_COMPILER_IR_IR_VAL_H
+#ifndef AERELL_IR_IR_VAL_H
+#define AERELL_IR_IR_VAL_H
 
 #include <memory>
 #include <vector>
 
 #include <llvm/IR/IRBuilder.h>
 
-#include <aerell/compiler/ir/ir_llvm.h>
+#include "aerell/ir/ir_llvm.h"
 
 namespace aerell
 {

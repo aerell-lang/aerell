@@ -6,14 +6,14 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_IR_IR_TYPE_H
-#define AERELL_COMPILER_IR_IR_TYPE_H
+#ifndef AERELL_IR_IR_TYPE_H
+#define AERELL_IR_IR_TYPE_H
 
 #include <array>
 #include <utility>
 #include <vector>
 
-#include <aerell/support/ostream.h>
+#include "aerell/support/ostream.h"
 
 namespace aerell
 {

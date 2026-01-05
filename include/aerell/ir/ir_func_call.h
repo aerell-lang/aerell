@@ -6,25 +6,31 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_IR_IR_F32_H
-#define AERELL_COMPILER_IR_IR_F32_H
+#ifndef AERELL_IR_IR_FUNC_CALL_H
+#define AERELL_IR_IR_FUNC_CALL_H
 
-#include <aerell/compiler/ir/ir_val.h>
+#include "aerell/support/ostream.h"
+#include "aerell/ir/ir_instruct.h"
+#include "aerell/ir/ir_val.h"
 
 namespace aerell
 {
 
-class IRF32 : public IRVal
+class IRFuncCall : public IRInstruct
 {
   public:
-    IRF32(float value);
+    template <std::convertible_to<std::string> A, std::convertible_to<IRVal::Vec> B>
+    IRFuncCall(A&& ident, B&& args) : ident(std::forward<A>(ident)), args(std::forward<B>(args))
+    {
+    }
 
     void print(OStream& os) const override;
 
     llvm::Value* toLlvm(IRllvm::Ptr& ptr, IRllvm::Ctx& ctx, llvm::IRBuilder<>& builder) const override;
 
   private:
-    float value;
+    std::string ident;
+    IRVal::Vec args;
 };
 
 } // namespace aerell

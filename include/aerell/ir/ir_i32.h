@@ -6,10 +6,10 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_IR_IR_I32_H
-#define AERELL_COMPILER_IR_IR_I32_H
+#ifndef AERELL_IR_IR_I32_H
+#define AERELL_IR_IR_I32_H
 
-#include <aerell/compiler/ir/ir_val.h>
+#include "aerell/ir/ir_val.h"
 
 namespace aerell
 {

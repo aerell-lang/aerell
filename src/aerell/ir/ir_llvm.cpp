@@ -10,7 +10,7 @@
 #include <llvm/Linker/Linker.h>
 #include <llvm/Passes/PassBuilder.h>
 
-#include "aerell/compiler/ir/ir_llvm.h"
+#include "aerell/ir/ir_llvm.h"
 
 namespace aerell
 {

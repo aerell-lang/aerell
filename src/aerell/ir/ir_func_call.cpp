@@ -6,7 +6,7 @@
  * See the LICENSE file for details.
  */
 
-#include "aerell/compiler/ir/ir_func_call.h"
+#include "aerell/ir/ir_func_call.h"
 
 namespace aerell
 {

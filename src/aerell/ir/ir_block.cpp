@@ -6,7 +6,7 @@
  * See the LICENSE file for details.
  */
 
-#include "aerell/compiler/ir/ir_block.h"
+#include "aerell/ir/ir_block.h"
 
 namespace aerell
 {

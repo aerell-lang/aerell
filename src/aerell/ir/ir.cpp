@@ -9,14 +9,14 @@
 #include <format>
 #include <variant>
 
-#include "aerell/compiler/ir/ir.h"
-#include "aerell/compiler/ir/ir_val.h"
-#include "aerell/compiler/ir/ir_instruct.h"
-#include "aerell/compiler/ir/ir_i32.h"
-#include <aerell/compiler/ir/ir_f32.h>
-#include <aerell/compiler/ir/ir_chr.h>
-#include "aerell/compiler/ir/ir_str.h"
-#include "aerell/compiler/ir/ir_func_call.h"
+#include "aerell/ir/ir.h"
+#include "aerell/ir/ir_val.h"
+#include "aerell/ir/ir_instruct.h"
+#include "aerell/ir/ir_i32.h"
+#include "aerell/ir/ir_f32.h"
+#include "aerell/ir/ir_chr.h"
+#include "aerell/ir/ir_str.h"
+#include "aerell/ir/ir_func_call.h"
 
 namespace aerell
 {
@@ -135,7 +135,7 @@ IRVal::Ptr IR::expr(const AST::Ptr& ptr)
 
 void IR::func(ASTFunc& ctx)
 {
-    const auto& ident = (std::string)(*ctx.ident).getText();
+    const auto& ident = (std::string)(*ctx.ident).lexeme();
 
     std::variant<IRFunc*, IRFunc> funcVariant = this->mod->getFunc(ident);
     IRFunc* funcTemp = nullptr;
@@ -171,7 +171,7 @@ void IR::func(ASTFunc& ctx)
 
 IRVal::Ptr IR::funcCall(ASTFuncCall& ctx)
 {
-    const auto& ident = (std::string)ctx.ident->getText();
+    const auto& ident = (std::string)ctx.ident->lexeme();
 
     IRFunc* func = this->mod->getFunc(ident);
 
@@ -179,7 +179,7 @@ IRVal::Ptr IR::funcCall(ASTFuncCall& ctx)
     {
         if(ctx.symbolCalled == nullptr)
         {
-            ctx.ident->source->printErrorMessage(ctx.ident->offset, ctx.ident->size, "[IR] Undefined function");
+            ctx.ident->print("[IR] Undefined function");
             this->hasError = true;
             return nullptr;
         }
@@ -188,7 +188,7 @@ IRVal::Ptr IR::funcCall(ASTFuncCall& ctx)
         if(this->mod->addFunc(
                ident, IRFunc(symbol->getPub(), symbol->getParams(), symbol->getVrdic(), symbol->getRet())) == nullptr)
         {
-            ctx.ident->source->printErrorMessage(ctx.ident->offset, ctx.ident->size, "[IR] Failed to declare function");
+            ctx.ident->print("[IR] Failed to declare function");
             this->hasError = true;
             return nullptr;
         }
@@ -206,14 +206,13 @@ IRVal::Ptr IR::funcCall(ASTFuncCall& ctx)
 IRVal::Ptr IR::literal(ASTLiteral& ctx)
 {
     auto value = ctx.value;
-    if(value->type == TokenType::INTL) return std::make_unique<IRI32>(std::stoi(std::string(value->getText())));
+    if(value->type() == TokenType::INTL) return std::make_unique<IRI32>(std::stoi(std::string(value->lexeme())));
 
-    if(value->type == TokenType::FLTL) return std::make_unique<IRF32>(std::stof(std::string(value->getText())));
+    if(value->type() == TokenType::FLTL) return std::make_unique<IRF32>(std::stof(std::string(value->lexeme())));
 
-    if(value->type == TokenType::CHRL)
+    if(value->type() == TokenType::CHRL)
     {
-        std::string_view chrl{value->getText()};
-        chrl = chrl.substr(1, chrl.size() - 2);
+        std::string_view chrl{value->lexeme().substr(1, value->lexeme().size() - 2)};
         std::string result;
         for(size_t i = 0; i < chrl.size(); ++i)
         {
@@ -248,10 +247,9 @@ IRVal::Ptr IR::literal(ASTLiteral& ctx)
         return std::make_unique<IRChr>(result[0]);
     }
 
-    if(value->type == TokenType::STRL)
+    if(value->type() == TokenType::STRL)
     {
-        std::string_view strl{value->getText()};
-        strl = strl.substr(1, strl.size() - 2);
+        std::string_view strl{value->lexeme().substr(1, value->lexeme().size() - 2)};
         std::string result;
         for(size_t i = 0; i < strl.size(); ++i)
         {

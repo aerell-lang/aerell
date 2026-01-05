@@ -6,16 +6,16 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_IR_IR_MOD_H
-#define AERELL_COMPILER_IR_IR_MOD_H
+#ifndef AERELL_IR_IR_MOD_H
+#define AERELL_IR_IR_MOD_H
 
 #include <unordered_map>
 #include <vector>
 
 #include <llvm/IR/IRBuilder.h>
 
-#include "aerell/compiler/ir/ir_func.h"
-#include "aerell/compiler/ir/ir_llvm.h"
+#include "aerell/ir/ir_func.h"
+#include "aerell/ir/ir_llvm.h"
 
 namespace aerell
 {

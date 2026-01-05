@@ -10,8 +10,8 @@
 
 #include <llvm/IR/Module.h>
 
-#include "aerell/compiler/ir/ir_mod.h"
-#include <aerell/compiler/ir/ir_func.h>
+#include "aerell/ir/ir_mod.h"
+#include "aerell/ir/ir_func.h"
 
 namespace aerell
 {

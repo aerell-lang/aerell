@@ -6,16 +6,15 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_IR_IR_H
-#define AERELL_COMPILER_IR_IR_H
+#ifndef AERELL_IR_IR_H
+#define AERELL_IR_IR_H
 
-#include <aerell/compiler/ast/ast_func.h>
-#include <aerell/compiler/ast/ast_func_call.h>
-#include <aerell/compiler/ast/ast_literal.h>
-#include <aerell/compiler/symbol/symbol_func.h>
-#include <aerell/compiler/ir/ir_mod.h>
-#include <aerell/compiler/ir/ir_val.h>
-#include <aerell/compiler/ir/ir_llvm.h>
+#include "aerell/ast/ast_func.h"
+#include "aerell/ast/ast_func_call.h"
+#include "aerell/ast/ast_literal.h"
+#include "aerell/ir/ir_mod.h"
+#include "aerell/ir/ir_val.h"
+#include "aerell/ir/ir_llvm.h"
 
 namespace aerell
 {
