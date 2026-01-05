@@ -6,15 +6,16 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_SEMANTIC_SEMANTIC_H
-#define AERELL_COMPILER_SEMANTIC_SEMANTIC_H
+#ifndef AERELL_SEMANTIC_SEMANTIC_H
+#define AERELL_SEMANTIC_SEMANTIC_H
 
+#include <aerell/parser/parser.h>
 #include <memory>
 
-#include <aerell/compiler/symbol/symbol_table.h>
-#include <aerell/compiler/ast/ast_func.h>
-#include <aerell/compiler/ast/ast_func_call.h>
-#include <aerell/compiler/ast/ast_literal.h>
+#include "aerell/symbol/symbol_table.h"
+#include "aerell/ast/ast_func.h"
+#include "aerell/ast/ast_func_call.h"
+#include "aerell/ast/ast_literal.h"
 
 namespace aerell
 {
@@ -23,7 +24,8 @@ class Semantic
 {
   public:
     Semantic(SymbolTable& symbolTable);
-    bool analysis(const AST::ChildrenWithSource& childrenWithSource);
+    bool analysis(const Parser::Result& result);
+    bool analysis(const Parser::Results& results);
 
   private:
     bool hasError = false;

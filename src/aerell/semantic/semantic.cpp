@@ -6,18 +6,22 @@
  * See the LICENSE file for details.
  */
 
-#include "aerell/compiler/semantic/semantic.h"
-#include <aerell/compiler/symbol/symbol_print.h>
-#include <aerell/support/utils.h>
+#include "aerell/semantic/semantic.h"
 
 namespace aerell
 {
 
 Semantic::Semantic(SymbolTable& symbolTable) : symbolTable(&symbolTable) {}
 
-bool Semantic::analysis(const AST::ChildrenWithSource& childrenWithSource)
+bool Semantic::analysis(const Parser::Result& result)
 {
-    for(const AST::Ptr& ptr : childrenWithSource.children) stmt(ptr);
+    for(const AST::Ptr& ast : result.asts) this->stmt(ast);
+    return !this->hasError;
+}
+
+bool Semantic::analysis(const Parser::Results& results)
+{
+    for(const auto& result : results) this->analysis(result);
     return !this->hasError;
 }
 
@@ -47,10 +51,10 @@ std::optional<IRType> Semantic::funcCall(ASTFuncCall& ctx)
 {
     const auto& ident = ctx.ident;
 
-    auto symbolFunc = this->symbolTable->findFunc(ident->getText(), true);
+    auto symbolFunc = this->symbolTable->findFunc(ident->lexeme(), true);
     if(symbolFunc == nullptr)
     {
-        ident->source->printErrorMessage(ident->offset, ident->size, "[S] Undefined function");
+        ident->print("[S] Undefined function");
         if(!this->hasError) this->hasError = true;
         return std::nullopt;
     }
@@ -65,14 +69,14 @@ std::optional<IRType> Semantic::funcCall(ASTFuncCall& ctx)
 
     if(symbolFunc->getParams().size() != args.size())
     {
-        ident->source->printErrorMessage(ident->offset, ident->size, "[S] Invalid number of function arguments");
+        ident->print("[S] Invalid number of function arguments");
         if(!this->hasError) this->hasError = true;
         return std::nullopt;
     }
 
     if(args != symbolFunc->getParams())
     {
-        ident->source->printErrorMessage(ident->offset, ident->size, "[S] The function argument is incorrect");
+        ident->print("[S] The function argument is incorrect");
         if(!this->hasError) this->hasError = true;
         return std::nullopt;
     }
@@ -84,10 +88,10 @@ std::optional<IRType> Semantic::funcCall(ASTFuncCall& ctx)
 
 std::optional<IRType> Semantic::literal(ASTLiteral& ctx)
 {
-    if(ctx.value->type == TokenType::INTL) return IRType::I32;
-    if(ctx.value->type == TokenType::FLTL) return IRType::F32;
-    if(ctx.value->type == TokenType::CHRL) return IRType::CHR;
-    if(ctx.value->type == TokenType::STRL) return IRType::STR;
+    if(ctx.value->type() == TokenType::INTL) return IRType::I32;
+    if(ctx.value->type() == TokenType::FLTL) return IRType::F32;
+    if(ctx.value->type() == TokenType::CHRL) return IRType::CHR;
+    if(ctx.value->type() == TokenType::STRL) return IRType::STR;
     else
         return std::nullopt;
 }
