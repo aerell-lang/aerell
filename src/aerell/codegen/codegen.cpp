@@ -8,13 +8,13 @@
 
 #include <filesystem>
 
-#include "llvm/IR/LegacyPassManager.h"
-#include "llvm/MC/TargetRegistry.h"
-#include "llvm/Target/TargetMachine.h"
-#include "llvm/Target/TargetOptions.h"
-#include "llvm/TargetParser/Host.h"
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/MC/TargetRegistry.h>
+#include <llvm/Target/TargetMachine.h>
+#include <llvm/Target/TargetOptions.h>
+#include <llvm/TargetParser/Host.h>
 
-#include "aerell/compiler/codegen/codegen.h"
+#include "aerell/codegen/codegen.h"
 
 namespace aerell
 {

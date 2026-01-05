@@ -6,10 +6,10 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_CODEGEN_CODEGEN_H
-#define AERELL_COMPILER_CODEGEN_CODEGEN_H
+#ifndef AERELL_CODEGEN_CODEGEN_H
+#define AERELL_CODEGEN_CODEGEN_H
 
-#include <aerell/compiler/ir/ir.h>
+#include "aerell/ir/ir_llvm.h"
 
 namespace aerell
 {
