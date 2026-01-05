@@ -37,6 +37,8 @@ enum class TokenType
 
     ASSIGN, // =
 
+    QMARK, // ?
+
     FLTL,
     INTL,
     CHRL,
@@ -64,6 +66,8 @@ constexpr auto tokenTypeNames = std::to_array<std::pair<TokenType, const char*>>
     {TokenType::VRDIC, "VRDIC"},
     //
     {TokenType::ASSIGN, "ASSIGN"},
+
+    {TokenType::QMARK, "QMARK"},
     //
     {TokenType::FLTL, "FLTL"},
     {TokenType::INTL, "INTL"},

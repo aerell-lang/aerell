@@ -13,8 +13,7 @@ namespace aerell
 
 static std::pair<TokenType, std::string_view> symbols[] = {
     {TokenType::LPAREN, "("}, {TokenType::RPAREN, ")"},  {TokenType::LBRACE, "{"}, {TokenType::RBRACE, "}"},
-    {TokenType::COMMA, ","},  {TokenType::VRDIC, "..."}, {TokenType::ASSIGN, "="},
-};
+    {TokenType::COMMA, ","},  {TokenType::VRDIC, "..."}, {TokenType::ASSIGN, "="}, {TokenType::QMARK, "?"}};
 
 static std::pair<TokenType, std::string_view> keywords[] = {
     {TokenType::I32, "i32"}, {TokenType::I64, "i64"}, {TokenType::F32, "f32"},
