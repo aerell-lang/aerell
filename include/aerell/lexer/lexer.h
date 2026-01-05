@@ -49,7 +49,7 @@ class Lexer
 
     // Token
     bool hasToken() const;
-    Token getToken();
+    Token& getToken();
 
     // Fragment
     bool isDigit(char character) const;

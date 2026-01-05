@@ -18,6 +18,28 @@ Token::Token(const Source* source, TokenType type, size_t offset, size_t size)
 {
 }
 
+Token::Token(Token&& other)
+{
+    this->_type = other._type;
+    other._type = TokenType::ILLEGAL;
+    this->_source = other._source;
+    other._source = nullptr;
+    this->_offset = other._offset;
+    other._offset = 0;
+    this->_size = other._size;
+    other._size = 0;
+}
+
+Token& Token::operator=(const Token& other)
+{
+    if(this == &other) return *this;
+    this->_type = other._type;
+    this->_source = other._source;
+    this->_offset = other._offset;
+    this->_size = other._size;
+    return *this;
+}
+
 TokenType Token::type() const { return this->_type; }
 
 std::string_view Token::lexeme() const { return this->_source->content().substr(this->_offset, this->_size); }

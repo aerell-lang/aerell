@@ -25,6 +25,9 @@ class Token
 
     Token();
     Token(const Source* source, TokenType type, size_t offset, size_t size);
+    Token(Token&& other);
+
+    Token& operator=(const Token& other);
 
     TokenType type() const;
     std::string_view lexeme() const;

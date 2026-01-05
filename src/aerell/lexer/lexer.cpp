@@ -95,7 +95,7 @@ bool Lexer::lexing(const Source& source, Results& results)
 
     result.tokens = {
         std::make_move_iterator(result.tokens.begin() + lastImportIndex), std::make_move_iterator(result.tokens.end())};
-    if(result.tokens.size() != 1 && result.tokens[0].type() != TokenType::EOFF) results.emplace_back(result);
+    if(result.tokens.size() != 1 && result.tokens[0].type() != TokenType::EOFF) results.emplace_back(std::move(result));
 
     return !hasError;
 }
@@ -106,13 +106,12 @@ Lexer::Result Lexer::lexing(const Source& source)
     this->_charReader.set(this->_source->content());
     Lexer::Result result{this->_source, {}};
 
-    Token token = this->getToken();
-    while(token.type() != TokenType::EOFF)
+    auto& token = this->getToken();
+    while(this->hasToken())
     {
         result.tokens.emplace_back(std::move(token));
         token = this->getToken();
     }
-
     result.tokens.emplace_back(std::move(token));
 
     return result;
@@ -126,24 +125,24 @@ void Lexer::createToken(TokenType type, size_t offset, size_t size)
 void Lexer::createToken(TokenType type, size_t size) { this->createToken(type, this->_charReader.tell(), size); }
 
 // Token
-bool Lexer::hasToken() const { return this->_charReader.canAdvance(); }
+bool Lexer::hasToken() const { return this->_token.type() != TokenType::EOFF; }
 
-Token Lexer::getToken()
+Token& Lexer::getToken()
 {
-    if(!this->hasToken())
+    if(!this->_charReader.canAdvance())
     {
         this->eofHandler();
-        return std::move(this->_token);
+        return this->_token;
     }
 
-    while(this->hasToken() && (this->wsHandler() || this->commentHandler()));
+    while(this->_charReader.canAdvance() && (this->wsHandler() || this->commentHandler()));
 
     if(this->symbolHandler() || this->keywordHandler() || this->identHandler() || this->fltHandler() ||
        this->intHandler() || this->chrHandler() || this->strHandler())
-        return std::move(this->_token);
+        return this->_token;
 
     this->illegalHandler();
-    return std::move(this->_token);
+    return this->_token;
 }
 
 bool Lexer::isDigit(char character) const { return std::isdigit(character); }
