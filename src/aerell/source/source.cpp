@@ -53,19 +53,14 @@ const std::filesystem::path& Source::path() const { return this->_path; }
 
 std::string_view Source::content() const { return this->_content; }
 
-std::string_view Source::content(const Token& token) const
-{
-    return this->content().substr(token.getOffset(), token.getSize());
-}
-
-void Source::print(const Token& token, std::string_view message) const
+void Source::print(size_t offset, size_t size, std::string_view message) const
 {
     // Find line and column from offset
-    auto it = std::upper_bound(this->_lineStartOffsets.begin(), this->_lineStartOffsets.end(), token.getOffset());
+    auto it = std::upper_bound(this->_lineStartOffsets.begin(), this->_lineStartOffsets.end(), offset);
 
     size_t line = (it - this->_lineStartOffsets.begin());
     size_t lineStart = this->_lineStartOffsets[line - 1];
-    size_t column = token.getOffset() - lineStart + 1;
+    size_t column = offset - lineStart + 1;
 
     // Prepare print message
     auto path = std::format("{}:{}:{}", this->path().generic_string(), line, column);
@@ -78,7 +73,7 @@ void Source::print(const Token& token, std::string_view message) const
     errs() << std::string(path.size(), '-') << '\n';
     errs() << path << "\n\n";
     errs() << prefix << view << "\n";
-    errs() << std::string(prefix.size() + (column - 1), ' ') << std::string(token.getSize(), '^') << '\n';
+    errs() << std::string(prefix.size() + (column - 1), ' ') << std::string(size, '^') << '\n';
     errs() << ' ' << message << '\n';
 }
 

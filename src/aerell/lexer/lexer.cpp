@@ -67,16 +67,16 @@ bool Lexer::lexing(const Source& source, Results& results)
     auto result = this->lexing(source);
     for(const auto& token : result.tokens)
     {
-        if(token.getType() != TokenType::STRL) break;
+        if(token.type() != TokenType::STRL) break;
         lastImportIndex++;
 
         std::string message;
         OSStream os(message);
-        int status = sourceManager.import(result.source.content(token).substr(1, token.getSize() - 2), false, &os);
+        int status = sourceManager.import(token.lexeme().substr(1, token.lexeme().size() - 2), false, &os);
         if(status == 0)
         {
             message = {"[I] " + message};
-            result.source.print(token, message);
+            token.print(message);
             if(!hasError) hasError = true;
             continue;
         }
@@ -95,7 +95,7 @@ bool Lexer::lexing(const Source& source, Results& results)
 
     result.tokens = {
         std::make_move_iterator(result.tokens.begin() + lastImportIndex), std::make_move_iterator(result.tokens.end())};
-    if(result.tokens.size() != 1 && result.tokens[0].getType() != TokenType::EOFF) results.emplace_back(result);
+    if(result.tokens.size() != 1 && result.tokens[0].type() != TokenType::EOFF) results.emplace_back(result);
 
     return !hasError;
 }
@@ -104,12 +104,13 @@ Lexer::Result Lexer::lexing(const Source& source)
 {
     this->charReader.set(source.content());
     Lexer::Result result{source, {}};
+    this->source = &source;
 
     bool stop = false;
     while(!stop)
     {
         auto& token = this->getToken();
-        if(token.getType() == TokenType::EOFF) stop = true;
+        if(token.type() == TokenType::EOFF) stop = true;
         result.tokens.push_back(std::move(token));
     }
 
@@ -140,7 +141,10 @@ Token& Lexer::getToken()
     return this->token;
 }
 
-void Lexer::createToken(TokenType type, size_t offset, size_t size) { this->token = {type, offset, size}; }
+void Lexer::createToken(TokenType type, size_t offset, size_t size)
+{
+    this->token = {this->source, type, offset, size};
+}
 
 void Lexer::createToken(TokenType type, size_t size) { this->createToken(type, this->charReader.tell(), size); }
 

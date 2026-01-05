@@ -13,6 +13,7 @@
 
 #include "aerell/support/ostream.h"
 #include "aerell/token/token_type.h"
+#include <aerell/source/source.h>
 
 namespace aerell
 {
@@ -23,18 +24,19 @@ class Token
     using List = std::vector<Token>;
 
     Token();
-    Token(TokenType type, size_t offset, size_t size);
+    Token(const Source* source, TokenType type, size_t offset, size_t size);
 
-    TokenType getType() const;
-    size_t getOffset() const;
-    size_t getSize() const;
+    TokenType type() const;
+    std::string_view lexeme() const;
 
+    void print(std::string_view message) const;
     void print(OStream& os) const;
 
   private:
-    TokenType type;
-    size_t offset;
-    size_t size;
+    const Source* _source;
+    TokenType _type;
+    size_t _offset;
+    size_t _size;
 };
 
 inline OStream& operator<<(OStream& os, const Token& token)

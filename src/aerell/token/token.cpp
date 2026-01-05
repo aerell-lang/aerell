@@ -11,16 +11,19 @@
 namespace aerell
 {
 
-Token::Token() : type{TokenType::ILLEGAL}, offset{0}, size{0} {}
+Token::Token() : _source(nullptr), _type{TokenType::ILLEGAL}, _offset{0}, _size{0} {}
 
-Token::Token(TokenType type, size_t offset, size_t size) : type{type}, offset{offset}, size{size} {}
+Token::Token(const Source* source, TokenType type, size_t offset, size_t size)
+    : _source(source), _type{type}, _offset{offset}, _size{size}
+{
+}
 
-TokenType Token::getType() const { return this->type; }
+TokenType Token::type() const { return this->_type; }
 
-size_t Token::getOffset() const { return this->offset; }
+std::string_view Token::lexeme() const { return this->_source->content().substr(this->_offset, this->_size); }
 
-size_t Token::getSize() const { return this->size; }
+void Token::print(std::string_view message) const { this->_source->print(this->_offset, this->_size, message); }
 
-void Token::print(OStream& os) const { os << "{ offset: " << this->offset << " size: " << this->size << " }"; }
+void Token::print(OStream& os) const { os << toString(this->type()) << ' ' << this->lexeme(); }
 
 } // namespace aerell

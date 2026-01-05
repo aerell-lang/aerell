@@ -13,7 +13,6 @@
 #include <vector>
 
 #include <aerell/support/ostream.h>
-#include <aerell/token/token.h>
 
 namespace aerell
 {
@@ -27,9 +26,8 @@ class Source
 
     const std::filesystem::path& path() const;
     std::string_view content() const;
-    std::string_view content(const Token& token) const;
 
-    void print(const Token& token, std::string_view message) const;
+    void print(size_t offset, size_t size, std::string_view message) const;
 
   private:
     const std::filesystem::path& _path;

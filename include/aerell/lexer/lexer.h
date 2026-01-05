@@ -37,6 +37,7 @@ class Lexer
     SourceManager& sourceManager;
     CharReader& charReader;
 
+    const Source* source = nullptr;
     Token token;
 
     // Lexing
@@ -78,7 +79,7 @@ inline OStream& operator<<(OStream& os, const Lexer::Result& result)
 
     for(const auto& token : result.tokens)
     {
-        const char* t = toString(token.getType());
+        const char* t = toString(token.type());
         size_t width = std::strlen(t);
         maxWidth = std::max(maxWidth, width);
     }
@@ -87,7 +88,7 @@ inline OStream& operator<<(OStream& os, const Lexer::Result& result)
 
     for(const auto& token : result.tokens)
     {
-        const char* t = toString(token.getType());
+        const char* t = toString(token.type());
         size_t width = std::strlen(t);
 
         if(width < maxWidth)
@@ -95,7 +96,7 @@ inline OStream& operator<<(OStream& os, const Lexer::Result& result)
             outs() << std::string(maxWidth - width, ' ');
         }
 
-        outs() << t << " " << result.source.content(token) << '\n';
+        outs() << t << " " << token.lexeme() << '\n';
     }
     return os;
 }
