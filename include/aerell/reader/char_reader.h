@@ -26,13 +26,18 @@ class CharReader
     size_t size() const;
 
     // Position
-    size_t tell(size_t offset = 0) const;
+    size_t tell(size_t offset) const;
+    size_t tell() const;
     void seek(size_t pos);
-    bool canAdvance(size_t offset = 0, size_t size = 1) const;
-    void advance(size_t offset = 1);
+    bool canAdvance(size_t offset, size_t size) const;
+    bool canAdvance(size_t size) const;
+    bool canAdvance() const;
+    void advance(size_t offset);
+    void advance();
 
     // Char
-    char peek(size_t offset = 0);
+    char peek(size_t offset);
+    char peek();
 
     // String
     std::string_view peek(size_t offset, size_t size);

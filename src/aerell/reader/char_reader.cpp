@@ -33,11 +33,19 @@ size_t CharReader::size() const { return this->_size; }
 // Position
 size_t CharReader::tell(size_t offset) const { return this->_pos + offset; }
 
+size_t CharReader::tell() const { return this->tell(0); }
+
 void CharReader::seek(size_t pos) { this->_pos = pos; }
 
 bool CharReader::canAdvance(size_t offset, size_t size) const { return (this->tell(offset) + size) <= this->size(); }
 
+bool CharReader::canAdvance(size_t size) const { return this->canAdvance(0, size); }
+
+bool CharReader::canAdvance() const { return this->canAdvance(1); }
+
 void CharReader::advance(size_t offset) { this->seek(this->tell(offset)); }
+
+void CharReader::advance() { this->advance(1); }
 
 // Char
 char CharReader::peek(size_t offset)
@@ -48,6 +56,8 @@ char CharReader::peek(size_t offset)
 
     return this->_data[this->tell(offset)];
 }
+
+char CharReader::peek() { return this->peek(0); }
 
 // String
 std::string_view CharReader::peek(size_t offset, size_t size)
