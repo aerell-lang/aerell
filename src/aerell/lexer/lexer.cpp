@@ -102,9 +102,9 @@ bool Lexer::lexing(const Source& source, Results& results)
 
 Lexer::Result Lexer::lexing(const Source& source)
 {
-    this->charReader.set(source.content());
-    Lexer::Result result{source, {}};
     this->source = &source;
+    this->charReader.set(this->source->content());
+    Lexer::Result result{this->source, {}};
 
     bool stop = false;
     while(!stop)

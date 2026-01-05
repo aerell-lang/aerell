@@ -6,18 +6,18 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_PARSER_PARSER_H
-#define AERELL_COMPILER_PARSER_PARSER_H
+#ifndef AERELL_PARSER_PARSER_H
+#define AERELL_PARSER_PARSER_H
 
-#include <map>
+#include <aerell/lexer/lexer.h>
+#include <aerell/source/source.h>
 #include <memory>
 #include <vector>
 
-#include <aerell/compiler/symbol/symbol_table.h>
-#include <aerell/compiler/lexer/lexer.h>
-#include "aerell/compiler/ast/ast.h"
-#include "aerell/compiler/ast/ast_func_param.h"
-#include "aerell/compiler/token/token.h"
+#include "aerell/token/token.h"
+#include "aerell/symbol/symbol_table.h"
+#include "aerell/ast/ast.h"
+#include "aerell/ast/ast_func_param.h"
 
 namespace aerell
 {
@@ -25,11 +25,6 @@ namespace aerell
 class Parser
 {
   public:
-    Parser(SymbolTable& symbolTable);
-
-    bool parsing(const Token::Vec& vec, AST::ChildrenWithSource& childrenWithSource);
-
-  private:
     enum class Rule
     {
         STMT,
@@ -42,9 +37,20 @@ class Parser
         LITERAL
     };
 
-    typedef std::map<Rule, std::vector<TokenType>> Rules;
+    struct Result
+    {
+        const Source* source;
+        AST::List asts;
+    };
 
-    static Rules rules;
+    using Results = std::vector<Result>;
+
+    Parser(SymbolTable& symbolTable);
+
+    bool parsing(const Lexer::Result& lResult, Result& pResult);
+    bool parsing(const Lexer::Results& lResults, Results& pResults);
+
+  private:
     SymbolTable* symbolTable = nullptr;
     const std::vector<Token>* tokensRef = nullptr;
     size_t pos = 0;

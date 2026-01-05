@@ -24,7 +24,7 @@ class ASTFuncCall : public AST
 
     const Token* ident = nullptr;
     const SymbolFunc* symbolCalled = nullptr;
-    Children args;
+    List args;
 
     void print(OStream& os, size_t indent = 0) const override;
 };

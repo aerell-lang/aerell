@@ -21,15 +21,7 @@ class AST
 {
   public:
     using Ptr = std::unique_ptr<AST>;
-    using Children = std::vector<Ptr>;
-
-    struct ChildrenWithSource
-    {
-        const char* source = nullptr;
-        Children children;
-    };
-
-    using Groups = std::vector<ChildrenWithSource>;
+    using List = std::vector<Ptr>;
 
     virtual ~AST() {};
 
@@ -42,27 +34,15 @@ inline OStream& operator<<(OStream& os, const AST& obj)
     return os;
 }
 
-inline OStream& operator<<(OStream& os, const AST::Ptr& obj)
+inline OStream& operator<<(OStream& os, const AST::Ptr& ast)
 {
-    os << (*obj);
+    os << (*ast);
     return os;
 }
 
-inline OStream& operator<<(OStream& os, const AST::Children& children)
+inline OStream& operator<<(OStream& os, const AST::List& list)
 {
-    for(const auto& child : children) os << child;
-    return os;
-}
-
-inline OStream& operator<<(OStream& os, const AST::ChildrenWithSource& childrenWithSource)
-{
-    os << '\n' << childrenWithSource.source << ":\n" << childrenWithSource.children;
-    return os;
-}
-
-inline OStream& operator<<(OStream& os, const AST::Groups& groups)
-{
-    for(const auto& group : groups) os << group;
+    for(const auto& ast : list) os << ast;
     return os;
 }
 

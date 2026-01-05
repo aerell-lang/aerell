@@ -6,57 +6,66 @@
  * See the LICENSE file for details.
  */
 
+#include <map>
 #include <memory>
 #include <sstream>
 #include <vector>
 
 #include <llvm/Support/raw_ostream.h>
 
-#include <aerell/compiler/ast/ast_func.h>
-#include <aerell/compiler/ast/ast_func_call.h>
-#include <aerell/compiler/ast/ast_literal.h>
-#include "aerell/compiler/parser/parser.h"
-#include <aerell/compiler/symbol/symbol_func.h>
+#include "aerell/parser/parser.h"
+#include "aerell/symbol/symbol_func.h"
+#include "aerell/ast/ast_func.h"
+#include "aerell/ast/ast_func_call.h"
+#include "aerell/ast/ast_literal.h"
 
 namespace aerell
 {
 
-Parser::Rules Parser::rules{
-    {Rule::STMT,
-     {TokenType::P, TokenType::F, TokenType::IDENT, TokenType::INTL, TokenType::FLTL, TokenType::CHRL,
-      TokenType::STRL}},
-    {Rule::FUNC, {TokenType::P, TokenType::F}},
-    {Rule::FUNC_PARAM, {TokenType::IDENT}},
-    {Rule::DATA_TYPE, {TokenType::I32, TokenType::F32, TokenType::CHR, TokenType::STR}},
-    {Rule::BLOCK, {TokenType::LBRACE}},
-    {Rule::EXPR, {TokenType::IDENT, TokenType::INTL, TokenType::FLTL, TokenType::CHRL, TokenType::STRL}},
-    {Rule::FUNC_CALL, {TokenType::IDENT}},
-    {Rule::LITERAL, {TokenType::INTL, TokenType::FLTL, TokenType::CHRL, TokenType::STRL}},
+static std::map<Parser::Rule, std::vector<TokenType>> rules{
+    {Parser::Rule::STMT, {TokenType::IDENT, TokenType::INTL, TokenType::FLTL, TokenType::CHRL, TokenType::STRL}},
+    {Parser::Rule::FUNC, {TokenType::IDENT}},
+    {Parser::Rule::FUNC_PARAM, {TokenType::IDENT}},
+    {Parser::Rule::DATA_TYPE, {TokenType::I32, TokenType::F32, TokenType::CHR, TokenType::STR}},
+    {Parser::Rule::BLOCK, {TokenType::LBRACE}},
+    {Parser::Rule::EXPR, {TokenType::IDENT, TokenType::INTL, TokenType::FLTL, TokenType::CHRL, TokenType::STRL}},
+    {Parser::Rule::FUNC_CALL, {TokenType::IDENT}},
+    {Parser::Rule::LITERAL, {TokenType::INTL, TokenType::FLTL, TokenType::CHRL, TokenType::STRL}},
 };
 
 Parser::Parser(SymbolTable& symbolTable) : symbolTable(&symbolTable) {}
 
-bool Parser::parsing(const Token::Vec& vec, AST::ChildrenWithSource& childrenWithSource)
+bool Parser::parsing(const Lexer::Result& lResult, Result& pResult)
 {
     if(this->hasError) this->hasError = false;
-    this->tokensRef = &vec;
+    this->tokensRef = &lResult.tokens;
     this->pos = 0;
 
-    while(this->pos < this->tokensRef->size() && (*this->tokensRef)[this->pos].type != TokenType::EOFF)
+    pResult.source = lResult.source;
+    while(this->pos < this->tokensRef->size() && (*this->tokensRef)[this->pos].type() != TokenType::EOFF)
     {
-        if(childrenWithSource.source == nullptr)
-            childrenWithSource.source = (*this->tokensRef)[this->pos].source->getPath().c_str();
-
         if(is(Rule::STMT))
         {
             if(auto ast = stmt())
             {
-                childrenWithSource.children.push_back(std::move(ast));
+                pResult.asts.emplace_back(std::move(ast));
                 continue;
             }
         }
         expectErrorMessage(Rule::STMT);
         this->pos++;
+    }
+
+    return !this->hasError;
+}
+
+bool Parser::parsing(const Lexer::Results& lResults, Results& pResults)
+{
+    for(const auto& lResult : lResults)
+    {
+        Result result;
+        if(!this->parsing(lResult, result)) continue;
+        pResults.emplace_back(std::move(result));
     }
 
     return !this->hasError;
@@ -74,12 +83,12 @@ void Parser::expectErrorMessage(const std::vector<TokenType>& types)
         if(init) init = false;
         else
             oss << ", ";
-        oss << to_string(type);
+        oss << toString(type);
     }
 
-    oss << " but instead " << to_string((*tokensRef)[pos].type);
+    oss << " but instead " << toString((*tokensRef)[pos].type());
 
-    (*tokensRef)[pos].source->printErrorMessage((*tokensRef)[pos].offset, (*tokensRef)[pos].size, oss.str().c_str());
+    (*tokensRef)[pos].print(oss.str().c_str());
 
     if(!hasError) hasError = true;
 }
@@ -89,7 +98,7 @@ void Parser::expectErrorMessage(Rule rule) { return expectErrorMessage(rules[rul
 bool Parser::expect(const std::vector<TokenType>& types)
 {
     if(pos < tokensRef->size() &&
-       std::all_of(types.begin(), types.end(), [&](const auto& type) { return (*tokensRef)[pos].type != type; }))
+       std::all_of(types.begin(), types.end(), [&](const auto& type) { return (*tokensRef)[pos].type() != type; }))
     {
         expectErrorMessage(types);
         return false;
@@ -104,7 +113,7 @@ bool Parser::expect(Rule rule) { return expect(rules[rule]); }
 bool Parser::is(const std::vector<TokenType>& types)
 {
     return pos < tokensRef->size() &&
-           std::any_of(types.begin(), types.end(), [&](const auto& type) { return (*tokensRef)[pos].type == type; });
+           std::any_of(types.begin(), types.end(), [&](const auto& type) { return (*tokensRef)[pos].type() == type; });
 }
 
 bool Parser::is(TokenType type) { return is(std::vector<TokenType>{type}); }
@@ -121,30 +130,19 @@ std::unique_ptr<AST> Parser::stmt()
 
 std::unique_ptr<AST> Parser::func()
 {
-    // P / F
-    if(!expect(Rule::FUNC)) return nullptr;
-    bool pub = is(TokenType::P);
-    pos++;
-
-    // F if before is P
-    if(pub)
-    {
-        if(!expect(TokenType::F)) return nullptr;
-        pos++;
-    }
-
     // IDENT
     if(!expect(TokenType::IDENT)) return nullptr;
     auto ident = &(*tokensRef)[pos];
+    bool pub = true;
     pos++;
 
-    auto symbolFunc = this->symbolTable->findFunc(ident->getText(), false);
+    auto symbolFunc = this->symbolTable->findFunc(ident->lexeme(), false);
     if(symbolFunc != nullptr)
     {
-        ident->source->printErrorMessage(ident->offset, ident->size, "[P] Duplicate function");
+        ident->print("[P] Duplicate function");
         return nullptr;
     };
-    symbolFunc = this->symbolTable->createFunc(pub, ident->getText());
+    symbolFunc = this->symbolTable->createFunc(pub, ident->lexeme());
 
     // LPAREN
     if(!expect(TokenType::LPAREN)) return nullptr;
@@ -159,12 +157,12 @@ std::unique_ptr<AST> Parser::func()
     if(is(Rule::FUNC_PARAM))
         if(auto param = funcParam())
         {
-            if(param.value().type->type == TokenType::I32) dataTypes.push_back(IRType::I32);
-            else if(param.value().type->type == TokenType::F32)
+            if(param.value().type->type() == TokenType::I32) dataTypes.push_back(IRType::I32);
+            else if(param.value().type->type() == TokenType::F32)
                 dataTypes.push_back(IRType::F32);
-            else if(param.value().type->type == TokenType::CHR)
+            else if(param.value().type->type() == TokenType::CHR)
                 dataTypes.push_back(IRType::CHR);
-            else if(param.value().type->type == TokenType::STR)
+            else if(param.value().type->type() == TokenType::STR)
                 dataTypes.push_back(IRType::STR);
 
             params.push_back(std::move(param.value()));
@@ -180,12 +178,12 @@ std::unique_ptr<AST> Parser::func()
                 }
                 else if(auto param = funcParam())
                 {
-                    if(param.value().type->type == TokenType::I32) dataTypes.push_back(IRType::I32);
-                    else if(param.value().type->type == TokenType::F32)
+                    if(param.value().type->type() == TokenType::I32) dataTypes.push_back(IRType::I32);
+                    else if(param.value().type->type() == TokenType::F32)
                         dataTypes.push_back(IRType::F32);
-                    else if(param.value().type->type == TokenType::CHR)
+                    else if(param.value().type->type() == TokenType::CHR)
                         dataTypes.push_back(IRType::CHR);
-                    else if(param.value().type->type == TokenType::STR)
+                    else if(param.value().type->type() == TokenType::STR)
                         dataTypes.push_back(IRType::STR);
 
                     params.push_back(std::move(param.value()));
@@ -206,10 +204,10 @@ std::unique_ptr<AST> Parser::func()
     if(is(Rule::DATA_TYPE)) ret = dataType();
     if(ret != nullptr)
     {
-        if(ret->type == TokenType::I32) symbolFunc->setRet(IRType::I32);
-        if(ret->type == TokenType::F32) symbolFunc->setRet(IRType::F32);
-        if(ret->type == TokenType::CHR) symbolFunc->setRet(IRType::CHR);
-        if(ret->type == TokenType::STR) symbolFunc->setRet(IRType::STR);
+        if(ret->type() == TokenType::I32) symbolFunc->setRet(IRType::I32);
+        if(ret->type() == TokenType::F32) symbolFunc->setRet(IRType::F32);
+        if(ret->type() == TokenType::CHR) symbolFunc->setRet(IRType::CHR);
+        if(ret->type() == TokenType::STR) symbolFunc->setRet(IRType::STR);
     }
 
     // Block
@@ -240,19 +238,19 @@ std::optional<ASTFuncParam> Parser::funcParam()
     auto ident = &(*tokensRef)[pos];
     pos++;
 
-    auto symbolVar = this->symbolTable->createVar(ident->getText());
+    auto symbolVar = this->symbolTable->createVar(ident->lexeme());
 
     // DATA_TYPE
     if(!is(Rule::DATA_TYPE)) return std::nullopt;
     const Token* type{dataType()};
     if(type != nullptr)
     {
-        if(type->type == TokenType::I32) symbolVar->setType(IRType::I32);
-        else if(type->type == TokenType::F32)
+        if(type->type() == TokenType::I32) symbolVar->setType(IRType::I32);
+        else if(type->type() == TokenType::F32)
             symbolVar->setType(IRType::F32);
-        else if(type->type == TokenType::CHR)
+        else if(type->type() == TokenType::CHR)
             symbolVar->setType(IRType::CHR);
-        else if(type->type == TokenType::STR)
+        else if(type->type() == TokenType::STR)
             symbolVar->setType(IRType::STR);
         else
             return std::nullopt;

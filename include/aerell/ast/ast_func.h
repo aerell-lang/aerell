@@ -24,7 +24,7 @@ class ASTFunc : public AST
     const Token* ident = nullptr;
     std::vector<ASTFuncParam> params;
     const Token* ret = nullptr;
-    std::optional<Children> stmts = std::nullopt;
+    std::optional<List> stmts = std::nullopt;
     SymbolFunc* symbol = nullptr;
 
     void print(OStream& os, size_t indent = 0) const override;

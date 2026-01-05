@@ -23,7 +23,7 @@ class Lexer
   public:
     struct Result
     {
-        const Source& source;
+        const Source* source;
         Token::List tokens;
     };
 
@@ -84,19 +84,16 @@ inline OStream& operator<<(OStream& os, const Lexer::Result& result)
         maxWidth = std::max(maxWidth, width);
     }
 
-    outs() << '\n' << result.source.path().generic_string() << ":\n";
+    outs() << '\n' << result.source->path().generic_string() << ":\n";
 
     for(const auto& token : result.tokens)
     {
         const char* t = toString(token.type());
         size_t width = std::strlen(t);
 
-        if(width < maxWidth)
-        {
-            outs() << std::string(maxWidth - width, ' ');
-        }
+        if(width < maxWidth) outs() << std::string(maxWidth - width, ' ');
 
-        outs() << t << " " << token.lexeme() << '\n';
+        outs() << token << '\n';
     }
     return os;
 }
