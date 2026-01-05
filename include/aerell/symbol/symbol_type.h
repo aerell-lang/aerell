@@ -6,8 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_SYMBOL_SYMBOL_TYPE_H
-#define AERELL_COMPILER_SYMBOL_SYMBOL_TYPE_H
+#ifndef AERELL_SYMBOL_SYMBOL_TYPE_H
+#define AERELL_SYMBOL_SYMBOL_TYPE_H
 
 #include <array>
 

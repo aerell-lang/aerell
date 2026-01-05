@@ -6,14 +6,14 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_SYMBOL_SYMBOL_FUNC_H
-#define AERELL_COMPILER_SYMBOL_SYMBOL_FUNC_H
+#ifndef AERELL_SYMBOL_SYMBOL_FUNC_H
+#define AERELL_SYMBOL_SYMBOL_FUNC_H
 
 #include <optional>
 #include <vector>
 
-#include "aerell/compiler/symbol/symbol.h"
-#include "aerell/compiler/ir/ir_type.h"
+#include "aerell/symbol/symbol.h"
+#include "aerell/ir/ir_type.h"
 
 namespace aerell
 {

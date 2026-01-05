@@ -6,10 +6,10 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_SYMBOL_SYMBOL_H
-#define AERELL_COMPILER_SYMBOL_SYMBOL_H
+#ifndef AERELL_SYMBOL_SYMBOL_H
+#define AERELL_SYMBOL_SYMBOL_H
 
-#include "symbol_type.h"
+#include "aerell/symbol/symbol_type.h"
 
 namespace aerell
 {

@@ -6,9 +6,9 @@
  * See the LICENSE file for details.
  */
 
-#include <aerell/support/ostream.h>
-#include "aerell/compiler/symbol/symbol_print.h"
-#include "aerell/compiler/symbol/symbol_type.h"
+#include "aerell/support/ostream.h"
+#include "aerell/symbol/symbol_type.h"
+#include "aerell/symbol/symbol_print.h"
 
 namespace aerell
 {

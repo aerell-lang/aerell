@@ -6,8 +6,8 @@
  * See the LICENSE file for details.
  */
 
-#include "aerell/compiler/symbol/symbol_func.h"
-#include <aerell/compiler/symbol/symbol_type.h>
+#include "aerell/symbol/symbol_func.h"
+#include "aerell/symbol/symbol_type.h"
 
 namespace aerell
 {

@@ -6,17 +6,17 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_SYMBOL_SYMBOL_TABLE_H
-#define AERELL_COMPILER_SYMBOL_SYMBOL_TABLE_H
+#ifndef AERELL_SYMBOL_SYMBOL_TABLE_H
+#define AERELL_SYMBOL_SYMBOL_TABLE_H
 
 #include <memory>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
 
-#include "aerell/compiler/symbol/symbol_var.h"
-#include "aerell/compiler/symbol/symbol_func.h"
-#include "aerell/compiler/symbol/symbol.h"
+#include "aerell/symbol/symbol_var.h"
+#include "aerell/symbol/symbol_func.h"
+#include "aerell/symbol/symbol.h"
 
 namespace aerell
 {

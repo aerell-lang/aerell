@@ -6,11 +6,11 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_SYMBOL_SYMBOL_VAR_H
-#define AERELL_COMPILER_SYMBOL_SYMBOL_VAR_H
+#ifndef AERELL_SYMBOL_SYMBOL_VAR_H
+#define AERELL_SYMBOL_SYMBOL_VAR_H
 
-#include "aerell/compiler/symbol/symbol.h"
-#include <aerell/compiler/ir/ir_type.h>
+#include "aerell/symbol/symbol.h"
+#include "aerell/ir/ir_type.h"
 
 namespace aerell
 {

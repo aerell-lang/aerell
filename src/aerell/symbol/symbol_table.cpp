@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include "aerell/compiler/symbol/symbol_table.h"
+#include "aerell/symbol/symbol_table.h"
 
 namespace aerell
 {

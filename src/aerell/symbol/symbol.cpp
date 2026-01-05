@@ -6,7 +6,7 @@
  * See the LICENSE file for details.
  */
 
-#include "aerell/compiler/symbol/symbol.h"
+#include "aerell/symbol/symbol.h"
 
 namespace aerell
 {
