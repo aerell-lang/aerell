@@ -6,7 +6,7 @@
  * See the LICENSE file for details.
  */
 
-#include "aerell/compiler/ast/ast_literal.h"
+#include "aerell/ast/ast_literal.h"
 
 namespace aerell
 {
@@ -14,7 +14,7 @@ namespace aerell
 void ASTLiteral::print(OStream& os, size_t indent) const
 {
     os << std::string(indent, ' ') << "Literal\n";
-    os << std::string(indent, ' ') << " value: " << this->value->getText() << '\n';
+    os << std::string(indent, ' ') << " value: " << *this->value << '\n';
 }
 
 } // namespace aerell

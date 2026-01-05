@@ -6,12 +6,12 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_AST_AST_LITERAL_H
-#define AERELL_COMPILER_AST_AST_LITERAL_H
+#ifndef AERELL_AST_AST_LITERAL_H
+#define AERELL_AST_AST_LITERAL_H
 
-#include <aerell/compiler/ast/ast.h>
-#include <aerell/compiler/token/token.h>
-#include <aerell/support/ostream.h>
+#include "aerell/support/ostream.h"
+#include "aerell/token/token.h"
+#include "aerell/ast/ast.h"
 
 namespace aerell
 {

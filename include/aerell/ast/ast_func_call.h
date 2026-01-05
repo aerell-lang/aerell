@@ -6,13 +6,13 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_AST_AST_FUNC_CALL_H
-#define AERELL_COMPILER_AST_AST_FUNC_CALL_H
+#ifndef AERELL_AST_AST_FUNC_CALL_H
+#define AERELL_AST_AST_FUNC_CALL_H
 
-#include <aerell/compiler/ast/ast.h>
-#include <aerell/compiler/symbol/symbol_func.h>
-#include <aerell/compiler/token/token.h>
-#include <aerell/support/ostream.h>
+#include "aerell/support/ostream.h"
+#include "aerell/token/token.h"
+#include "aerell/ast/ast.h"
+#include "aerell/symbol/symbol_func.h"
 
 namespace aerell
 {

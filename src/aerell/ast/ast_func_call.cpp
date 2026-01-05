@@ -6,7 +6,7 @@
  * See the LICENSE file for details.
  */
 
-#include <aerell/compiler/ast/ast_func_call.h>
+#include "aerell/ast/ast_func_call.h"
 
 namespace aerell
 {
@@ -14,7 +14,7 @@ namespace aerell
 void ASTFuncCall::print(OStream& os, size_t indent) const
 {
     os << std::string(indent, ' ') << "FuncCall\n";
-    os << std::string(indent, ' ') << " name: " << this->ident->getText() << "\n";
+    os << std::string(indent, ' ') << " name: " << *this->ident << "\n";
     if(this->args.empty()) return;
     os << std::string(indent, ' ') << " args:\n";
     for(const auto& arg : this->args) arg->print(os, indent + 2);

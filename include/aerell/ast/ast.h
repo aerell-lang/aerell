@@ -6,13 +6,13 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_AST_AST_H
-#define AERELL_COMPILER_AST_AST_H
+#ifndef AERELL_AST_AST_H
+#define AERELL_AST_AST_H
 
 #include <memory>
 #include <vector>
 
-#include <aerell/support/ostream.h>
+#include "aerell/support/ostream.h"
 
 namespace aerell
 {

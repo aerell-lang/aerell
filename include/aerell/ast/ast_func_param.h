@@ -6,10 +6,10 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_COMPILER_AST_AST_FUNC_PARAM_H
-#define AERELL_COMPILER_AST_AST_FUNC_PARAM_H
+#ifndef AERELL_AST_AST_FUNC_PARAM_H
+#define AERELL_AST_AST_FUNC_PARAM_H
 
-#include <aerell/compiler/token/token.h>
+#include "aerell/token/token.h"
 
 namespace aerell
 {

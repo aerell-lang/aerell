@@ -6,7 +6,7 @@
  * See the LICENSE file for details.
  */
 
-#include <aerell/compiler/ast/ast_func.h>
+#include "aerell/ast/ast_func.h"
 
 namespace aerell
 {
@@ -14,18 +14,18 @@ namespace aerell
 void ASTFunc::print(OStream& os, size_t indent) const
 {
     os << std::string(indent, ' ') << "Func\n";
-    os << std::string(indent, ' ') << " ident: " << this->ident->getText() << "\n";
+    os << std::string(indent, ' ') << " ident: " << *this->ident << "\n";
     if(!this->params.empty())
     {
         os << std::string(indent, ' ') << " params:\n";
         for(auto param : this->params)
         {
             os << std::string(indent + 1, ' ') << " FuncParam\n";
-            os << std::string(indent + 2, ' ') << " ident: " << param.ident->getText() << "\n";
-            os << std::string(indent + 2, ' ') << " type: " << param.type->getText() << "\n";
+            os << std::string(indent + 2, ' ') << " ident: " << *param.ident << "\n";
+            os << std::string(indent + 2, ' ') << " type: " << *param.type << "\n";
         }
     }
-    if(this->ret != nullptr) os << std::string(indent, ' ') << " ret: " << this->ret->getText() << "\n";
+    if(this->ret != nullptr) os << std::string(indent, ' ') << " ret: " << *this->ret << "\n";
     if(this->stmts.has_value())
     {
         os << std::string(indent, ' ') << " stmts:\n";
