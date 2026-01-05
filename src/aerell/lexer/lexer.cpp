@@ -22,7 +22,7 @@ static std::pair<TokenType, std::string_view> keywords[] = {
 };
 
 Lexer::Lexer(SourceManager& sourceManager, CharReader& charReader)
-    : sourceManager{sourceManager}, charReader{charReader}
+    : _sourceManager{sourceManager}, _charReader{charReader}
 {
 }
 
@@ -37,7 +37,7 @@ bool Lexer::lexing(std::string_view source, Results& results)
 
     for(const auto& source : sources)
     {
-        int status = this->sourceManager.import(source.first, source.second, &errs());
+        int status = this->_sourceManager.import(source.first, source.second, &errs());
         if(status == 0)
         {
             errs() << '\n';
@@ -48,7 +48,7 @@ bool Lexer::lexing(std::string_view source, Results& results)
             continue;
 
         Results tempResults;
-        if(!this->lexing(this->sourceManager.last(), tempResults))
+        if(!this->lexing(this->_sourceManager.last(), tempResults))
         {
             if(!hasError) hasError = true;
             continue;
@@ -72,7 +72,7 @@ bool Lexer::lexing(const Source& source, Results& results)
 
         std::string message;
         OSStream os(message);
-        int status = sourceManager.import(token.lexeme().substr(1, token.lexeme().size() - 2), false, &os);
+        int status = this->_sourceManager.import(token.lexeme().substr(1, token.lexeme().size() - 2), false, &os);
         if(status == 0)
         {
             message = {"[I] " + message};
@@ -84,7 +84,7 @@ bool Lexer::lexing(const Source& source, Results& results)
             continue;
 
         Results tempResults;
-        if(!this->lexing(this->sourceManager.last(), tempResults))
+        if(!this->lexing(this->_sourceManager.last(), tempResults))
         {
             if(!hasError) hasError = true;
             continue;
@@ -102,60 +102,58 @@ bool Lexer::lexing(const Source& source, Results& results)
 
 Lexer::Result Lexer::lexing(const Source& source)
 {
-    this->source = &source;
-    this->charReader.set(this->source->content());
-    Lexer::Result result{this->source, {}};
+    this->_source = &source;
+    this->_charReader.set(this->_source->content());
+    Lexer::Result result{this->_source, {}};
 
-    bool stop = false;
-    while(!stop)
+    Token token = this->getToken();
+    while(token.type() != TokenType::EOFF)
     {
-        auto& token = this->getToken();
-        if(token.type() == TokenType::EOFF) stop = true;
-        result.tokens.push_back(std::move(token));
+        result.tokens.emplace_back(std::move(token));
+        token = this->getToken();
     }
+
+    result.tokens.emplace_back(std::move(token));
 
     return result;
 }
 
-bool Lexer::hasToken() const { return this->charReader.canAdvance(); }
-
-Token& Lexer::getToken()
+void Lexer::createToken(TokenType type, size_t offset, size_t size)
 {
-    while(this->hasToken())
-    {
-        if(this->wsHandler() || this->commentHandler()) continue;
-        break;
-    }
+    this->_token = {this->_source, type, offset, size};
+}
 
+void Lexer::createToken(TokenType type, size_t size) { this->createToken(type, this->_charReader.tell(), size); }
+
+// Token
+bool Lexer::hasToken() const { return this->_charReader.canAdvance(); }
+
+Token Lexer::getToken()
+{
     if(!this->hasToken())
     {
         this->eofHandler();
-        return this->token;
+        return std::move(this->_token);
     }
 
-    if(this->identHandler() || this->keywordHandler() || this->symbolHandler() || this->intHandler() ||
-       this->fltHandler() || this->chrHandler() || this->strHandler())
-        return this->token;
+    while(this->hasToken() && (this->wsHandler() || this->commentHandler()));
+
+    if(this->symbolHandler() || this->keywordHandler() || this->identHandler() || this->fltHandler() ||
+       this->intHandler() || this->chrHandler() || this->strHandler())
+        return std::move(this->_token);
 
     this->illegalHandler();
-    return this->token;
+    return std::move(this->_token);
 }
-
-void Lexer::createToken(TokenType type, size_t offset, size_t size)
-{
-    this->token = {this->source, type, offset, size};
-}
-
-void Lexer::createToken(TokenType type, size_t size) { this->createToken(type, this->charReader.tell(), size); }
 
 bool Lexer::isDigit(char character) const { return std::isdigit(character); }
-bool Lexer::isDigit(size_t offset) const { return this->isDigit(this->charReader.peek(offset)); }
+bool Lexer::isDigit(size_t offset) const { return this->isDigit(this->_charReader.peek(offset)); }
 
-bool Lexer::isIdentStart(char character) const { return character == '_' || std::isalpha(character); }
-bool Lexer::isIdentStart(size_t offset) const { return this->isIdentStart(this->charReader.peek(offset)); }
+bool Lexer::isIdentStart(char character) const { return character == '_' || std::iswalpha(character); }
+bool Lexer::isIdentStart(size_t offset) const { return this->isIdentStart(this->_charReader.peek(offset)); }
 
-bool Lexer::isIdentContinue(char character) const { return character == '_' || std::isalnum(character); }
-bool Lexer::isIdentContinue(size_t offset) const { return this->isIdentContinue(this->charReader.peek(offset)); }
+bool Lexer::isIdentContinue(char character) const { return character == '_' || std::iswalnum(character); }
+bool Lexer::isIdentContinue(size_t offset) const { return this->isIdentContinue(this->_charReader.peek(offset)); }
 
 void Lexer::eofHandler() { this->createToken(TokenType::EOFF, 1); }
 
@@ -163,14 +161,14 @@ void Lexer::illegalHandler()
 {
     size_t size = 1;
     this->createToken(TokenType::ILLEGAL, size);
-    this->charReader.advance(size);
+    this->_charReader.advance(size);
 }
 
 bool Lexer::wsHandler()
 {
-    if(std::isspace(this->charReader.peek()))
+    if(std::iswspace(this->_charReader.peek()))
     {
-        this->charReader.advance();
+        this->_charReader.advance();
         return true;
     }
     return false;
@@ -179,16 +177,11 @@ bool Lexer::wsHandler()
 bool Lexer::commentHandler()
 {
     // #
-    if(!this->charReader.match('#')) return false;
-    this->charReader.advance();
+    if(!this->_charReader.match('#')) return false;
+    this->_charReader.advance();
 
-    // .
-    while(this->charReader.canAdvance())
-    {
-        // Exclude \n
-        if(this->charReader.match('\n')) break;
-        this->charReader.advance();
-    }
+    // . exclude \n
+    while(this->_charReader.canAdvance() && !this->_charReader.match('\n')) this->_charReader.advance();
 
     return true;
 }
@@ -198,9 +191,9 @@ bool Lexer::symbolHandler()
     for(const auto& [type, symbol] : symbols)
     {
         size_t size = symbol.size();
-        if(!this->charReader.canAdvance(size) || !this->charReader.match(symbol)) continue;
+        if(!this->_charReader.canAdvance(size) || !this->_charReader.match(symbol)) continue;
         this->createToken(type, size);
-        this->charReader.advance(size);
+        this->_charReader.advance(size);
         return true;
     }
     return false;
@@ -211,10 +204,10 @@ bool Lexer::keywordHandler()
     for(const auto& [type, keyword] : keywords)
     {
         size_t size = keyword.size();
-        if(!this->charReader.canAdvance(size) || !this->charReader.match(keyword) || this->isIdentContinue(size))
+        if(!this->_charReader.canAdvance(size) || !this->_charReader.match(keyword) || this->isIdentContinue(size))
             continue;
         this->createToken(type, size);
-        this->charReader.advance(size);
+        this->_charReader.advance(size);
         return true;
     }
     return false;
@@ -225,14 +218,14 @@ bool Lexer::intHandler()
     // [0-9]
     if(!this->isDigit()) return false;
 
-    size_t offset = this->charReader.tell();
-    this->charReader.advance();
+    size_t offset = this->_charReader.tell();
+    this->_charReader.advance();
 
     // [0-9]*
-    while(this->charReader.canAdvance() && this->isDigit()) this->charReader.advance();
+    while(this->_charReader.canAdvance() && this->isDigit()) this->_charReader.advance();
 
     // Calculate size
-    size_t size = this->charReader.tell() - offset;
+    size_t size = this->_charReader.tell() - offset;
 
     //
     this->createToken(TokenType::INTL, offset, size);
@@ -245,33 +238,33 @@ bool Lexer::fltHandler()
     // [0-9]
     if(!this->isDigit()) return false;
 
-    size_t offset = this->charReader.tell();
-    this->charReader.advance();
+    size_t offset = this->_charReader.tell();
+    this->_charReader.advance();
 
     // [0-9]*
-    while(this->charReader.canAdvance() && this->isDigit()) this->charReader.advance();
+    while(this->_charReader.canAdvance() && this->isDigit()) this->_charReader.advance();
 
     // .
-    if(!this->charReader.match('.'))
+    if(!this->_charReader.match('.'))
     {
-        this->charReader.seek(offset);
+        this->_charReader.seek(offset);
         return false;
     }
-    this->charReader.advance();
+    this->_charReader.advance();
 
     // [0-9]
     if(!this->isDigit())
     {
-        this->charReader.seek(offset);
+        this->_charReader.seek(offset);
         return false;
     }
-    this->charReader.advance();
+    this->_charReader.advance();
 
     // [0-9]*
-    while(this->charReader.canAdvance() && this->isDigit()) this->charReader.advance();
+    while(this->_charReader.canAdvance() && this->isDigit()) this->_charReader.advance();
 
     // Calculate size
-    size_t size = this->charReader.tell() - offset;
+    size_t size = this->_charReader.tell() - offset;
 
     //
     this->createToken(TokenType::FLTL, offset, size);
@@ -282,38 +275,38 @@ bool Lexer::fltHandler()
 bool Lexer::chrHandler()
 {
     // '
-    if(!this->charReader.match('\'')) return false;
-    size_t offset = this->charReader.tell();
-    this->charReader.advance();
+    if(!this->_charReader.match('\'')) return false;
+    size_t offset = this->_charReader.tell();
+    this->_charReader.advance();
 
     // Escape
-    if(this->charReader.match('\\'))
+    if(this->_charReader.match('\\'))
     {
-        this->charReader.advance();
-        if(this->charReader.canAdvance()) this->charReader.advance();
+        this->_charReader.advance();
+        if(this->_charReader.canAdvance()) this->_charReader.advance();
     }
     else
     {
         // .
-        char c = this->charReader.peek();
+        char c = this->_charReader.peek();
         if(c == '\'' || c == '\n')
         {
-            this->charReader.seek(offset);
+            this->_charReader.seek(offset);
             return false;
         }
-        this->charReader.advance();
+        this->_charReader.advance();
     }
 
     // '
-    if(!this->charReader.match('\''))
+    if(!this->_charReader.match('\''))
     {
-        this->charReader.seek(offset);
+        this->_charReader.seek(offset);
         return false;
     }
-    this->charReader.advance();
+    this->_charReader.advance();
 
     // Calculate size
-    size_t size = this->charReader.tell() - offset;
+    size_t size = this->_charReader.tell() - offset;
 
     //
     this->createToken(TokenType::CHRL, offset, size);
@@ -323,27 +316,27 @@ bool Lexer::chrHandler()
 
 bool Lexer::strHandler()
 {
-    if(!this->charReader.match('"')) return false;
+    if(!this->_charReader.match('"')) return false;
 
-    size_t offset = this->charReader.tell();
-    this->charReader.advance();
+    size_t offset = this->_charReader.tell();
+    this->_charReader.advance();
 
-    while(this->charReader.canAdvance())
+    while(this->_charReader.canAdvance())
     {
-        char c = this->charReader.peek();
+        char c = this->_charReader.peek();
 
         if(c == '"' || c == '\n')
         {
-            this->charReader.advance();
+            this->_charReader.advance();
             break;
         }
 
-        if(c == '\\') this->charReader.advance();
+        if(c == '\\') this->_charReader.advance();
 
-        this->charReader.advance();
+        this->_charReader.advance();
     }
 
-    size_t size = this->charReader.tell() - offset;
+    size_t size = this->_charReader.tell() - offset;
 
     this->createToken(TokenType::STRL, offset, size);
 
@@ -354,17 +347,12 @@ bool Lexer::identHandler()
 {
     if(!this->isIdentStart()) return false;
 
-    size_t offset = this->charReader.tell();
-    this->charReader.advance();
+    size_t offset = this->_charReader.tell();
+    this->_charReader.advance();
 
-    while(this->charReader.canAdvance())
-    {
-        if(this->isIdentContinue()) this->charReader.advance();
-        else
-            break;
-    }
+    while(this->_charReader.canAdvance() && this->isIdentContinue()) this->_charReader.advance();
 
-    size_t size = this->charReader.tell() - offset;
+    size_t size = this->_charReader.tell() - offset;
 
     this->createToken(TokenType::IDENT, offset, size);
 

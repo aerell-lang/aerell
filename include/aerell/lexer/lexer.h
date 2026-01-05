@@ -34,22 +34,22 @@ class Lexer
     bool lexing(std::string_view source, Results& results);
 
   private:
-    SourceManager& sourceManager;
-    CharReader& charReader;
+    SourceManager& _sourceManager;
+    CharReader& _charReader;
 
-    const Source* source = nullptr;
-    Token token;
+    const Source* _source = nullptr;
+    Token _token;
 
     // Lexing
     bool lexing(const Source& source, Results& results);
     Result lexing(const Source& source);
 
-    // Token
-    bool hasToken() const;
-    Token& getToken();
-
     void createToken(TokenType type, size_t offset, size_t size);
     void createToken(TokenType type, size_t size);
+
+    // Token
+    bool hasToken() const;
+    Token getToken();
 
     // Fragment
     bool isDigit(char character) const;
@@ -88,8 +88,7 @@ inline OStream& operator<<(OStream& os, const Lexer::Result& result)
 
     for(const auto& token : result.tokens)
     {
-        const char* t = toString(token.type());
-        size_t width = std::strlen(t);
+        size_t width = std::strlen(toString(token.type()));
 
         if(width < maxWidth) outs() << std::string(maxWidth - width, ' ');
 
