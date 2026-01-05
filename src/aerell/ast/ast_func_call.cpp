@@ -14,7 +14,7 @@ namespace aerell
 void ASTFuncCall::print(OStream& os, size_t indent) const
 {
     os << std::string(indent, ' ') << "FuncCall\n";
-    os << std::string(indent, ' ') << " name: " << *this->ident << "\n";
+    os << std::string(indent, ' ') << " name: " << this->ident->lexeme() << "\n";
     if(this->args.empty()) return;
     os << std::string(indent, ' ') << " args:\n";
     for(const auto& arg : this->args) arg->print(os, indent + 2);

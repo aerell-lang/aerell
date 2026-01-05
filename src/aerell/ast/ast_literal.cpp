@@ -14,7 +14,7 @@ namespace aerell
 void ASTLiteral::print(OStream& os, size_t indent) const
 {
     os << std::string(indent, ' ') << "Literal\n";
-    os << std::string(indent, ' ') << " value: " << *this->value << '\n';
+    os << std::string(indent, ' ') << " value: " << this->value->lexeme() << '\n';
 }
 
 } // namespace aerell
