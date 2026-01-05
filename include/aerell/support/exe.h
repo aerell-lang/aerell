@@ -6,15 +6,19 @@
  * See the LICENSE file for details.
  */
 
-#ifndef AERELL_SUPPORT_UTILS_H
-#define AERELL_SUPPORT_UTILS_H
+#ifndef AERELL_SUPPORT_EXE_H
+#define AERELL_SUPPORT_EXE_H
 
 #include <filesystem>
 
 namespace aerell
 {
 
-std::filesystem::path getExeDir();
+class Exe
+{
+  public:
+    static std::filesystem::path getDir();
+};
 
 } // namespace aerell
 

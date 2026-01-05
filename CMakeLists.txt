@@ -125,6 +125,10 @@ file(
     GLOB_RECURSE
     "AERELL_SRC_FILES"
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/support/*.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/source/*.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/reader/*.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/token/*.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/aerell/lexer/*.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/cli/*.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/aerell/app/main.cpp"
 )

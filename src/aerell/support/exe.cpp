@@ -6,7 +6,7 @@
  * See the LICENSE file for details.
  */
 
-#include "aerell/support/utils.h"
+#include "aerell/support/exe.h"
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -17,12 +17,12 @@
 namespace aerell
 {
 
-std::filesystem::path getExeDir()
+std::filesystem::path Exe::getDir()
 {
 #if defined(_WIN64)
     char path[MAX_PATH];
     GetModuleFileNameA(nullptr, path, MAX_PATH);
-    return std::filesystem::path(path).parent_path();
+    return std::filesystem::weakly_canonical(path).parent_path();
 #else
 #error "Only Win supported"
 #endif
