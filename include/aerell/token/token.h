@@ -14,7 +14,7 @@ typedef struct
     token_type_t type;
     size_t offset;
     size_t size;
-    file_t* file;
+    const file_t* file;
 } token_t;
 
 void debug_token(const token_t* token);

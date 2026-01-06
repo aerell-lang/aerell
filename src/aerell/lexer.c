@@ -43,6 +43,7 @@ void lexer(const file_t* file, token_t* tokens, size_t size)
             tokens[token_index].type = TOKEN_TYPE_INTL;
             tokens[token_index].offset = offset;
             tokens[token_index].size = ((size_t)(content - begin)) - offset;
+            tokens[token_index].file = file;
 
             token_index++;
             continue;
@@ -52,6 +53,7 @@ void lexer(const file_t* file, token_t* tokens, size_t size)
         tokens[token_index].type = TOKEN_TYPE_ILLEGAL;
         tokens[token_index].offset = (size_t)(content - begin);
         tokens[token_index].size = 1;
+        tokens[token_index].file = file;
 
         token_index++;
         content++;
@@ -61,4 +63,5 @@ void lexer(const file_t* file, token_t* tokens, size_t size)
     tokens[token_index].type = TOKEN_TYPE_EOF;
     tokens[token_index].size = 0;
     tokens[token_index].offset = (size_t)(content - begin);
+    tokens[token_index].file = file;
 }
