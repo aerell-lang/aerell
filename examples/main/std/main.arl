@@ -1,4 +1,0 @@
-p f __main() { 
-    main() 
-}
-__main()

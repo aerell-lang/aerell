@@ -1,4 +1,0 @@
-# Example to print "Hello World!" in Aerell.
-
-# Call print function with argument "Hello World!"
-print("Hello World!")

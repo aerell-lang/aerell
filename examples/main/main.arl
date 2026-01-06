@@ -1,5 +1,0 @@
-"std/main"
-
-p f main() {
-    print("Hello World!")
-}

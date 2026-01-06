@@ -1,3 +1,0 @@
-p f hw() {
-    print("Hello World!")
-}
