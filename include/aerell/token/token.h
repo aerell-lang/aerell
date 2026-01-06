@@ -17,8 +17,8 @@ typedef struct
     file_t* file;
 } token_t;
 
-void print_token(const token_t* token);
+void debug_token(const token_t* token);
 
-void print_tokens(const token_t* tokens);
+void debug_tokens(const token_t* tokens);
 
 #endif

@@ -24,7 +24,7 @@ int main(int argc, const char* argv[])
 
     lexer(file, tokens, size);
 
-    print_tokens(tokens);
+    debug_tokens(tokens);
 
     file_free(file);
     return 0;
