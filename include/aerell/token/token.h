@@ -1,59 +1,22 @@
-/*
- * This file is part of The Aerell Programming Language
- *
- * Copyright 2025 The Aerell Programming Language Authors
- * Licensed under the Apache License, Version 2.0.
- * See the LICENSE file for details.
- */
+// Copyright 2026 Fern Aerell.
+// SPDX-License-Identifier: Apache-2.0
 
 #ifndef AERELL_TOKEN_TOKEN_H
 #define AERELL_TOKEN_TOKEN_H
 
-#include <vector>
+#include <stddef.h>
 
-#include "aerell/support/ostream.h"
 #include "aerell/token/token_type.h"
-#include <aerell/source/source.h>
 
-namespace aerell
+typedef struct
 {
+    token_type_t type;
+    size_t offset;
+    size_t size;
+} token_t;
 
-class Token
-{
-  public:
-    using List = std::vector<Token>;
+void print_token(const token_t* token);
 
-    Token();
-    Token(const Source* source, TokenType type, size_t offset, size_t size);
-    Token(Token&& other);
-
-    Token& operator=(const Token& other);
-
-    TokenType type() const;
-    std::string_view lexeme() const;
-
-    void print(std::string_view message) const;
-    void print(OStream& os) const;
-
-  private:
-    const Source* _source;
-    TokenType _type;
-    size_t _offset;
-    size_t _size;
-};
-
-inline OStream& operator<<(OStream& os, const Token& token)
-{
-    token.print(os);
-    return os;
-}
-
-inline OStream& operator<<(OStream& os, const Token::List& list)
-{
-    for(const auto& token : list) os << token;
-    return os;
-}
-
-} // namespace aerell
+void print_tokens(const token_t* tokens);
 
 #endif
