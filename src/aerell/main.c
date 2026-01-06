@@ -22,7 +22,7 @@ int main(int argc, const char* argv[])
     token_t tokens[10] = {0};
     size_t size = sizeof(tokens) / sizeof(tokens[0]);
 
-    lexer(file->content, tokens, size);
+    lexer(file, tokens, size);
 
     print_tokens(tokens);
 

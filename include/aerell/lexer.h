@@ -5,7 +5,8 @@
 #define AERELL_LEXER_H
 
 #include "aerell/token/token.h"
+#include "aerell/file/file.h"
 
-void lexer(const char* data, token_t* tokens, size_t size);
+void lexer(const file_t* file, token_t* tokens, size_t size);
 
 #endif
