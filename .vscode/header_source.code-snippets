@@ -1,7 +1,7 @@
 {
   "Header Source": {
     "prefix": "header-source",
-    "scope": "c,h",
+    "scope": "c,cpp",
     "body": [
       "// Copyright 2026 Fern Aerell.",
       "// SPDX-License-Identifier: Apache-2.0",
