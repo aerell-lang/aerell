@@ -1,4 +1,4 @@
-# The Aerell Programming Language
+# Aerell Programming Language
 
 <p align="center">
     <img alt="Aerell Programming Language Logo" src="https://raw.githubusercontent.com/aerell-lang/logo/refs/heads/main/logo.png" width="250">
@@ -6,4 +6,5 @@
 
 > This programming language is under development.
 
-Aerell is an open source programming language.
+## License
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
