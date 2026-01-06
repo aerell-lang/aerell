@@ -1,2 +1,0 @@
-The Aerell Programming Language
-ISSUES & TODO LIST
