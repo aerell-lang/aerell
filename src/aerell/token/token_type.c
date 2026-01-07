@@ -3,7 +3,7 @@
 
 #include "aerell/token/token_type.h"
 
-const char* to_string(token_type_t t)
+const char* token_type_to_string(token_type_t t)
 {
     switch(t)
     {

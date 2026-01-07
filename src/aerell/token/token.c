@@ -9,26 +9,11 @@ void debug_token(const token_t* token)
 {
     if(token == NULL) return;
 
-    printf("{type: %s, offset: %zu, size: %zu} ", to_string(token->type), token->offset, token->size);
+    printf("type: %s, offset: %zu, size: %zu", token_type_to_string(token->type), token->offset, token->size);
 
     const char* content = token->file->content + token->offset;
 
-    if(token->type == TOKEN_TYPE_ILLEGAL) printf("(%d) ", *content);
+    if(token->type == TOKEN_TYPE_ILLEGAL) printf(", char_number: %d", *content);
 
-    printf("%.*s\n", (int)token->size, content);
-}
-
-void debug_tokens(const token_t* tokens)
-{
-    if(tokens == NULL) return;
-
-    printf("%s\n", tokens->file->path);
-
-    while(tokens->type != TOKEN_TYPE_EOF)
-    {
-        debug_token(tokens);
-        tokens++;
-    }
-
-    debug_token(tokens);
+    printf(", content: %.*s\n", (int)token->size, content);
 }

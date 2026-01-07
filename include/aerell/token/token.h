@@ -19,6 +19,4 @@ typedef struct
 
 void debug_token(const token_t* token);
 
-void debug_tokens(const token_t* tokens);
-
 #endif
