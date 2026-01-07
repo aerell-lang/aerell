@@ -11,7 +11,7 @@ in a very large number (due to unsigned overflow), which will be greater than 9.
 */
 inline static bool is_digit(char c) { return (unsigned char)(c - '0') <= 9; }
 
-inline static bool is_ws(char c) { return c == ' ' || c == '\n'; }
+inline static bool is_ws(char c) { return c == ' ' || c == '\t' || c == '\r' || c == '\n'; }
 
 void lexer(const file_t* file, token_t* tokens, size_t size)
 {
