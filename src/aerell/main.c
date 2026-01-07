@@ -19,12 +19,15 @@ int main(int argc, const char* argv[])
         return 1;
     }
 
-    token_t tokens[10] = {0};
-    size_t size = sizeof(tokens) / sizeof(tokens[0]);
+    lexer_t lexer = {0};
+    lexer_set_file(&lexer, file);
 
-    lexer(file, tokens, size);
-
-    debug_tokens(tokens);
+    token_t token = {0};
+    do
+    {
+        lexer_get_token(&lexer, &token);
+        debug_token(&token);
+    } while(token.type != TOKEN_TYPE_EOF);
 
     file_free(file);
     return 0;

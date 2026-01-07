@@ -7,6 +7,14 @@
 #include "aerell/token/token.h"
 #include "aerell/file/file.h"
 
-void lexer(const file_t* file, token_t* tokens, size_t size);
+typedef struct
+{
+    const file_t* file;
+    const char* content;
+} lexer_t;
+
+void lexer_set_file(lexer_t* lexer, const file_t* file);
+
+void lexer_get_token(lexer_t* lexer, token_t* token);
 
 #endif

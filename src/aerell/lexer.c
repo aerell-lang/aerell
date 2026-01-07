@@ -1,7 +1,19 @@
 // Copyright 2026 Fern Aerell.
 // SPDX-License-Identifier: Apache-2.0
 
+#include <assert.h>
+
 #include "aerell/lexer.h"
+
+void lexer_set_file(lexer_t* lexer, const file_t* file)
+{
+    assert(lexer != NULL);
+    assert(file != NULL);
+
+    if(lexer == NULL || file == NULL) return;
+
+    lexer->content = (lexer->file = file)->content;
+}
 
 /*
 How it works:
@@ -13,62 +25,59 @@ inline static bool is_digit(char c) { return (unsigned char)(c - '0') <= 9; }
 
 inline static bool is_ws(char c) { return c == ' ' || c == '\t' || c == '\r' || c == '\n'; }
 
-void lexer(const file_t* file, token_t* tokens, size_t size)
+void lexer_get_token(lexer_t* lexer, token_t* token)
 {
-    if(tokens == NULL || size == 0) return;
+    assert(lexer != NULL);
+    assert(token != NULL);
 
-    const char* content = file->content;
-    const char* begin = content;
+    if(lexer == NULL || token == NULL) return;
 
-    size_t token_index = 0;
-
-    while(size > 1 && *content != '\0' && token_index < (size - 1))
+    while(*lexer->content != '\0')
     {
         // Skip whitespace and new line
-        if(is_ws(*content))
+        if(is_ws(*lexer->content))
         {
-            content++;
+            lexer->content++;
             continue;
         }
 
         // Skip comment
-        if(*content == '#')
+        if(*lexer->content == '#')
         {
-            while(*content != '\n' && *content != '\0') content++;
+            while(*lexer->content != '\n' && *lexer->content != '\0') lexer->content++;
             continue;
         }
 
         // Integer literal
-        if(is_digit(*content))
+        if(is_digit(*lexer->content))
         {
-            size_t offset = (size_t)(content - begin);
+            size_t offset = (size_t)(lexer->content - lexer->file->content);
 
-            content++;
+            lexer->content++;
 
-            while(is_digit(*content)) content++;
+            while(is_digit(*lexer->content)) lexer->content++;
 
-            tokens[token_index].type = TOKEN_TYPE_INTL;
-            tokens[token_index].offset = offset;
-            tokens[token_index].size = ((size_t)(content - begin)) - offset;
-            tokens[token_index].file = file;
+            token->type = TOKEN_TYPE_INTL;
+            token->offset = offset;
+            token->size = ((size_t)(lexer->content - lexer->file->content)) - offset;
+            token->file = lexer->file;
 
-            token_index++;
-            continue;
+            return;
         }
 
         // Illegal
-        tokens[token_index].type = TOKEN_TYPE_ILLEGAL;
-        tokens[token_index].offset = (size_t)(content - begin);
-        tokens[token_index].size = 1;
-        tokens[token_index].file = file;
+        token->type = TOKEN_TYPE_ILLEGAL;
+        token->offset = (size_t)(lexer->content - lexer->file->content);
+        token->size = 1;
+        token->file = lexer->file;
 
-        token_index++;
-        content++;
+        lexer->content++;
+        return;
     }
 
-    // EOF
-    tokens[token_index].type = TOKEN_TYPE_EOF;
-    tokens[token_index].size = 0;
-    tokens[token_index].offset = (size_t)(content - begin);
-    tokens[token_index].file = file;
+    // End of file
+    token->type = TOKEN_TYPE_EOF;
+    token->offset = (size_t)(lexer->content - lexer->file->content);
+    token->size = 0;
+    token->file = lexer->file;
 }
