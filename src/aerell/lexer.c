@@ -31,6 +31,13 @@ void lexer(const file_t* file, token_t* tokens, size_t size)
             continue;
         }
 
+        // Skip comment
+        if(*content == '#')
+        {
+            while(*content != '\n' && *content != '\0') content++;
+            continue;
+        }
+
         // Integer literal
         if(is_digit(*content))
         {
