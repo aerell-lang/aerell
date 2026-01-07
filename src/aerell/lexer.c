@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <assert.h>
+#include <string.h>
 
 #include "aerell/lexer.h"
 
@@ -13,6 +14,7 @@ void lexer_set_file(lexer_t* lexer, const file_t* file)
     if(lexer == NULL || file == NULL) return;
 
     lexer->content = (lexer->file = file)->content;
+    memset(&lexer->token, 0, sizeof(lexer->token));
 }
 
 /*
@@ -25,12 +27,11 @@ inline static bool is_digit(char c) { return (unsigned char)(c - '0') <= 9; }
 
 inline static bool is_ws(char c) { return c == ' ' || c == '\t' || c == '\r' || c == '\n'; }
 
-void lexer_get_token(lexer_t* lexer, token_t* token)
+token_t* lexer_get_token(lexer_t* lexer)
 {
     assert(lexer != NULL);
-    assert(token != NULL);
 
-    if(lexer == NULL || token == NULL) return;
+    if(lexer == NULL) return NULL;
 
     while(*lexer->content != '\0')
     {
@@ -57,27 +58,29 @@ void lexer_get_token(lexer_t* lexer, token_t* token)
 
             while(is_digit(*lexer->content)) lexer->content++;
 
-            token->type = TOKEN_TYPE_INTL;
-            token->offset = offset;
-            token->size = ((size_t)(lexer->content - lexer->file->content)) - offset;
-            token->file = lexer->file;
+            lexer->token.type = TOKEN_TYPE_INTL;
+            lexer->token.offset = offset;
+            lexer->token.size = ((size_t)(lexer->content - lexer->file->content)) - offset;
+            lexer->token.file = lexer->file;
 
-            return;
+            return &lexer->token;
         }
 
         // Illegal
-        token->type = TOKEN_TYPE_ILLEGAL;
-        token->offset = (size_t)(lexer->content - lexer->file->content);
-        token->size = 1;
-        token->file = lexer->file;
+        lexer->token.type = TOKEN_TYPE_ILLEGAL;
+        lexer->token.offset = (size_t)(lexer->content - lexer->file->content);
+        lexer->token.size = 1;
+        lexer->token.file = lexer->file;
 
         lexer->content++;
-        return;
+        return &lexer->token;
     }
 
     // End of file
-    token->type = TOKEN_TYPE_EOF;
-    token->offset = (size_t)(lexer->content - lexer->file->content);
-    token->size = 0;
-    token->file = lexer->file;
+    lexer->token.type = TOKEN_TYPE_EOF;
+    lexer->token.offset = (size_t)(lexer->content - lexer->file->content);
+    lexer->token.size = 0;
+    lexer->token.file = lexer->file;
+
+    return &lexer->token;
 }

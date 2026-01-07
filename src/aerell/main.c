@@ -2,33 +2,73 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "aerell/lexer.h"
 #include "aerell/file/file.h"
+#include "aerell/lexer.h"
+#include "aerell/ast/ast.h"
+#include "aerell/parser.h"
 
 int main(int argc, const char* argv[])
 {
     if(argc == 1) return 0;
 
-    const char* path = argv[1];
-
-    file_t* file = file_load(path);
-    if(file == NULL)
+    bool isLex = false;
+    bool isParse = false;
+    if(argc > 2)
     {
-        printf("Failed to load file %s\n", path);
-        return 1;
+        isLex = strcmp(argv[1], "lex") == 0;
+        isParse = strcmp(argv[1], "parse") == 0;
     }
 
-    lexer_t lexer = {0};
-    lexer_set_file(&lexer, file);
-
-    token_t token = {0};
-    do
+    if(argc == 3 && (isLex || isParse))
     {
-        lexer_get_token(&lexer, &token);
-        debug_token(&token);
-    } while(token.type != TOKEN_TYPE_EOF);
 
-    file_free(file);
-    return 0;
+        const char* path = argv[2];
+        file_t* file = file_load(path);
+        if(file == NULL)
+        {
+            printf("Failed to load file %s\n", path);
+            return 1;
+        }
+
+        lexer_t lexer = {0};
+        lexer_set_file(&lexer, file);
+
+        if(isLex)
+        {
+            token_t* token = NULL;
+            do
+            {
+                token = lexer_get_token(&lexer);
+                debug_token(token);
+            } while(token->type != TOKEN_TYPE_EOF);
+
+            printf("\nLexing finished.");
+            return 0;
+        }
+
+        parser_t parser;
+        parser_init(&parser, &lexer);
+
+        ast_t* ast = parser_parse(&parser);
+        if(ast == NULL)
+        {
+            printf("Failed to parse file %s\n", path);
+            file_free(file);
+            return 1;
+        }
+
+        debug_ast(ast);
+
+        free(ast);
+        file_free(file);
+
+        printf("\nParsing finished.");
+        return 0;
+    }
+
+    printf("Invalid arguments or too few or too many.\n");
+    return 1;
 }
