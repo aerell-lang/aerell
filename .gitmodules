@@ -1,0 +1,3 @@
+[submodule "libs/file"]
+	path = libs/file
+	url = https://github.com/aerell-lang/file.git
