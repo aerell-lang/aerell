@@ -17,6 +17,9 @@ else()
     message(STATUS "ccache not found")
 endif()
 
+# Libs
+add_subdirectory("libs/file")
+
 # Aerell
 set(AERELL aerell)
 
@@ -35,6 +38,12 @@ target_include_directories(
     ${AERELL}
     PRIVATE
     "include"
+)
+
+target_link_libraries(
+    ${AERELL}
+    PRIVATE
+    "file"
 )
 
 # Installation

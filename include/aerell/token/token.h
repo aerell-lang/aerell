@@ -6,8 +6,9 @@
 
 #include <stddef.h>
 
+#include <file/file.h>
+
 #include "aerell/token/token_type.h"
-#include "aerell/file/file.h"
 
 typedef struct
 {

@@ -11,7 +11,7 @@ void debug_token(const token_t* token)
 
     printf("type: %s, offset: %zu, size: %zu", token_type_to_string(token->type), token->offset, token->size);
 
-    const char* content = token->file->content + token->offset;
+    const char* content = file_get_content(token->file) + token->offset;
 
     if(token->type == TOKEN_TYPE_ILLEGAL) printf(", char_number: %d", *content);
 

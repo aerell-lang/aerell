@@ -13,7 +13,7 @@ void lexer_set_file(lexer_t* lexer, const file_t* file)
 
     if(lexer == NULL || file == NULL) return;
 
-    lexer->content = (lexer->file = file)->content;
+    lexer->content = file_get_content((lexer->file = file));
     memset(&lexer->token, 0, sizeof(lexer->token));
 }
 
@@ -52,7 +52,7 @@ token_t* lexer_get_token(lexer_t* lexer)
         // Integer literal
         if(is_digit(*lexer->content))
         {
-            size_t offset = (size_t)(lexer->content - lexer->file->content);
+            size_t offset = (size_t)(lexer->content - file_get_content(lexer->file));
 
             lexer->content++;
 
@@ -60,7 +60,7 @@ token_t* lexer_get_token(lexer_t* lexer)
 
             lexer->token.type = TOKEN_TYPE_INTL;
             lexer->token.offset = offset;
-            lexer->token.size = ((size_t)(lexer->content - lexer->file->content)) - offset;
+            lexer->token.size = ((size_t)(lexer->content - file_get_content(lexer->file))) - offset;
             lexer->token.file = lexer->file;
 
             return &lexer->token;
@@ -68,7 +68,7 @@ token_t* lexer_get_token(lexer_t* lexer)
 
         // Illegal
         lexer->token.type = TOKEN_TYPE_ILLEGAL;
-        lexer->token.offset = (size_t)(lexer->content - lexer->file->content);
+        lexer->token.offset = (size_t)(lexer->content - file_get_content(lexer->file));
         lexer->token.size = 1;
         lexer->token.file = lexer->file;
 
@@ -78,7 +78,7 @@ token_t* lexer_get_token(lexer_t* lexer)
 
     // End of file
     lexer->token.type = TOKEN_TYPE_EOF;
-    lexer->token.offset = (size_t)(lexer->content - lexer->file->content);
+    lexer->token.offset = (size_t)(lexer->content - file_get_content(lexer->file));
     lexer->token.size = 0;
     lexer->token.file = lexer->file;
 

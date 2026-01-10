@@ -4,8 +4,9 @@
 #ifndef AERELL_LEXER_H
 #define AERELL_LEXER_H
 
+#include <file/file.h>
+
 #include "aerell/token/token.h"
-#include "aerell/file/file.h"
 
 typedef struct
 {

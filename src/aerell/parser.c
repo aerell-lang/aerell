@@ -70,7 +70,7 @@ ast_t* parser_parse(parser_t* parser)
             parser->ast[parser->ast_size].value = 0;
 
             char buffer[token->size + 1];
-            strncpy(buffer, token->file->content + token->offset, token->size);
+            strncpy(buffer, file_get_content(token->file) + token->offset, token->size);
             buffer[token->size] = '\0';
 
             char* endptr;

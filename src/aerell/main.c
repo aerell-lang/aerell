@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "aerell/file/file.h"
+#include <file/file.h>
+
 #include "aerell/lexer.h"
 #include "aerell/ast/ast.h"
 #include "aerell/parser.h"
@@ -56,14 +57,14 @@ int main(int argc, const char* argv[])
         if(ast == NULL)
         {
             printf("Failed to parse file %s\n", path);
-            file_free(file);
+            file_unload(file);
             return 1;
         }
 
         debug_ast(ast);
 
         free(ast);
-        file_free(file);
+        file_unload(file);
 
         printf("\nParsing finished.");
         return 0;
