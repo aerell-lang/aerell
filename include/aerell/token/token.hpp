@@ -17,6 +17,9 @@ class Token
   public:
     Token(File& file);
 
+    TokenKind getKind() const;
+    void setKind(TokenKind kind);
+
     std::size_t getOffset() const;
     void setOffset(std::size_t offset);
 
