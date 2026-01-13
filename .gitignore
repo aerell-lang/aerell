@@ -1,4 +1,11 @@
+# cmake
 build
+
+# clang
 .cache
+
+# idea
 .idea
-.env.build
+
+# env
+.env
