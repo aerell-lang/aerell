@@ -3,8 +3,13 @@ cmake_minimum_required(VERSION 4.0.0)
 project(
     "Aerell Programming Language"
     VERSION 0.0.0
-    LANGUAGES C
+    LANGUAGES CXX
 )
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # CCache
 find_program(CCACHE_PROGRAM "ccache")
@@ -17,16 +22,13 @@ else()
     message(STATUS "ccache not found")
 endif()
 
-# Libs
-add_subdirectory("libs/file")
-
 # Aerell
 set(AERELL aerell)
 
 file(
     GLOB_RECURSE
     AERELL_SRC_FILES
-    "src/aerell/*.c"
+    "src/aerell/*.cpp"
 )
 
 add_executable(
@@ -38,12 +40,6 @@ target_include_directories(
     ${AERELL}
     PRIVATE
     "include"
-)
-
-target_link_libraries(
-    ${AERELL}
-    PRIVATE
-    "file"
 )
 
 # Installation
