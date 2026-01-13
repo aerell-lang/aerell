@@ -14,8 +14,11 @@ class Lexer
 
     const Token& getToken();
 
+    void debug();
+
   private:
     File& file;
+    const char* data;
     Token token;
 };
 
