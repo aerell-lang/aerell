@@ -1,3 +1,7 @@
 # This is a single line comment
 
 20 11 2005 # integer literal expression
+# output:
+# 20
+# 11
+# 2005
