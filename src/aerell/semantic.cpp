@@ -6,8 +6,21 @@
 namespace aerell
 {
 
-Semantic::Semantic(Parser& parser) : parser(parser) {}
+Semantic::Semantic(AST& ast) : ast(ast) {}
 
-AST Semantic::analyze() { return this->parser.parse(); }
+bool Semantic::analyze()
+{
+    this->analyze(0);
+    return true;
+}
+
+void Semantic::analyze(std::uint32_t index)
+{
+    switch(ast.getKind(index))
+    {
+    case ASTKind::NONE: break;
+    case ASTKind::INTL: break;
+    }
+}
 
 } // namespace aerell

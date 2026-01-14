@@ -3,18 +3,21 @@
 
 #pragma once
 
-#include "aerell/parser.hpp"
+#include <cstdint>
+
+#include "aerell/ast/ast.hpp"
 
 namespace aerell
 {
 class Semantic
 {
   public:
-    Semantic(Parser& parser);
-
-    AST analyze();
+    Semantic(AST& ast);
+    bool analyze();
 
   private:
-    Parser& parser;
+    AST& ast;
+
+    void analyze(std::uint32_t index);
 };
 } // namespace aerell

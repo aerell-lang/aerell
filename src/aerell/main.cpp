@@ -3,6 +3,7 @@
 
 #include "aerell/file.hpp"
 #include "aerell/lexer.hpp"
+#include "aerell/ast/ast.hpp"
 #include "aerell/parser.hpp"
 #include "aerell/semantic.hpp"
 #include "aerell/ir.hpp"
@@ -14,7 +15,9 @@ int main()
     aerell::File file{"main.arl"};
     aerell::Lexer lexer{file};
     aerell::Parser parser{lexer};
-    aerell::Semantic semantic{parser};
+    aerell::AST ast = parser.parse();
+    aerell::Semantic semantic{ast};
+    if(!semantic.analyze()) return 1;
     aerell::IR ir{semantic};
     aerell::Module module = ir.gen();
     aerell::VM vm{module};
