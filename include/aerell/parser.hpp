@@ -3,7 +3,20 @@
 
 #pragma once
 
+#include "aerell/lexer.hpp"
+
 namespace aerell
 {
 
-}
+class Parser
+{
+  public:
+    Parser(Lexer& lexer);
+
+    void debug();
+
+  private:
+    Lexer& lexer;
+};
+
+} // namespace aerell
