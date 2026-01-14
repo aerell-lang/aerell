@@ -21,6 +21,8 @@ File::File(std::string_view path) : path{std::filesystem::weakly_canonical(path)
     file.close();
 }
 
+const std::filesystem::path& File::getPath() const { return this->path; }
+
 const char* File::getData() const { return this->content.data(); }
 
 } // namespace aerell

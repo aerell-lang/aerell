@@ -14,6 +14,7 @@ class File
   public:
     File(std::string_view path);
 
+    const std::filesystem::path& getPath() const;
     const char* getData() const;
 
   private:
