@@ -8,7 +8,9 @@
 namespace aerell
 {
 
-Lexer::Lexer(File& file) : file(file), token(file), data(file.getData()) {}
+Lexer::Lexer(const File& file) : file(file), token(file), data(file.getData()) {}
+
+const File& Lexer::getFile() const { return this->file; }
 
 #define CURRENT_CHAR *this->data
 #define NL '\n'

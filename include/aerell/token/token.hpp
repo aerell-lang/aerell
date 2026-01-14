@@ -15,22 +15,22 @@ namespace aerell
 class Token
 {
   public:
-    Token(File& file);
+    Token(const File& file);
 
     TokenKind getKind() const;
     void setKind(TokenKind kind);
 
-    std::size_t getOffset() const;
-    void setOffset(std::size_t offset);
+    std::uint32_t getOffset() const;
+    void setOffset(std::uint32_t offset);
 
-    std::size_t getSize() const;
-    void setSize(std::size_t size);
+    std::uint32_t getSize() const;
+    void setSize(std::uint32_t size);
 
   private:
-    File& file;
+    const File& file;
     TokenKind kind;
-    std::size_t offset;
-    std::size_t size;
+    std::uint32_t offset;
+    std::uint32_t size;
 };
 
 } // namespace aerell

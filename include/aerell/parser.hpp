@@ -4,6 +4,7 @@
 #pragma once
 
 #include "aerell/lexer.hpp"
+#include "aerell/ast/ast.hpp"
 
 namespace aerell
 {
@@ -12,7 +13,7 @@ class Parser
 {
   public:
     Parser(Lexer& lexer);
-
+    AST parse();
     void debug();
 
   private:

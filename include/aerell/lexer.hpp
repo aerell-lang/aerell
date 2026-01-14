@@ -12,14 +12,14 @@ namespace aerell
 class Lexer
 {
   public:
-    Lexer(File& file);
+    Lexer(const File& file);
 
+    const File& getFile() const;
     const Token& getToken();
-
     void debug();
 
   private:
-    File& file;
+    const File& file;
     const char* data;
     Token token;
 };

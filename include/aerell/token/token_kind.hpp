@@ -11,7 +11,7 @@
 namespace aerell
 {
 
-enum class TokenKind
+enum class TokenKind : std::uint8_t
 {
     EOFF,
     ILLEGAL,
