@@ -22,10 +22,4 @@ AST Parser::parse()
     return ast;
 }
 
-void Parser::debug()
-{
-    AST ast = this->parse();
-    ast.debug();
-}
-
 } // namespace aerell

@@ -14,7 +14,6 @@ class Parser
   public:
     Parser(Lexer& lexer);
     AST parse();
-    void debug();
 
   private:
     Lexer& lexer;
