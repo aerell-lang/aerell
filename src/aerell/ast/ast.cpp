@@ -18,22 +18,40 @@ AST::AST(const File& file) : file(file)
 
 std::uint32_t AST::addData1(std::uint32_t data)
 {
-    std::uint32_t index = static_cast<std::uint32_t>(this->data1.size());
-    this->data1.push_back(data);
+    std::uint32_t index = 0;
+    if(this->data1.size() > 1)
+    {
+        index = static_cast<std::uint32_t>(this->data1.size());
+        this->data1.push_back(data);
+    }
+    else
+        this->data1[index] = data;
     return index;
 }
 
 std::uint32_t AST::addData2(std::uint32_t data)
 {
-    std::uint32_t index = static_cast<std::uint32_t>(this->data2.size());
-    this->data2.push_back(data);
+    std::uint32_t index = 0;
+    if(this->data2.size() > 1)
+    {
+        index = static_cast<std::uint32_t>(this->data2.size());
+        this->data2.push_back(data);
+    }
+    else
+        this->data2[index] = data;
     return index;
 }
 
 std::uint32_t AST::addKind(ASTKind kind)
 {
-    std::uint32_t kindIndex = static_cast<std::uint32_t>(this->kinds.size());
-    this->kinds.push_back(kind);
+    std::uint32_t kindIndex = 0;
+    if(this->kinds.size() > 1)
+    {
+        kindIndex = static_cast<std::uint32_t>(this->kinds.size());
+        this->kinds.push_back(kind);
+    }
+    else
+        this->kinds[kindIndex] = kind;
     return kindIndex;
 }
 
