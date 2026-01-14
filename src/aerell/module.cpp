@@ -6,6 +6,10 @@
 namespace aerell
 {
 
-std::string Module::toStr() const { return "# This is message from module debug function."; }
+Module::Module() : name("unknown") {}
+
+void Module::setName(std::string_view name) { this->name = name; }
+
+std::string Module::toStr() const { return "# name: " + this->name; }
 
 } // namespace aerell

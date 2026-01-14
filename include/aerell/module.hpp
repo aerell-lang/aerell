@@ -11,9 +11,14 @@ namespace aerell
 class Module
 {
   public:
+    Module();
+
+    void setName(std::string_view name);
+
     std::string toStr() const;
 
   private:
+    std::string name;
 };
 
 } // namespace aerell

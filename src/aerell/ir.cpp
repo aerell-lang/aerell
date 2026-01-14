@@ -10,6 +10,7 @@ IR::IR(Semantic& semantic) : ast{semantic.analyze()} {}
 
 Module IR::gen()
 {
+    this->module.setName(this->ast.getFile().getPath().generic_string());
     this->gen(0);
     return std::move(this->module);
 }
