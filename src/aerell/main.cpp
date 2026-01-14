@@ -5,6 +5,7 @@
 #include "aerell/lexer.hpp"
 #include "aerell/parser.hpp"
 #include "aerell/semantic.hpp"
+#include "aerell/ir.hpp"
 
 int main()
 {
@@ -12,7 +13,7 @@ int main()
     aerell::Lexer lexer{file};
     aerell::Parser parser{lexer};
     aerell::Semantic semantic{parser};
-    semantic.analyze();
+    aerell::IR::gen(semantic);
 
     return 0;
 }
