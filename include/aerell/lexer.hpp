@@ -16,7 +16,6 @@ class Lexer
 
     const File& getFile() const;
     const Token& getToken();
-    void debug();
 
   private:
     const File& file;

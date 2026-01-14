@@ -1,8 +1,6 @@
 // Copyright 2026 Fern Aerell.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <print>
-
 #include "aerell/lexer.hpp"
 
 namespace aerell
@@ -75,22 +73,6 @@ const Token& Lexer::getToken()
     SET_SIZE(1);
     NEXT_CHAR;
     RET_TOKEN;
-}
-
-#define PRINT_TOKEN(x)                                                                                                 \
-    std::println(                                                                                                      \
-        "[{}] offset: {}, size: {}, lexeme: {:.{}}", toStr(x.getKind()), x.getOffset(), x.getSize(),                   \
-        this->file.getData() + x.getOffset(), x.getSize())
-
-void Lexer::debug()
-{
-    const aerell::Token& token = this->getToken();
-    while(token.getKind() != aerell::TokenKind::EOFF)
-    {
-        PRINT_TOKEN(token);
-        this->getToken();
-    }
-    PRINT_TOKEN(token);
 }
 
 } // namespace aerell
