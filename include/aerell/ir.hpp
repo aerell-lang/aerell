@@ -3,7 +3,10 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "aerell/semantic.hpp"
+#include "aerell/module.hpp"
 
 namespace aerell
 {
@@ -11,9 +14,14 @@ namespace aerell
 class IR
 {
   public:
-    static IR gen(Semantic& semantic);
+    IR(Semantic& semantic);
+    Module gen();
 
   private:
+    AST ast;
+    Module module;
+
+    void gen(std::uint32_t index);
 };
 
 } // namespace aerell

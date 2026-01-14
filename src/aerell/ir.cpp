@@ -1,17 +1,26 @@
 // Copyright 2026 Fern Aerell.
 // SPDX-License-Identifier: Apache-2.0
 
-#include "aerell/ast/ast.hpp"
 #include "aerell/ir.hpp"
 
 namespace aerell
 {
 
-IR IR::gen(Semantic& semantic)
+IR::IR(Semantic& semantic) : ast{semantic.analyze()} {}
+
+Module IR::gen()
 {
-    AST ast = semantic.analyze();
-    ast.debug();
-    return {};
+    this->gen(0);
+    return std::move(this->module);
+}
+
+void IR::gen(std::uint32_t index)
+{
+    switch(this->ast.getKind(index))
+    {
+    case ASTKind::NONE: break;
+    case ASTKind::INTL: break;
+    }
 }
 
 } // namespace aerell

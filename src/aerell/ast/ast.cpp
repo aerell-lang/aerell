@@ -1,7 +1,8 @@
 // Copyright 2026 Fern Aerell.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <print>
+#include <cassert>
+#include <format>
 
 #include "aerell/ast/ast.hpp"
 
@@ -43,8 +44,9 @@ std::uint32_t AST::addIntl(std::uint32_t offset, std::uint32_t size)
     return this->addKind(ASTKind::INTL);
 }
 
-void AST::debug() const
+std::string AST::toStr() const
 {
+    std::string str;
     for(std::size_t i = 0; i < this->kinds.size(); i++)
     {
         ASTKind kind = this->kinds.at(i);
@@ -54,12 +56,31 @@ void AST::debug() const
         case ASTKind::INTL:
             std::size_t offset = this->data1[i];
             std::size_t size = this->data2[i];
-            std::println(
-                "[{}] offset: {}, size: {}, lexeme: {:.{}}", toStr(kind), offset, size, this->file.getData() + offset,
-                size);
+            str += std::format(
+                "[{}] offset: {}, size: {}, lexeme: {:.{}}", aerell::toStr(kind), offset, size,
+                this->file.getData() + offset, size);
             break;
         }
     }
+    return str;
+}
+
+ASTKind AST::getKind(std::uint32_t index) const
+{
+    assert(index < this->kinds.size());
+    return this->kinds[index];
+}
+
+std::uint32_t AST::getData1(std::uint32_t index) const
+{
+    assert(index < this->data1.size());
+    return this->data1[index];
+}
+
+std::uint32_t AST::getData2(std::uint32_t index) const
+{
+    assert(index < this->data2.size());
+    return this->data1[index];
 }
 
 } // namespace aerell
