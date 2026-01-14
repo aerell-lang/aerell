@@ -65,6 +65,8 @@ std::string AST::toStr() const
     return str;
 }
 
+const File& AST::getFile() const { return this->file; }
+
 ASTKind AST::getKind(std::uint32_t index) const
 {
     assert(index < this->kinds.size());

@@ -20,6 +20,8 @@ class AST
 
     std::string toStr() const;
 
+    const File& getFile() const;
+
     ASTKind getKind(std::uint32_t index) const;
     std::uint32_t getData1(std::uint32_t index) const;
     std::uint32_t getData2(std::uint32_t index) const;
