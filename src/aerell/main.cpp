@@ -4,12 +4,15 @@
 #include "aerell/file.hpp"
 #include "aerell/lexer.hpp"
 #include "aerell/parser.hpp"
+#include "aerell/semantic.hpp"
 
 int main()
 {
-    aerell::File file("main.arl");
-    aerell::Lexer lexer(file);
-    aerell::Parser parser(lexer);
-    parser.debug();
+    aerell::File file{"main.arl"};
+    aerell::Lexer lexer{file};
+    aerell::Parser parser{lexer};
+    aerell::Semantic semantic{parser};
+    semantic.analyze();
+
     return 0;
 }

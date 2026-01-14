@@ -6,4 +6,8 @@
 namespace aerell
 {
 
-}
+Semantic::Semantic(Parser& parser) : parser(parser) {}
+
+AST Semantic::analyze() { return this->parser.parse(); }
+
+} // namespace aerell
