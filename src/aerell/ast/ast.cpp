@@ -19,40 +19,48 @@ AST::AST(const File& file) : file(file)
 std::uint32_t AST::addData1(std::uint32_t data)
 {
     std::uint32_t index = 0;
-    if(this->data1.size() > 1)
+
+    if(this->data1.size() == 1 && this->data1[index] == 0)
     {
-        index = static_cast<std::uint32_t>(this->data1.size());
-        this->data1.push_back(data);
-    }
-    else
         this->data1[index] = data;
+        return index;
+    }
+
+    index = static_cast<std::uint32_t>(this->data1.size());
+    this->data1.push_back(data);
+
     return index;
 }
 
 std::uint32_t AST::addData2(std::uint32_t data)
 {
     std::uint32_t index = 0;
-    if(this->data2.size() > 1)
+
+    if(this->data2.size() == 1 && this->data2[index] == 0)
     {
-        index = static_cast<std::uint32_t>(this->data2.size());
-        this->data2.push_back(data);
-    }
-    else
         this->data2[index] = data;
+        return index;
+    }
+
+    index = static_cast<std::uint32_t>(this->data2.size());
+    this->data2.push_back(data);
+
     return index;
 }
 
 std::uint32_t AST::addKind(ASTKind kind)
 {
-    std::uint32_t kindIndex = 0;
-    if(this->kinds.size() > 1)
+    std::uint32_t index = 0;
+    if(this->kinds.size() == 1 && this->kinds[index] == ASTKind::NONE)
     {
-        kindIndex = static_cast<std::uint32_t>(this->kinds.size());
-        this->kinds.push_back(kind);
+        this->kinds[index] = kind;
+        return index;
     }
-    else
-        this->kinds[kindIndex] = kind;
-    return kindIndex;
+
+    index = static_cast<std::uint32_t>(this->kinds.size());
+    this->kinds.push_back(kind);
+
+    return index;
 }
 
 std::uint32_t AST::addIntl(std::uint32_t offset, std::uint32_t size)
@@ -75,7 +83,7 @@ std::string AST::toStr() const
             std::size_t offset = this->data1[i];
             std::size_t size = this->data2[i];
             str += std::format(
-                "[{}] offset: {}, size: {}, lexeme: {:.{}}", aerell::toStr(kind), offset, size,
+                "[{}] offset: {}, size: {}, lexeme: {:.{}}\n", aerell::toStr(kind), offset, size,
                 this->file.getData() + offset, size);
             break;
         }
@@ -100,7 +108,7 @@ std::uint32_t AST::getData1(std::uint32_t index) const
 std::uint32_t AST::getData2(std::uint32_t index) const
 {
     assert(index < this->data2.size());
-    return this->data1[index];
+    return this->data2[index];
 }
 
 } // namespace aerell
