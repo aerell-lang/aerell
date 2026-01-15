@@ -6,11 +6,9 @@
 #include "aerell/cli.hpp"
 #include "aerell/file.hpp"
 #include "aerell/lexer.hpp"
-#include "aerell/ast/ast.hpp"
 #include "aerell/parser.hpp"
 #include "aerell/semantic.hpp"
 #include "aerell/ir.hpp"
-#include "aerell/module/module.hpp"
 #include "aerell/vm.hpp"
 
 namespace aerell
@@ -130,15 +128,16 @@ int CLI::main(int argc, const char* argv[])
     }
 
     aerell::Parser parser{lexer};
-    aerell::AST ast = parser.parse();
+    auto ast = parser.parse();
+    if(!ast.has_value()) return 1;
 
     if(command == Command::PARSE)
     {
-        std::print("{}\nParsing completed.", ast.toStr());
+        std::print("{}\nParsing completed.", ast.value().toStr());
         return 0;
     }
 
-    aerell::Semantic semantic{ast};
+    aerell::Semantic semantic{ast.value()};
     if(!semantic.analyze()) return 1;
 
     if(command == Command::ANALYZE)
@@ -147,8 +146,8 @@ int CLI::main(int argc, const char* argv[])
         return 0;
     }
 
-    aerell::IR ir{ast};
-    aerell::Module module = ir.gen();
+    aerell::IR ir{ast.value()};
+    auto module = ir.gen();
 
     if(command == Command::GENERATE)
     {

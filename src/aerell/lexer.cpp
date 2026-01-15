@@ -20,7 +20,7 @@ const File& Lexer::getFile() const { return this->file; }
 #define SET_OFFSET_AUTO this->token.setOffset(this->data - this->file.getData())
 #define SET_KIND(x) this->token.setKind(TokenKind::x)
 #define SET_SIZE(x) this->token.setSize(x)
-#define SET_SIZE_AUTO SET_SIZE(this->data - (this->file.getData() + this->token.getOffset()))
+#define SET_SIZE_AUTO SET_SIZE(this->data - (this->file.getData() + this->token.getLexeme().offset))
 
 const Token& Lexer::getToken() const { return this->token; }
 

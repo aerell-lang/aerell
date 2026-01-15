@@ -18,15 +18,14 @@ class Token
     Token(const File& file);
 
     TokenKind getKind() const;
+
     void setKind(TokenKind kind);
-
-    std::uint32_t getOffset() const;
     void setOffset(std::uint32_t offset);
-
-    std::uint32_t getSize() const;
     void setSize(std::uint32_t size);
 
     std::string toStr() const;
+
+    const Lexeme& getLexeme() const;
 
   private:
     const File& file;

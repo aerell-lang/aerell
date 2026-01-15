@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include "aerell/lexer.hpp"
 #include "aerell/ast/ast.hpp"
 
@@ -13,11 +15,14 @@ class Parser
 {
   public:
     Parser(Lexer& lexer);
-    AST parse();
+    std::optional<AST> parse();
 
   private:
+    bool hasError;
     Lexer& lexer;
     AST ast;
+
+    void reset();
 
     void parseRoot();
     std::uint32_t parseStmt();

@@ -14,17 +14,17 @@ TokenKind Token::getKind() const { return this->kind; }
 
 void Token::setKind(TokenKind kind) { this->kind = kind; }
 
-std::uint32_t Token::getOffset() const { return this->lexeme.offset; }
 void Token::setOffset(std::uint32_t offset) { this->lexeme.offset = offset; }
 
-std::uint32_t Token::getSize() const { return this->lexeme.size; }
 void Token::setSize(std::uint32_t size) { this->lexeme.size = size; }
 
 std::string Token::toStr() const
 {
     return std::format(
-        "[{}] {{ offset: {}, size: {} }} {}", aerell::toStr(this->kind), this->getOffset(), this->getSize(),
-        this->file.getLexemeText(this->lexeme));
+        "[{}] {{ offset: {}, size: {} }} {}", aerell::toStr(this->kind), this->getLexeme().offset,
+        this->getLexeme().size, this->file.getLexemeText(this->getLexeme()));
 }
+
+const Lexeme& Token::getLexeme() const { return this->lexeme; }
 
 } // namespace aerell
