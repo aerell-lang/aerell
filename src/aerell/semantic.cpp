@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <optional>
-#include <print>
 
 #include "aerell/semantic.hpp"
+#include "aerell/message.hpp"
 #include "aerell/type.hpp"
 
 namespace aerell
@@ -35,6 +35,7 @@ std::optional<Type> getType(std::string_view str)
 
     if(isNegative)
     {
+        // Signed
         if(strLenLessOrEqual(str, "128")) return Type::I8;
         if(strLenLessOrEqual(str, "32768")) return Type::I16;
         if(strLenLessOrEqual(str, "2147483648")) return Type::I32;
@@ -65,14 +66,19 @@ void Semantic::analyze(std::uint32_t index)
     case ASTKind::NONE: break;
     case ASTKind::INTL:
         // Check int type
-        auto type = getType({ast.getFile().getData() + ast.getData1(index), ast.getData2(index)});
-        if(!type.has_value())
-        {
-            this->hasError = true;
-            std::println("Invalid integer value.");
-            break;
-        }
-        std::println("{}", toStr(type.value()));
+        auto offset = ast.getData1(index);
+        auto size = ast.getData2(index);
+        auto type = getType({ast.getFile().getData() + offset, size});
+        if(type.has_value()) break;
+        this->hasError = true;
+        Message::print(
+            ErrorCode::E0, ast.getFile(),
+            {
+                {"help: the minimum integer literal is -9223372036854775808 and the maximum is "
+                 "18446744073709551615",
+                 {offset, size},
+                 true},
+            });
         break;
     }
 }

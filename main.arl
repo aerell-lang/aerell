@@ -1,7 +1,9 @@
 # This is a single line comment
 
-20 11 2005 # integer literal expression
+20 11 2005 # Integer literal expression
 # output:
 # 20
 # 11
 # 2005
+
+1000000000000000000000000000 # Error: integer literal is too large
