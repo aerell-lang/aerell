@@ -18,7 +18,7 @@ int main()
     aerell::AST ast = parser.parse();
     aerell::Semantic semantic{ast};
     if(!semantic.analyze()) return 1;
-    aerell::IR ir{semantic};
+    aerell::IR ir{ast};
     aerell::Module module = ir.gen();
     aerell::VM vm{module};
     return vm.run();
