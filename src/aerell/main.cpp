@@ -9,7 +9,7 @@
 #include "aerell/parser.hpp"
 #include "aerell/semantic.hpp"
 #include "aerell/ir.hpp"
-#include "aerell/module.hpp"
+#include "aerell/module/module.hpp"
 #include "aerell/vm.hpp"
 
 int main()

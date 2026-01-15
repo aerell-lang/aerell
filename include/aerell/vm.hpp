@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "aerell/module.hpp"
+#include "aerell/module/module.hpp"
 
 namespace aerell
 {

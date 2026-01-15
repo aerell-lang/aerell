@@ -4,7 +4,7 @@
 #pragma once
 
 #include "aerell/ast/ast.hpp"
-#include "aerell/module.hpp"
+#include "aerell/module/module.hpp"
 
 namespace aerell
 {
