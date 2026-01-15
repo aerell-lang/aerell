@@ -6,7 +6,7 @@
 namespace aerell
 {
 
-Lexer::Lexer(const File& file) : file(file), data(file.getData()), token(file) {}
+Lexer::Lexer(const File& file) : file(file), data(file.getData()) {}
 
 const File& Lexer::getFile() const { return this->file; }
 
