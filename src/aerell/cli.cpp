@@ -114,7 +114,7 @@ int CLI::main(int argc, const char* argv[])
 
     if(command == Command::LEX)
     {
-        std::println("{}", file->getPath().generic_string());
+        std::println("\n{}", file->getPath().generic_string());
 
         lexer.forwardToken();
         while(lexer.getToken().getKind() != TokenKind::EOFF)
@@ -128,16 +128,15 @@ int CLI::main(int argc, const char* argv[])
     }
 
     aerell::Parser parser{lexer};
-    auto ast = parser.parse();
-    if(!ast.has_value()) return 1;
+    aerell::AST ast = parser.parse();
 
     if(command == Command::PARSE)
     {
-        std::print("{}\nParsing completed.", ast.value().toStr());
+        std::print("\n{}\nParsing completed.", ast.toStr());
         return 0;
     }
 
-    aerell::Semantic semantic{ast.value()};
+    aerell::Semantic semantic{ast};
     if(!semantic.analyze()) return 1;
 
     if(command == Command::ANALYZE)
@@ -146,8 +145,8 @@ int CLI::main(int argc, const char* argv[])
         return 0;
     }
 
-    aerell::IR ir{ast.value()};
-    auto module = ir.gen();
+    aerell::IR ir{ast};
+    aerell::Module module = ir.gen();
 
     if(command == Command::GENERATE)
     {

@@ -10,21 +10,13 @@ namespace aerell
 
 Parser::Parser(Lexer& lexer) : lexer{lexer}, ast{this->lexer.getFile()} {}
 
-std::optional<AST> Parser::parse()
+AST Parser::parse()
 {
-    this->reset();
+    this->ast.reset();
 
     this->parseRoot();
 
-    if(this->hasError) return std::nullopt;
-
     return std::move(this->ast);
-}
-
-void Parser::reset()
-{
-    if(this->hasError) this->hasError = false;
-    this->ast.reset();
 }
 
 #define PARSE_INTL_START_TOKEN_KIND (this->lexer.getToken().getKind() == TokenKind::INTL)
@@ -54,10 +46,7 @@ void Parser::parseRoot()
             continue;
         }
 
-        Message::print(
-            ErrorCode::E0, this->lexer.getFile(),
-            {"help: this character isn't supported here, please delete it", this->lexer.getToken().getLexeme(), true});
-        this->hasError = true;
+        Message::print(this->lexer.getFile(), ErrorCode::E0, this->lexer.getToken().getLexeme());
 
         this->lexer.forwardToken();
     }

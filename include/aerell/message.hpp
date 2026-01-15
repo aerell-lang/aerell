@@ -16,18 +16,12 @@ namespace aerell
 class Message
 {
   public:
-    struct Lexeme
-    {
-        std::string_view message;
-        aerell::Lexeme data;
-        bool pointer;
-    };
+    static void print(
+        const File& file, const std::vector<Lexeme>& lexemes, const std::vector<std::string_view>& messages);
+    static void print(const File& file, const Lexeme& lexeme, std::string_view message);
 
-    static void print(const File& file, const std::vector<Lexeme>& lexemes);
-    static void print(const File& file, const Lexeme& lexeme);
-
-    static void print(ErrorCode code, const File& file, const std::vector<Lexeme>& lexemes);
-    static void print(ErrorCode code, const File& file, const Lexeme& lexeme);
+    static void print(const File& file, ErrorCode ec, const std::vector<Lexeme>& lexemes);
+    static void print(const File& file, ErrorCode ec, const Lexeme& lexeme);
 
   private:
 };
