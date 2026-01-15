@@ -23,9 +23,10 @@ std::string Module::toStr() const
         const auto& inst = label.getInst();
         for(std::uint32_t i = 0; i < label.getInst().size(); i++)
         {
-            switch(inst.getKind(i))
+            auto kind = inst.getKind(i);
+            switch(kind)
             {
-            case InstKind::PRINT: str += std::format("{} {}\n", name, inst.getOperand(i)); break;
+            case InstKind::PRINT: str += std::format(" {} {}\n", aerell::toStr(kind), inst.getOperand(i)); break;
             }
         }
     }
