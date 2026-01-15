@@ -14,11 +14,17 @@ namespace aerell
 enum class ASTKind : std::uint8_t
 {
     NONE,
+    ROOT,
+    STMT,
+    EXPR,
     INTL,
 };
 
 constexpr auto astKindStr = std::to_array<std::pair<ASTKind, std::string_view>>({
     {ASTKind::NONE, "NONE"},
+    {ASTKind::ROOT, "ROOT"},
+    {ASTKind::STMT, "STMT"},
+    {ASTKind::EXPR, "EXPR"},
     {ASTKind::INTL, "INTL"},
 });
 
