@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-#include "aerell/semantic.hpp"
+#include "aerell/ast/ast.hpp"
 #include "aerell/module.hpp"
 
 namespace aerell
@@ -14,11 +14,11 @@ namespace aerell
 class IR
 {
   public:
-    IR(Semantic& semantic);
+    IR(AST& ast);
     Module gen();
 
   private:
-    AST ast;
+    AST& ast;
     Module module;
 
     void gen(std::uint32_t index);

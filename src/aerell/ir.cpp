@@ -6,7 +6,7 @@
 namespace aerell
 {
 
-IR::IR(Semantic& semantic) : ast{semantic.analyze()} {}
+IR::IR(AST& ast) : ast{ast} {}
 
 Module IR::gen()
 {
