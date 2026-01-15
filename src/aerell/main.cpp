@@ -1,6 +1,8 @@
 // Copyright 2026 Fern Aerell.
 // SPDX-License-Identifier: Apache-2.0
 
+#include <print>
+
 #include "aerell/file.hpp"
 #include "aerell/lexer.hpp"
 #include "aerell/ast/ast.hpp"
@@ -12,8 +14,13 @@
 
 int main()
 {
-    aerell::File file{"main.arl"};
-    aerell::Lexer lexer{file};
+    auto file = aerell::File::load("main.arl");
+    if(!file.has_value())
+    {
+        std::println("Failed to open file.");
+        return 1;
+    }
+    aerell::Lexer lexer{file.value()};
     aerell::Parser parser{lexer};
     aerell::AST ast = parser.parse();
     aerell::Semantic semantic{ast};
