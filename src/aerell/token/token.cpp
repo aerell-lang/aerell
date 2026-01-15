@@ -23,7 +23,7 @@ void Token::setSize(std::uint32_t size) { this->lexeme.size = size; }
 std::string Token::toStr() const
 {
     return std::format(
-        "[{}] {{offset: {}, size: {}, lexeme: {}}}", aerell::toStr(this->kind), this->getOffset(), this->getSize(),
+        "[{}] {{ offset: {}, size: {} }} {}", aerell::toStr(this->kind), this->getOffset(), this->getSize(),
         this->file.getLexemeText(this->lexeme));
 }
 
