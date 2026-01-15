@@ -16,6 +16,7 @@ class Semantic
     bool analyze();
 
   private:
+    bool hasError;
     AST& ast;
 
     void analyze(std::uint32_t index);
