@@ -118,4 +118,14 @@ std::uint32_t AST::getData2(std::uint32_t index) const
     return this->data2[index];
 }
 
+void AST::reset()
+{
+    if(this->empty()) return;
+    if(this->kinds.size() > 1) this->kinds.erase(this->kinds.begin() + 1, this->kinds.end());
+    if(this->data1.size() > 1) this->data1.erase(this->data1.begin() + 1, this->data1.end());
+    if(this->data2.size() > 1) this->data2.erase(this->data2.begin() + 1, this->data2.end());
+}
+
+bool AST::empty() const { return this->kinds.size() <= 1 && this->data1.size() <= 1 && this->data2.size() <= 1; }
+
 } // namespace aerell
