@@ -3,6 +3,8 @@
 
 #include <cassert>
 #include <format>
+#include <utility>
+#include <vector>
 
 #include "aerell/ast/ast.hpp"
 
@@ -16,53 +18,38 @@ AST::AST(const File& file) : file(file)
     this->addData2(0);
 }
 
-std::uint32_t AST::addData1(std::uint32_t data)
+const File& AST::getFile() const { return this->file; }
+
+std::string AST::toStr() const
 {
-    std::uint32_t index = 0;
-
-    if(this->data1.size() == 1 && this->data1[index] == 0)
+    std::string str;
+    std::vector<std::pair<std::uint32_t, std::uint32_t>> indexs{{1, 0}};
+    while(!indexs.empty())
     {
-        this->data1[index] = data;
-        return index;
+        auto [index, indent] = indexs.back();
+        indexs.pop_back();
+
+        std::string indentStr(indent, ' ');
+
+        auto kind = this->getKind(index);
+        switch(kind)
+        {
+        case ASTKind::NONE: break;
+        case ASTKind::ROOT:
+        case ASTKind::STMT:
+        case ASTKind::EXPR:
+            str += std::format("{}[{}]\n", indentStr, aerell::toStr(kind));
+            indexs.push_back({this->getData2(index), indent});
+            indexs.push_back({this->getData1(index), indent + 1});
+            break;
+        case ASTKind::INTL:
+            str += std::format(
+                "{}[{}] {}\n", indentStr, aerell::toStr(kind),
+                this->file.getLexemeText({this->getData1(index), this->getData2(index)}));
+            break;
+        }
     }
-
-    index = static_cast<std::uint32_t>(this->data1.size());
-    this->data1.push_back(data);
-
-    return index;
-}
-
-std::uint32_t AST::addData2(std::uint32_t data)
-{
-    std::uint32_t index = 0;
-
-    if(this->data2.size() == 1 && this->data2[index] == 0)
-    {
-        this->data2[index] = data;
-        return index;
-    }
-
-    index = static_cast<std::uint32_t>(this->data2.size());
-    this->data2.push_back(data);
-
-    return index;
-}
-
-std::uint32_t AST::addKind(ASTKind kind)
-{
-    std::uint32_t index = 0;
-    std::uint32_t count = this->getKindCount();
-
-    if(count == 1 && this->kinds[index] == ASTKind::NONE)
-    {
-        this->kinds[index] = kind;
-        return index;
-    }
-
-    index = count;
-    this->kinds.push_back(kind);
-
-    return index;
+    return str;
 }
 
 std::uint32_t AST::addIntl(std::uint32_t offset, std::uint32_t size)
@@ -72,34 +59,48 @@ std::uint32_t AST::addIntl(std::uint32_t offset, std::uint32_t size)
     return this->addKind(ASTKind::INTL);
 }
 
-std::string AST::toStr() const
+std::uint32_t AST::addData1(std::uint32_t data)
 {
-    std::string str;
-    for(std::size_t i = 0; i < this->kinds.size(); i++)
-    {
-        ASTKind kind = this->kinds.at(i);
-        switch(kind)
-        {
-        case ASTKind::NONE: break;
-        case ASTKind::INTL:
-            std::size_t offset = this->data1[i];
-            std::size_t size = this->data2[i];
-            str += std::format(
-                "[{}] offset: {}, size: {}, lexeme: {:.{}}\n", aerell::toStr(kind), offset, size,
-                this->file.getData() + offset, size);
-            break;
-        }
-    }
-    return str;
+    std::uint32_t index = static_cast<std::uint32_t>(this->data1.size());
+    this->data1.push_back(data);
+    return index;
 }
 
-const File& AST::getFile() const { return this->file; }
+std::uint32_t AST::addData2(std::uint32_t data)
+{
+    std::uint32_t index = static_cast<std::uint32_t>(this->data2.size());
+    this->data2.push_back(data);
+    return index;
+}
 
-std::uint32_t AST::getKindCount() const { return static_cast<std::uint32_t>(this->kinds.size()); }
+std::uint32_t AST::addKind(ASTKind kind)
+{
+    std::uint32_t index = static_cast<std::uint32_t>(this->kinds.size());
+    this->kinds.push_back(kind);
+    return index;
+}
+
+void AST::setKind(std::uint32_t index, ASTKind kind)
+{
+    assert(index < this->kinds.size());
+    this->kinds[index] = kind;
+}
+
+void AST::setData1(std::uint32_t index, std::uint32_t data)
+{
+    assert(index < this->data1.size());
+    this->data1[index] = data;
+}
+
+void AST::setData2(std::uint32_t index, std::uint32_t data)
+{
+    assert(index < this->data2.size());
+    this->data2[index] = data;
+}
 
 ASTKind AST::getKind(std::uint32_t index) const
 {
-    assert(index < this->getKindCount());
+    assert(index < this->kinds.size());
     return this->kinds[index];
 }
 

@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include "aerell/ast/ast.hpp"
 #include "aerell/module.hpp"
 
@@ -20,8 +18,6 @@ class IR
   private:
     AST& ast;
     Module module;
-
-    void gen(std::uint32_t index);
 };
 
 } // namespace aerell

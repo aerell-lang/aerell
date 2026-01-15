@@ -11,17 +11,7 @@ IR::IR(AST& ast) : ast{ast} {}
 Module IR::gen()
 {
     this->module.setName(this->ast.getFile().getPath().generic_string());
-    this->gen(0);
     return std::move(this->module);
-}
-
-void IR::gen(std::uint32_t index)
-{
-    switch(this->ast.getKind(index))
-    {
-    case ASTKind::NONE: break;
-    case ASTKind::INTL: break;
-    }
 }
 
 } // namespace aerell

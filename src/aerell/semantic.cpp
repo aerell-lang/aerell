@@ -12,13 +12,6 @@ namespace aerell
 
 Semantic::Semantic(AST& ast) : ast(ast) {}
 
-bool Semantic::analyze()
-{
-    this->hasError = false;
-    for(std::uint32_t i = 0; i < this->ast.getKindCount(); i++) this->analyze(i);
-    return !hasError;
-}
-
 bool strLenLessOrEqual(std::string_view str1, std::string_view str2)
 {
     if(str1.length() < str2.length()) return true;
@@ -59,28 +52,46 @@ std::optional<Type> getType(std::string_view str)
     return std::nullopt;
 }
 
-void Semantic::analyze(std::uint32_t index)
+bool Semantic::analyze()
 {
-    switch(ast.getKind(index))
+    this->hasError = false;
+
+    std::vector<std::uint32_t> indexs{1};
+    while(!indexs.empty())
     {
-    case ASTKind::NONE: break;
-    case ASTKind::INTL:
-        // Check int type
-        auto offset = ast.getData1(index);
-        auto size = ast.getData2(index);
-        auto type = getType({ast.getFile().getData() + offset, size});
-        if(type.has_value()) break;
-        this->hasError = true;
-        Message::print(
-            ErrorCode::E0, ast.getFile(),
-            {
-                {"help: the minimum integer literal is -9223372036854775808 and the maximum is "
-                 "18446744073709551615",
-                 {offset, size},
-                 true},
-            });
-        break;
+        auto index = indexs.back();
+        indexs.pop_back();
+
+        auto kind = this->ast.getKind(index);
+        switch(kind)
+        {
+        case ASTKind::NONE: break;
+        case ASTKind::ROOT:
+        case ASTKind::STMT:
+        case ASTKind::EXPR:
+            indexs.push_back(this->ast.getData2(index));
+            indexs.push_back(this->ast.getData1(index));
+            break;
+        case ASTKind::INTL:
+            // Check int type
+            auto offset = ast.getData1(index);
+            auto size = ast.getData2(index);
+            auto type = getType({ast.getFile().getData() + offset, size});
+            if(type.has_value()) break;
+            this->hasError = true;
+            Message::print(
+                ErrorCode::E0, ast.getFile(),
+                {
+                    {"help: the minimum integer literal is -9223372036854775808 and the maximum is "
+                     "18446744073709551615",
+                     {offset, size},
+                     true},
+                });
+            break;
+        }
     }
+
+    return !hasError;
 }
 
 } // namespace aerell

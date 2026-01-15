@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include "aerell/ast/ast.hpp"
 
 namespace aerell
@@ -18,7 +16,5 @@ class Semantic
   private:
     bool hasError;
     AST& ast;
-
-    void analyze(std::uint32_t index);
 };
 } // namespace aerell

@@ -15,7 +15,8 @@ class Lexer
     Lexer(const File& file);
 
     const File& getFile() const;
-    const Token& getToken();
+    const Token& getToken() const;
+    void forwardToken();
 
   private:
     const File& file;

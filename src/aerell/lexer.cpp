@@ -21,9 +21,10 @@ const File& Lexer::getFile() const { return this->file; }
 #define SET_KIND(x) this->token.setKind(TokenKind::x)
 #define SET_SIZE(x) this->token.setSize(x)
 #define SET_SIZE_AUTO SET_SIZE(this->data - (this->file.getData() + this->token.getOffset()))
-#define RET_TOKEN return this->token
 
-const Token& Lexer::getToken()
+const Token& Lexer::getToken() const { return this->token; }
+
+void Lexer::forwardToken()
 {
     // Skip
     while(!IS_EOF(CURRENT_CHAR))
@@ -53,7 +54,7 @@ const Token& Lexer::getToken()
         SET_KIND(EOFF);
         SET_OFFSET_AUTO;
         SET_SIZE(0);
-        RET_TOKEN;
+        return;
     }
 
     // INTL
@@ -64,7 +65,7 @@ const Token& Lexer::getToken()
         NEXT_CHAR;
         while(IS_DIGIT(CURRENT_CHAR)) NEXT_CHAR;
         SET_SIZE_AUTO;
-        RET_TOKEN;
+        return;
     }
 
     // ILLEGAL
@@ -72,7 +73,6 @@ const Token& Lexer::getToken()
     SET_OFFSET_AUTO;
     SET_SIZE(1);
     NEXT_CHAR;
-    RET_TOKEN;
 }
 
 } // namespace aerell

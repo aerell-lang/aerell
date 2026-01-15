@@ -17,6 +17,12 @@ class Parser
 
   private:
     Lexer& lexer;
+    AST ast;
+
+    void parseRoot();
+    std::uint32_t parseStmt();
+    std::uint32_t parseExpr();
+    std::uint32_t parseIntl();
 };
 
 } // namespace aerell
