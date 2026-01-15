@@ -84,7 +84,12 @@ std::string_view File::getLineText(std::uint32_t line) const
     else
         end = static_cast<std::uint32_t>(this->content.length());
 
-    return std::string_view(this->content.data() + start, end - start);
+    return {this->getData() + start, end - start};
+}
+
+std::string_view File::getLexemeText(const Lexeme& lexeme) const
+{
+    return {this->getData() + lexeme.offset, lexeme.size};
 }
 
 } // namespace aerell

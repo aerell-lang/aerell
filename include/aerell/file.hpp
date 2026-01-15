@@ -33,6 +33,7 @@ class File
     Location toLocation(const Lexeme& lexeme) const;
     std::uint32_t getOffsetFromLine(std::uint32_t line) const;
     std::string_view getLineText(std::uint32_t line) const;
+    std::string_view getLexemeText(const Lexeme& lexeme) const;
 
   private:
     std::filesystem::path path;
