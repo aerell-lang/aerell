@@ -5,6 +5,7 @@
 
 #include <cstddef>
 
+#include "aerell/file.hpp"
 #include "aerell/token/token_kind.hpp"
 #include "aerell/token/lexeme.hpp"
 
@@ -14,6 +15,8 @@ namespace aerell
 class Token
 {
   public:
+    Token(const File& file);
+
     TokenKind getKind() const;
     void setKind(TokenKind kind);
 
@@ -23,7 +26,10 @@ class Token
     std::uint32_t getSize() const;
     void setSize(std::uint32_t size);
 
+    std::string toStr() const;
+
   private:
+    const File& file;
     TokenKind kind;
     Lexeme lexeme;
 };
