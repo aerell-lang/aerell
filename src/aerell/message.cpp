@@ -105,10 +105,11 @@ void Message::print(const File& file, const Lexeme& lexeme) { print(file, std::v
 
 void Message::print(ErrorCode code, const File& file, const std::vector<Lexeme>& lexemes)
 {
-    std::print("error[{}]: ", toStr(code));
+    std::print("\nerror[{}]: ", toStr(code));
     switch(code)
     {
-    case ErrorCode::E0: std::println("integer literal is too large"); break;
+    case ErrorCode::E0: std::println("unsupported character"); break;
+    case ErrorCode::E1: std::println("integer literal is too large"); break;
     }
     print(file, lexemes);
 }

@@ -13,11 +13,13 @@ namespace aerell
 
 enum class ErrorCode : std::uint8_t
 {
-    E0,
+    E0, // unsupported character
+    E1, // integer literal is too large
 };
 
 constexpr auto errorCodeStr = std::to_array<std::pair<ErrorCode, std::string_view>>({
     {ErrorCode::E0, "E0"},
+    {ErrorCode::E1, "E1"},
 });
 
 constexpr std::string_view toStr(ErrorCode k)

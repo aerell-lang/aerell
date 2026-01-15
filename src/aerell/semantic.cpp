@@ -78,15 +78,15 @@ bool Semantic::analyze()
             auto size = ast.getData2(index);
             auto type = getType({ast.getFile().getData() + offset, size});
             if(type.has_value()) break;
-            this->hasError = true;
             Message::print(
-                ErrorCode::E0, ast.getFile(),
+                ErrorCode::E1, ast.getFile(),
                 {
                     {"help: the minimum integer literal is -9223372036854775808 and the maximum is "
                      "18446744073709551615",
                      {offset, size},
                      true},
                 });
+            this->hasError = true;
             break;
         }
     }
