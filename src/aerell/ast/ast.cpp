@@ -22,7 +22,8 @@ const File& AST::getFile() const { return this->file; }
 
 std::string AST::toStr() const
 {
-    std::string str;
+    std::string str = this->getFile().getPath().generic_string() + "\n";
+
     std::vector<std::pair<std::uint32_t, std::uint32_t>> indexs{{1, 0}};
     while(!indexs.empty())
     {
@@ -49,6 +50,7 @@ std::string AST::toStr() const
             break;
         }
     }
+
     return str;
 }
 
