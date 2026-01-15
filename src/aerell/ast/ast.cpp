@@ -51,13 +51,15 @@ std::uint32_t AST::addData2(std::uint32_t data)
 std::uint32_t AST::addKind(ASTKind kind)
 {
     std::uint32_t index = 0;
-    if(this->kinds.size() == 1 && this->kinds[index] == ASTKind::NONE)
+    std::uint32_t count = this->getKindCount();
+
+    if(count == 1 && this->kinds[index] == ASTKind::NONE)
     {
         this->kinds[index] = kind;
         return index;
     }
 
-    index = static_cast<std::uint32_t>(this->kinds.size());
+    index = count;
     this->kinds.push_back(kind);
 
     return index;
@@ -93,9 +95,11 @@ std::string AST::toStr() const
 
 const File& AST::getFile() const { return this->file; }
 
+std::uint32_t AST::getKindCount() const { return static_cast<std::uint32_t>(this->kinds.size()); }
+
 ASTKind AST::getKind(std::uint32_t index) const
 {
-    assert(index < this->kinds.size());
+    assert(index < this->getKindCount());
     return this->kinds[index];
 }
 

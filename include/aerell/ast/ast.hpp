@@ -22,6 +22,7 @@ class AST
 
     const File& getFile() const;
 
+    std::uint32_t getKindCount() const;
     ASTKind getKind(std::uint32_t index) const;
     std::uint32_t getData1(std::uint32_t index) const;
     std::uint32_t getData2(std::uint32_t index) const;
