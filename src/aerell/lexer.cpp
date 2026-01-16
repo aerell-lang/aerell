@@ -57,6 +57,16 @@ void Lexer::forwardToken()
         return;
     }
 
+    // PLUS
+    if(IS_CHR(CURRENT_CHAR, '+'))
+    {
+        SET_KIND(PLUS);
+        SET_OFFSET_AUTO;
+        NEXT_CHAR;
+        SET_SIZE_AUTO;
+        return;
+    }
+
     // INTL
     if(IS_DIGIT(CURRENT_CHAR))
     {

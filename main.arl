@@ -6,7 +6,7 @@
 # 11
 # 2005
 
-1000000000000000000000000000 # Error: integer literal is too large
+# 1000000000000000000000000000 # Error: integer literal is too large
 
 # Add operator
-1 + 1 # Error: because '+' is illegal
+1 + 1

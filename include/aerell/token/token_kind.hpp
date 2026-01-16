@@ -15,12 +15,14 @@ enum class TokenKind : std::uint8_t
 {
     EOFF,
     ILLEGAL,
+    PLUS,
     INTL
 };
 
 constexpr auto tokenKindStr = std::to_array<std::pair<TokenKind, std::string_view>>({
     {TokenKind::EOFF, "EOFF"},
     {TokenKind::ILLEGAL, "ILLEGAL"},
+    {TokenKind::PLUS, "PLUS"},
     {TokenKind::INTL, "INTL"},
 });
 
