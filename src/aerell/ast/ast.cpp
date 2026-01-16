@@ -39,6 +39,8 @@ std::string AST::toStr() const
         case ASTKind::ROOT:
         case ASTKind::STMT:
         case ASTKind::EXPR:
+        case ASTKind::ADD:
+        case ASTKind::LITERAL:
             str += std::format("{}[{}]\n", indentStr, aerell::toStr(kind));
             indexs.push_back({this->getData2(index), indent});
             indexs.push_back({this->getData1(index), indent + 1});

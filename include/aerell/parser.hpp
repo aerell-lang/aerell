@@ -22,6 +22,8 @@ class Parser
     void parseRoot();
     std::uint32_t parseStmt();
     std::uint32_t parseExpr();
+    std::uint32_t parseAdd();
+    std::uint32_t parseLiteral();
     std::uint32_t parseIntl();
 };
 

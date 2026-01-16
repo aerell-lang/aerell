@@ -17,6 +17,8 @@ enum class ASTKind : std::uint8_t
     ROOT,
     STMT,
     EXPR,
+    ADD,
+    LITERAL,
     INTL,
 };
 
@@ -25,6 +27,8 @@ constexpr auto astKindStr = std::to_array<std::pair<ASTKind, std::string_view>>(
     {ASTKind::ROOT, "ROOT"},
     {ASTKind::STMT, "STMT"},
     {ASTKind::EXPR, "EXPR"},
+    {ASTKind::ADD, "ADD"},
+    {ASTKind::LITERAL, "LITERAL"},
     {ASTKind::INTL, "INTL"},
 });
 

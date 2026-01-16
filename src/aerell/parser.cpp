@@ -20,7 +20,9 @@ AST Parser::parse()
 }
 
 #define PARSE_INTL_START_TOKEN_KIND (this->lexer.getToken().getKind() == TokenKind::INTL)
-#define PARSE_EXPR_START_TOKEN_KIND PARSE_INTL_START_TOKEN_KIND
+#define PARSE_LITERAL_START_TOKEN_KIND PARSE_INTL_START_TOKEN_KIND
+#define PARSE_ADD_START_TOKEN_KIND PARSE_LITERAL_START_TOKEN_KIND
+#define PARSE_EXPR_START_TOKEN_KIND PARSE_ADD_START_TOKEN_KIND
 #define PARSE_STMT_START_TOKEN_KIND PARSE_EXPR_START_TOKEN_KIND
 
 void Parser::parseRoot()
@@ -76,10 +78,63 @@ std::uint32_t Parser::parseExpr()
     std::uint32_t d1i = this->ast.addData1(0);
     this->ast.addData2(0);
 
+    // add
+    this->ast.setData1(d1i, this->parseAdd());
+
+    return expri;
+}
+
+std::uint32_t Parser::parseAdd()
+{
+    assert(PARSE_ADD_START_TOKEN_KIND);
+    if(!PARSE_ADD_START_TOKEN_KIND) return 0;
+
+    std::uint32_t literali = this->parseLiteral();
+
+    // (+ literal)
+    if(this->lexer.getToken().getKind() == TokenKind::PLUS)
+    {
+        this->lexer.forwardToken();
+
+        std::uint32_t add = this->ast.addKind(ASTKind::ADD);
+        this->ast.addData1(literali);
+        this->ast.addData2(0);
+
+        std::uint32_t curr = literali;
+
+        std::uint32_t literali = this->parseLiteral();
+        this->ast.setData2(curr, literali);
+        curr = literali;
+
+        // (+ literal)*
+        while(this->lexer.getToken().getKind() == TokenKind::PLUS)
+        {
+            this->lexer.forwardToken();
+
+            literali = this->parseLiteral();
+            this->ast.setData2(curr, literali);
+            curr = literali;
+        }
+
+        return add;
+    }
+
+    return literali;
+}
+
+std::uint32_t Parser::parseLiteral()
+{
+    assert(PARSE_LITERAL_START_TOKEN_KIND);
+    if(!PARSE_LITERAL_START_TOKEN_KIND) return 0;
+
+    std::uint32_t literali = this->ast.addKind(ASTKind::LITERAL);
+    std::uint32_t d1i = this->ast.addData1(0);
+    this->ast.addData2(0);
+
     // intl
     this->ast.setData1(d1i, this->parseIntl());
 
-    return expri;
+    return literali;
 }
 
 std::uint32_t Parser::parseIntl()
