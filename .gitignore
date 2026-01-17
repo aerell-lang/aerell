@@ -4,8 +4,5 @@ build
 # clang
 .cache
 
-# idea
-.idea
-
 # env
 .env
