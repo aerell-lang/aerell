@@ -1,11 +1,11 @@
 // Copyright 2026 Fern Aerell.
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef INCLUDE
+#ifdef INCLUDE_FILE
 #pragma once
 #endif
 
-#ifndef INCLUDE
+#ifndef INCLUDE_FILE
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +19,7 @@ typedef struct
 } File;
 
 bool file_load(File* file, const char* path)
-#ifdef INCLUDE
+#ifdef INCLUDE_FILE
     ;
 #else
 {
@@ -59,7 +59,7 @@ bool file_load(File* file, const char* path)
 #endif
 
 void file_unload(File* file)
-#ifdef INCLUDE
+#ifdef INCLUDE_FILE
     ;
 #else
 {

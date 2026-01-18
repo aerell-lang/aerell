@@ -1,13 +1,17 @@
 // Copyright 2026 Fern Aerell.
 // SPDX-License-Identifier: Apache-2.0
 
-#define INCLUDE
-
 #include <stdio.h>
 #include <string.h>
 
+#define INCLUDE_FILE
 #include "aerell/file.c"
+
+#define INCLUDE_TOKENIZER
 #include "aerell/tokenizer.c"
+
+#define INCLUDE_PARSE
+#include "aerell/parse.c"
 
 static const char* version = "Aerell version: 0.0.0";
 static const char* help = "A command-line utility for Aerell development.\n\
@@ -97,6 +101,12 @@ int main(int argc, const char* argv[])
         token = tokenizer_next(&tokenizer);
     }
     tokenizer_dump(&tokenizer, &token);
+
+    Parse parse = {0};
+    parse.source = file.buffer;
+    parse.token_index = 0;
+
+    parse_root(&parse);
 
     file_unload(&file);
     return 0;

@@ -1,13 +1,13 @@
 // Copyright 2026 Fern Aerell.
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef INCLUDE
+#ifdef INCLUDE_TOKENIZER
 #pragma once
 #endif
 
 #include <stddef.h>
 
-#ifndef INCLUDE
+#ifndef INCLUDE_TOKENIZER
 #include <stdio.h>
 #include <string.h>
 #endif
@@ -20,10 +20,8 @@ typedef enum
     TOKEN_TAG_NUML,
 } TokenTag;
 
-#define DEF(x, y)
-
 const char* TokenTagName(TokenTag tag)
-#ifdef INCLUDE
+#ifdef INCLUDE_TOKENIZER
     ;
 #else
 {
@@ -67,7 +65,7 @@ typedef enum
 } TokenizerState;
 
 Tokenizer tokenizer_init(const char* buffer, size_t len)
-#ifdef INCLUDE
+#ifdef INCLUDE_TOKENIZER
     ;
 #else
 {
@@ -80,7 +78,7 @@ Tokenizer tokenizer_init(const char* buffer, size_t len)
 #endif
 
 void tokenizer_dump(const Tokenizer* self, const Token* token)
-#ifdef INCLUDE
+#ifdef INCLUDE_TOKENIZER
     ;
 #else
 {
@@ -91,7 +89,7 @@ void tokenizer_dump(const Tokenizer* self, const Token* token)
 #endif
 
 Token tokenizer_next(Tokenizer* self)
-#ifdef INCLUDE
+#ifdef INCLUDE_TOKENIZER
     ;
 #else
 {
