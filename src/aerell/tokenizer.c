@@ -8,6 +8,7 @@
 #include <stddef.h>
 
 #ifndef INCLUDE_TOKENIZER
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #endif
@@ -20,7 +21,7 @@ typedef enum
     TOKEN_TAG_NUML,
 } TokenTag;
 
-const char* TokenTagName(TokenTag tag)
+const char* token_tag_name(TokenTag tag)
 #ifdef INCLUDE_TOKENIZER
     ;
 #else
@@ -69,10 +70,15 @@ Tokenizer tokenizer_init(const char* buffer, size_t len)
     ;
 #else
 {
-    Tokenizer tokenizer;
+    Tokenizer tokenizer = {0};
+
+    assert(buffer != NULL && "buffer is null");
+    if(buffer == NULL) return tokenizer;
+
     tokenizer.buffer = buffer;
     tokenizer.len = len;
     tokenizer.index = 0;
+
     return tokenizer;
 }
 #endif
@@ -82,8 +88,11 @@ void tokenizer_dump(const Tokenizer* self, const Token* token)
     ;
 #else
 {
+    assert(self != NULL && "self is null");
+    assert(token != NULL && "token is null");
+    if(self == NULL || token == NULL) return;
     printf(
-        "%s %.*s\n", TokenTagName(token->tag), (int)(token->loc.end - token->loc.start),
+        "%s %.*s\n", token_tag_name(token->tag), (int)(token->loc.end - token->loc.start),
         self->buffer + token->loc.start);
 }
 #endif
@@ -93,10 +102,14 @@ Token tokenizer_next(Tokenizer* self)
     ;
 #else
 {
+    assert(self != NULL && "self is null");
+
     Token result;
     result.tag = TOKEN_TAG_INVALID;
     result.loc.start = self->index;
     result.loc.end = 0;
+
+    if(self == NULL) return result;
 
     TokenizerState state = TOKENIZER_STATE_START;
 state:

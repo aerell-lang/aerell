@@ -44,6 +44,9 @@ void node_list_free(NodeList* nl)
     ;
 #else
 {
+
+    assert(nl != NULL && "nl is null");
+    if(nl == NULL) return;
     if(nl->tag != NULL) free(nl->tag);
     if(nl->main_token != NULL) free(nl->main_token);
     if(nl->data != NULL) free(nl->data);
@@ -57,7 +60,9 @@ void node_list_append_assume_capacity(NodeList* nl, NodeTag tag, uint32_t main_t
     ;
 #else
 {
-    // Do something in here
+    assert(nl != NULL && "nl is null");
+    if(nl == NULL) return;
+
     if(nl->size >= nl->capacity)
     {
         size_t new_capacity = (nl->capacity == 0) ? 2 : nl->capacity * 2;

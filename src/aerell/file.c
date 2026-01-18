@@ -6,6 +6,7 @@
 #endif
 
 #ifndef INCLUDE_FILE
+#include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +24,9 @@ bool file_load(File* file, const char* path)
     ;
 #else
 {
+    assert(file != NULL && "file is null");
+    if(file == NULL) return false;
+
     file->path = path;
     file->buffer = NULL;
 
@@ -34,6 +38,7 @@ bool file_load(File* file, const char* path)
     rewind(fptr);
 
     char* buffer = malloc(len + 1);
+    assert(buffer != NULL && "buffer is null, malloc failed");
     if(buffer == NULL)
     {
         fclose(fptr);
@@ -41,6 +46,7 @@ bool file_load(File* file, const char* path)
     }
 
     size_t rlen = fread(buffer, 1, len, fptr);
+    assert(rlen == len && "rlen don't same with len, something wrong with fread");
     if(rlen != len)
     {
         free(buffer);
@@ -63,6 +69,8 @@ void file_unload(File* file)
     ;
 #else
 {
+    assert(file != NULL && "file is null");
+    if(file == NULL) return;
     free((char*)file->buffer);
 }
 #endif

@@ -5,8 +5,11 @@
 #pragma once
 #endif
 
+#ifndef INCLUDE_PARSE
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
+#endif
 
 #define INCLUDE_AST
 #include "aerell/ast.c"
@@ -25,6 +28,9 @@ void parse_root(Parse* p)
     ;
 #else
 {
+    assert(p != NULL && "p is null");
+    if(p == NULL) return;
+
     // Root node must be index 0
     NodeListData data;
     data.node = 0;
