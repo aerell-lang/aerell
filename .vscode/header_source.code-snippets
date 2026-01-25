@@ -3,7 +3,7 @@
     "prefix": "header-source",
     "scope": "c,cpp",
     "body": [
-      "// Copyright 2026 Fern Aerell.",
+      "// Copyright 2026 Fern Aerell",
       "// SPDX-License-Identifier: Apache-2.0",
       "$0"
     ]
