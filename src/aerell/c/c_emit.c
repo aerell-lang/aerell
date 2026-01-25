@@ -7,7 +7,7 @@
 #include <string.h>
 #include <string.h>
 
-#include "aerell/backend/c/c_emit.h"
+#include "aerell/c/c_emit.h"
 
 typedef struct
 {
@@ -44,65 +44,65 @@ void buff_free(buff_t* self)
     self->qty = 0;
 }
 
-const char* c_emit(const ir_mod_t* mod)
+const char* c_emit(const ir_mod_t* ir_mod)
 {
-    assert(mod != NULL && "mod is null");
+    assert(ir_mod != NULL && "mod is null");
 
     buff_t root_buff = {0};
 
-    for(uint32_t i = 0; i < mod->funcs.qty; i++)
+    for(uint32_t i = 0; i < ir_mod->funcs.qty; i++)
     {
-        if(mod->funcs.pub[i] && mod->funcs.inst_qty[i] == 0) buff_write(&root_buff, "extern ");
-        switch(mod->funcs.ret[i])
+        if(ir_mod->funcs.pub[i] && ir_mod->funcs.inst_qty[i] == 0) buff_write(&root_buff, "extern ");
+        switch(ir_mod->funcs.ret[i])
         {
         case IR_TYPE_VOID: buff_write(&root_buff, "void "); break;
         case IR_TYPE_I32: buff_write(&root_buff, "int "); break;
         case IR_TYPE_STR: buff_write(&root_buff, "const char* "); break;
         }
-        buff_write(&root_buff, mod->vals.data[mod->funcs.name[i]].str);
+        buff_write(&root_buff, ir_mod->vals.data[ir_mod->funcs.name[i]].str);
         buff_write(&root_buff, "(");
-        for(uint32_t j = 0; j < mod->funcs.param_qty[i]; j++)
+        for(uint32_t j = 0; j < ir_mod->funcs.param_qty[i]; j++)
         {
             if(j > 0) buff_write(&root_buff, ", ");
-            switch(mod->funcs.param[i][j])
+            switch(ir_mod->funcs.param[i][j])
             {
             case IR_TYPE_VOID: buff_write(&root_buff, "void"); break;
             case IR_TYPE_I32: buff_write(&root_buff, "int"); break;
             case IR_TYPE_STR: buff_write(&root_buff, "const char*"); break;
             }
         }
-        if(mod->funcs.vrdic[i]) buff_write(&root_buff, ",...");
+        if(ir_mod->funcs.vrdic[i]) buff_write(&root_buff, ",...");
         buff_write(&root_buff, ")");
-        if(mod->funcs.inst_qty[i] == 0)
+        if(ir_mod->funcs.inst_qty[i] == 0)
         {
             buff_write(&root_buff, ";");
             continue;
         }
         buff_write(&root_buff, "{");
         buff_t arg_buff = {0};
-        for(uint32_t j = 0; j < mod->funcs.inst_qty[i]; j++)
+        for(uint32_t j = 0; j < ir_mod->funcs.inst_qty[i]; j++)
         {
-            switch(mod->funcs.inst_type[i][j])
+            switch(ir_mod->funcs.inst_type[i][j])
             {
             case IR_FUNC_INST_TYPE_ARG:
-                if(mod->funcs.inst_data[i][j].arg.arg_idx > 0) buff_write(&arg_buff, ",");
-                switch(mod->vals.type[mod->funcs.inst_data[i][j].arg.val_idx])
+                if(ir_mod->funcs.inst_data[i][j].arg.arg_idx > 0) buff_write(&arg_buff, ",");
+                switch(ir_mod->vals.type[ir_mod->funcs.inst_data[i][j].arg.val_idx])
                 {
                 case IR_TYPE_VOID: break;
                 case IR_TYPE_I32:
                     char x[12];
-                    snprintf(x, sizeof(x), "%i", mod->vals.data[mod->funcs.inst_data[i][j].arg.val_idx].i32);
+                    snprintf(x, sizeof(x), "%i", ir_mod->vals.data[ir_mod->funcs.inst_data[i][j].arg.val_idx].i32);
                     buff_write(&arg_buff, x);
                     break;
                 case IR_TYPE_STR:
                     buff_write(&arg_buff, "\"");
-                    buff_write(&arg_buff, mod->vals.data[mod->funcs.inst_data[i][j].arg.val_idx].str);
+                    buff_write(&arg_buff, ir_mod->vals.data[ir_mod->funcs.inst_data[i][j].arg.val_idx].str);
                     buff_write(&arg_buff, "\"");
                     break;
                 }
                 break;
             case IR_FUNC_INST_TYPE_CALL:
-                buff_write(&root_buff, mod->vals.data[mod->funcs.name[mod->funcs.inst_data[i][j].idx]].str);
+                buff_write(&root_buff, ir_mod->vals.data[ir_mod->funcs.name[ir_mod->funcs.inst_data[i][j].idx]].str);
                 buff_write(&root_buff, "(");
                 buff_write(&root_buff, arg_buff.data);
                 buff_write(&root_buff, ");");

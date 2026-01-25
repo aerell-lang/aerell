@@ -1,13 +1,13 @@
 // Copyright 2026 Fern Aerell
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdlib.h>
 #include <stdio.h>
 
 #include "aerell/file.h"
 #include "aerell/ir/ir_gen.h"
 #include "aerell/ir/mod/ir_mod.h"
-#include "aerell/backend/c/c_emit.h"
+#include "aerell/llvm/llvm_ir_gen.h"
+// #include "aerell/c/c_emit.h"
 
 int main(int argc, const char* argv[])
 {
@@ -34,31 +34,37 @@ int main(int argc, const char* argv[])
 
     // ir_mod_dump(&ir_mod);
 
-    const char* buff = c_emit(&ir_mod);
-    if(buff == NULL)
-    {
-        printf("Failed to emit c.\n");
-        ir_mod_free(&ir_mod);
-        file_unload(&file);
-        return 1;
-    }
+    // LLVM
+    llvm_ir_gen_t llvm_ir_gen;
+    llvm_ir_gen_generate(&llvm_ir_gen, &ir_mod);
 
-    FILE* fw = fopen("a.c", "w");
-    if(fw == NULL)
-    {
-        printf("Failed to write c.\n");
-        ir_mod_free(&ir_mod);
-        file_unload(&file);
-        return 1;
-    }
+    // C
+    // const char* buff = c_emit(&ir_mod);
+    // if(buff == NULL)
+    // {
+    //     printf("Failed to emit c.\n");
+    //     ir_mod_free(&ir_mod);
+    //     file_unload(&file);
+    //     return 1;
+    // }
+
+    // FILE* fw = fopen("a.c", "w");
+    // if(fw == NULL)
+    // {
+    //     printf("Failed to write c.\n");
+    //     ir_mod_free(&ir_mod);
+    //     file_unload(&file);
+    //     return 1;
+    // }
 
     // printf("%s", cmod);
-    fprintf(fw, "%s", buff);
+    // fprintf(fw, "%s", buff);
 
-    printf("Emit a.c succesfully.\n");
+    // printf("Emit a.c succesfully.\n");
 
-    fclose(fw);
-    free((char*)buff);
+    // fclose(fw);
+    // free((char*)buff);
+
     ir_mod_free(&ir_mod);
     file_unload(&file);
     return 0;
