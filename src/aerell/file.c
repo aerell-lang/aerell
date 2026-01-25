@@ -1,76 +1,54 @@
-// Copyright 2026 Fern Aerell.
+// Copyright 2026 Fern Aerell
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef INCLUDE_FILE
-#pragma once
-#endif
-
-#ifndef INCLUDE_FILE
 #include <assert.h>
-#include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
-#endif
+#include <stdio.h>
 
-typedef struct
+#include "aerell/file.h"
+
+bool file_load(file_t* self, const char* path)
 {
-    const char* path;
-    const char* buffer;
-    size_t len;
-} File;
+    assert(self != NULL && path != NULL && "self or path is null");
 
-bool file_load(File* file, const char* path)
-#ifdef INCLUDE_FILE
-    ;
-#else
-{
-    assert(file != NULL && "file is null");
-    if(file == NULL) return false;
+    FILE* cfile = fopen(path, "rb");
+    if(cfile == NULL) return false;
 
-    file->path = path;
-    file->buffer = NULL;
+    fseek(cfile, 0, SEEK_END);
+    uintptr_t len = ftell(cfile);
+    rewind(cfile);
 
-    FILE* fptr = fopen(path, "rb");
-    if(fptr == NULL) return false;
-
-    fseek(fptr, 0, SEEK_END);
-    size_t len = ftell(fptr);
-    rewind(fptr);
-
-    char* buffer = malloc(len + 1);
-    assert(buffer != NULL && "buffer is null, malloc failed");
+    char* buffer = (char*)malloc(sizeof(char) * (len + 1));
+    assert(buffer != NULL && "malloc failed");
     if(buffer == NULL)
     {
-        fclose(fptr);
+        fclose(cfile);
         return false;
     }
 
-    size_t rlen = fread(buffer, 1, len, fptr);
-    assert(rlen == len && "rlen don't same with len, something wrong with fread");
+    uintptr_t rlen = fread(buffer, 1, len, cfile);
+    assert(rlen == len && "rlen != len");
     if(rlen != len)
     {
         free(buffer);
-        fclose(fptr);
+        fclose(cfile);
         return false;
     }
 
     buffer[len] = '\0';
 
-    file->buffer = buffer;
-    file->len = len;
+    fclose(cfile);
 
-    fclose(fptr);
+    self->path = path;
+    self->content.data = buffer;
+    self->content.len = len;
+
     return true;
 }
-#endif
 
-void file_unload(File* file)
-#ifdef INCLUDE_FILE
-    ;
-#else
+void file_unload(file_t* self)
 {
-    assert(file != NULL && "file is null");
-    if(file == NULL) return;
-    free((char*)file->buffer);
+    assert(self != NULL && "self is null");
+    free((char*)self->content.data);
+    self->content.len = 0;
 }
-#endif

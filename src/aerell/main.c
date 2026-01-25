@@ -1,113 +1,65 @@
-// Copyright 2026 Fern Aerell.
+// Copyright 2026 Fern Aerell
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
-#define INCLUDE_FILE
-#include "aerell/file.c"
-
-#define INCLUDE_TOKENIZER
-#include "aerell/tokenizer.c"
-
-#define INCLUDE_PARSE
-#include "aerell/parse.c"
-
-static const char* version = "Aerell version: 0.0.0";
-static const char* help = "A command-line utility for Aerell development.\n\
-\n\
-Usage: aerell <command>\n\
-\n\
-Available commands:\n\
- h, help             Print this usage information.\n\
- v, version          Print the Aerell compiler version.\n\
- lex <file>          Tokenize the source file and print the lexer output.\n";
-
-static inline void printVersion() { printf("%s", version); }
-
-static inline void printHelp() { printf("%s", help); }
-
-typedef enum
-{
-    COMMAND_NONE,
-    COMMAND_HELP,
-    COMMAND_VERSION,
-    COMMAND_LEX
-} Command;
-
-static inline int invalid()
-{
-    printf("Invalid arguments or too few or too many.\n");
-    printHelp();
-    return 0;
-}
+#include "aerell/file.h"
+#include "aerell/ir/ir_gen.h"
+#include "aerell/ir/mod/ir_mod.h"
+#include "aerell/backend/c/c_gen.h"
 
 int main(int argc, const char* argv[])
 {
     argc--;
     argv++;
 
-    if(argc == 0)
-    {
-        printHelp();
-        return 0;
-    }
+    if(argc == 0) return 0;
 
-    Command command = COMMAND_NONE;
-
-    if(argc == 1)
+    file_t file = {0};
+    if(!file_load(&file, *argv))
     {
-        if(strcmp(argv[0], "h") == 0 || strcmp(argv[0], "help") == 0) command = COMMAND_HELP;
-        else if(strcmp(argv[0], "v") == 0 || strcmp(argv[0], "version") == 0)
-            command = COMMAND_VERSION;
-        else
-            return invalid();
-    }
-    else if(argc == 2)
-    {
-        if(strcmp(argv[0], "lex") == 0) command = COMMAND_LEX;
-        else
-            return invalid();
-    }
-    else if(argc > 2)
-        return invalid();
-
-    if(command == COMMAND_NONE || command == COMMAND_HELP)
-    {
-        printHelp();
-        return 0;
-    }
-
-    if(command == COMMAND_VERSION)
-    {
-        printVersion();
-        return 0;
-    }
-
-    const char* path = argv[1];
-
-    File file = {0};
-    if(!file_load(&file, path))
-    {
-        printf("Failed to open file.");
+        printf("Failed to open file.\n");
         return 1;
     }
 
-    Tokenizer tokenizer = tokenizer_init(file.buffer, file.len);
-    Token token = tokenizer_next(&tokenizer);
-    while(token.tag != TOKEN_TAG_EOFF)
+    ir_mod_t ir_mod = {0};
+    ir_gen_t ir_gen = {0};
+
+    if(!ir_gen_generate(&ir_gen, &file, &ir_mod))
     {
-        tokenizer_dump(&tokenizer, &token);
-        token = tokenizer_next(&tokenizer);
+        printf("Failed to generate ir.\n");
+        return 1;
     }
-    tokenizer_dump(&tokenizer, &token);
 
-    Parse parse = {0};
-    parse.source = file.buffer;
-    parse.token_index = 0;
+    // ir_mod_dump(&ir_mod);
 
-    parse_root(&parse);
+    const char* cmod = c_gen_generate(&ir_mod);
+    if(cmod == NULL)
+    {
+        printf("Failed to generate c.\n");
+        ir_mod_free(&ir_mod);
+        file_unload(&file);
+        return 1;
+    }
 
+    FILE* fw = fopen("a.c", "w");
+    if(fw == NULL)
+    {
+        printf("Failed to generate c.\n");
+        ir_mod_free(&ir_mod);
+        file_unload(&file);
+        return 1;
+    }
+
+    // printf("%s", cmod);
+    fprintf(fw, "%s", cmod);
+
+    printf("Generate a.c succesfully.\n");
+
+    fclose(fw);
+    free((char*)cmod);
+    ir_mod_free(&ir_mod);
     file_unload(&file);
     return 0;
 }
