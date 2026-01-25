@@ -5,4 +5,4 @@
 
 #include "aerell/ir/mod/ir_mod.h"
 
-const char* c_gen_generate(const ir_mod_t* mod);
+const char* c_emit(const ir_mod_t* mod);

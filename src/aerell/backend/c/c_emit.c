@@ -7,16 +7,16 @@
 #include <string.h>
 #include <string.h>
 
-#include "aerell/backend/c/c_gen.h"
+#include "aerell/backend/c/c_emit.h"
 
 typedef struct
 {
     char* data;
     uint32_t cap;
     uint32_t qty;
-} c_mod_t;
+} buff_t;
 
-void c_mod_write(c_mod_t* self, const char* val)
+void buff_write(buff_t* self, const char* val)
 {
     assert(self != NULL && val != NULL && "self or val is null");
 
@@ -34,7 +34,7 @@ void c_mod_write(c_mod_t* self, const char* val)
     self->data[self->qty] = '\0';
 }
 
-void c_mod_free(c_mod_t* self)
+void buff_free(buff_t* self)
 {
     assert(self != NULL && "self is null");
 
@@ -44,76 +44,76 @@ void c_mod_free(c_mod_t* self)
     self->qty = 0;
 }
 
-const char* c_gen_generate(const ir_mod_t* mod)
+const char* c_emit(const ir_mod_t* mod)
 {
     assert(mod != NULL && "mod is null");
 
-    c_mod_t c_mod = {0};
+    buff_t root_buff = {0};
 
     for(uint32_t i = 0; i < mod->funcs.qty; i++)
     {
-        if(mod->funcs.pub[i] && mod->funcs.inst_qty[i] == 0) c_mod_write(&c_mod, "extern ");
+        if(mod->funcs.pub[i] && mod->funcs.inst_qty[i] == 0) buff_write(&root_buff, "extern ");
         switch(mod->funcs.ret[i])
         {
-        case IR_TYPE_VOID: c_mod_write(&c_mod, "void "); break;
-        case IR_TYPE_I32: c_mod_write(&c_mod, "int "); break;
-        case IR_TYPE_STR: c_mod_write(&c_mod, "const char* "); break;
+        case IR_TYPE_VOID: buff_write(&root_buff, "void "); break;
+        case IR_TYPE_I32: buff_write(&root_buff, "int "); break;
+        case IR_TYPE_STR: buff_write(&root_buff, "const char* "); break;
         }
-        c_mod_write(&c_mod, mod->vals.data[mod->funcs.name[i]].str);
-        c_mod_write(&c_mod, "(");
+        buff_write(&root_buff, mod->vals.data[mod->funcs.name[i]].str);
+        buff_write(&root_buff, "(");
         for(uint32_t j = 0; j < mod->funcs.param_qty[i]; j++)
         {
-            if(j > 0) c_mod_write(&c_mod, ", ");
+            if(j > 0) buff_write(&root_buff, ", ");
             switch(mod->funcs.param[i][j])
             {
-            case IR_TYPE_VOID: c_mod_write(&c_mod, "void"); break;
-            case IR_TYPE_I32: c_mod_write(&c_mod, "int"); break;
-            case IR_TYPE_STR: c_mod_write(&c_mod, "const char*"); break;
+            case IR_TYPE_VOID: buff_write(&root_buff, "void"); break;
+            case IR_TYPE_I32: buff_write(&root_buff, "int"); break;
+            case IR_TYPE_STR: buff_write(&root_buff, "const char*"); break;
             }
         }
-        if(mod->funcs.vrdic[i]) c_mod_write(&c_mod, ",...");
-        c_mod_write(&c_mod, ")");
+        if(mod->funcs.vrdic[i]) buff_write(&root_buff, ",...");
+        buff_write(&root_buff, ")");
         if(mod->funcs.inst_qty[i] == 0)
         {
-            c_mod_write(&c_mod, ";");
+            buff_write(&root_buff, ";");
             continue;
         }
-        c_mod_write(&c_mod, "{");
-        c_mod_t arg = {0};
+        buff_write(&root_buff, "{");
+        buff_t arg_buff = {0};
         for(uint32_t j = 0; j < mod->funcs.inst_qty[i]; j++)
         {
             switch(mod->funcs.inst_type[i][j])
             {
             case IR_FUNC_INST_TYPE_ARG:
-                if(mod->funcs.inst_data[i][j].arg.arg_idx > 0) c_mod_write(&arg, ",");
+                if(mod->funcs.inst_data[i][j].arg.arg_idx > 0) buff_write(&arg_buff, ",");
                 switch(mod->vals.type[mod->funcs.inst_data[i][j].arg.val_idx])
                 {
                 case IR_TYPE_VOID: break;
                 case IR_TYPE_I32:
                     char x[12];
                     snprintf(x, sizeof(x), "%i", mod->vals.data[mod->funcs.inst_data[i][j].arg.val_idx].i32);
-                    c_mod_write(&arg, x);
+                    buff_write(&arg_buff, x);
                     break;
                 case IR_TYPE_STR:
-                    c_mod_write(&arg, "\"");
-                    c_mod_write(&arg, mod->vals.data[mod->funcs.inst_data[i][j].arg.val_idx].str);
-                    c_mod_write(&arg, "\"");
+                    buff_write(&arg_buff, "\"");
+                    buff_write(&arg_buff, mod->vals.data[mod->funcs.inst_data[i][j].arg.val_idx].str);
+                    buff_write(&arg_buff, "\"");
                     break;
                 }
                 break;
             case IR_FUNC_INST_TYPE_CALL:
-                c_mod_write(&c_mod, mod->vals.data[mod->funcs.name[mod->funcs.inst_data[i][j].idx]].str);
-                c_mod_write(&c_mod, "(");
-                c_mod_write(&c_mod, arg.data);
-                c_mod_write(&c_mod, ");");
-                c_mod_free(&arg);
+                buff_write(&root_buff, mod->vals.data[mod->funcs.name[mod->funcs.inst_data[i][j].idx]].str);
+                buff_write(&root_buff, "(");
+                buff_write(&root_buff, arg_buff.data);
+                buff_write(&root_buff, ");");
+                buff_free(&arg_buff);
                 break;
             }
         }
-        c_mod_free(&arg);
-        c_mod_write(&c_mod, "}");
-        c_mod_write(&c_mod, "int main(){init();return 0;}");
+        buff_free(&arg_buff);
+        buff_write(&root_buff, "}");
+        buff_write(&root_buff, "int main(){init();return 0;}");
     }
 
-    return c_mod.data;
+    return root_buff.data;
 }

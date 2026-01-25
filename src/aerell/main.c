@@ -7,7 +7,7 @@
 #include "aerell/file.h"
 #include "aerell/ir/ir_gen.h"
 #include "aerell/ir/mod/ir_mod.h"
-#include "aerell/backend/c/c_gen.h"
+#include "aerell/backend/c/c_emit.h"
 
 int main(int argc, const char* argv[])
 {
@@ -34,10 +34,10 @@ int main(int argc, const char* argv[])
 
     // ir_mod_dump(&ir_mod);
 
-    const char* cmod = c_gen_generate(&ir_mod);
-    if(cmod == NULL)
+    const char* buff = c_emit(&ir_mod);
+    if(buff == NULL)
     {
-        printf("Failed to generate c.\n");
+        printf("Failed to emit c.\n");
         ir_mod_free(&ir_mod);
         file_unload(&file);
         return 1;
@@ -46,19 +46,19 @@ int main(int argc, const char* argv[])
     FILE* fw = fopen("a.c", "w");
     if(fw == NULL)
     {
-        printf("Failed to generate c.\n");
+        printf("Failed to write c.\n");
         ir_mod_free(&ir_mod);
         file_unload(&file);
         return 1;
     }
 
     // printf("%s", cmod);
-    fprintf(fw, "%s", cmod);
+    fprintf(fw, "%s", buff);
 
-    printf("Generate a.c succesfully.\n");
+    printf("Emit a.c succesfully.\n");
 
     fclose(fw);
-    free((char*)cmod);
+    free((char*)buff);
     ir_mod_free(&ir_mod);
     file_unload(&file);
     return 0;
