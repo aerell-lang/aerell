@@ -6,7 +6,7 @@
 #include "aerell/file.h"
 #include "aerell/ir/ir_gen.h"
 #include "aerell/ir/mod/ir_mod.h"
-#include "aerell/llvm/llvm_ir_gen.h"
+#include "aerell/llvm/llvm_ir.h"
 // #include "aerell/c/c_emit.h"
 
 int main(int argc, const char* argv[])
@@ -35,8 +35,7 @@ int main(int argc, const char* argv[])
     // ir_mod_dump(&ir_mod);
 
     // LLVM
-    llvm_ir_gen_t llvm_ir_gen;
-    llvm_ir_gen_generate(&llvm_ir_gen, &ir_mod);
+    llvm_ir_generate(&ir_mod);
 
     // C
     // const char* buff = c_emit(&ir_mod);
