@@ -5,4 +5,4 @@
 
 #include "aerell/ir/mod/ir_mod.h"
 
-void llvm_ir_generate(const ir_mod_t* ir_mod);
+bool llvm_ir_generate(const ir_mod_t* ir_mod);
