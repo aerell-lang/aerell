@@ -8,6 +8,7 @@
 #include "aerell/ir/mod/ir_mod.h"
 #include "aerell/llvm/llvm_init.h"
 #include "aerell/llvm/llvm_ir.h"
+#include "aerell/llvm/llvm_ir_mod.h"
 // #include "aerell/c/c_emit.h"
 
 int main(int argc, const char* argv[])
@@ -37,6 +38,9 @@ int main(int argc, const char* argv[])
 
     // LLVM
     llvm_init();
+
+    llvm_ir_mod_t llvm_ir_mod = {0};
+    llvm_ir_mod_init(&llvm_ir_mod, file.path);
 
     if(!llvm_ir_generate(&ir_mod))
     {
@@ -71,6 +75,7 @@ int main(int argc, const char* argv[])
     // fclose(fw);
     // free((char*)buff);
 
+    llvm_ir_mod_free(&llvm_ir_mod);
     ir_mod_free(&ir_mod);
     file_unload(&file);
     return 0;

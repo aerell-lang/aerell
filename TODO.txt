@@ -1,5 +1,5 @@
 - [ ] LLVM IR
-    - [ ] llvm_ir_mod
+    - [X] llvm_ir_mod
 
 - [ ] LLVM ASM
 - [ ] LLVM Object
